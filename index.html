@@ -9,10 +9,12 @@
   <title>教師時間表 · 劉皇發中學</title>
   <style>
     :root {
+      /* 一般上課日（Day 1–4、6–9）— 藍 */
       --bg: #f0f4f8;
       --card: #ffffff;
       --primary: #1a4d8c;
       --primary-dark: #0f3460;
+      --primary-soft: #e8f0fe;
       --accent: #2d8a6e;
       --free: #e8f0fe;
       --free-border: #90b4e8;
@@ -28,7 +30,36 @@
       --danger: #c0392b;
       --radius: 12px;
       --shadow: 0 2px 12px rgba(26, 77, 140, 0.08);
+      --focus-ring: rgba(26, 77, 140, 0.15);
+      --header-shadow: rgba(15, 52, 96, 0.28);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --theme-transition: background .25s ease, border-color .25s ease, color .2s ease, box-shadow .25s ease;
+    }
+    /* BF 日（Day 5、10）— 綠 */
+    html[data-day-theme="bf"] {
+      --bg: #eef7f3;
+      --primary: #157a52;
+      --primary-dark: #0d5238;
+      --primary-soft: #e0f2ea;
+      --accent: #1b9a66;
+      --free: #e0f2ea;
+      --free-border: #7bc4a4;
+      --shadow: 0 2px 12px rgba(21, 122, 82, 0.10);
+      --focus-ring: rgba(21, 122, 82, 0.18);
+      --header-shadow: rgba(13, 82, 56, 0.30);
+    }
+    /* 假期／無上課 — 粉紅 */
+    html[data-day-theme="holiday"] {
+      --bg: #faf0f4;
+      --primary: #c2185b;
+      --primary-dark: #8e0e42;
+      --primary-soft: #fce4ec;
+      --accent: #d81b60;
+      --free: #fce4ec;
+      --free-border: #e891b0;
+      --shadow: 0 2px 12px rgba(194, 24, 91, 0.10);
+      --focus-ring: rgba(194, 24, 91, 0.18);
+      --header-shadow: rgba(142, 14, 66, 0.30);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
@@ -40,6 +71,7 @@
       line-height: 1.45;
       min-height: 100dvh;
       padding-bottom: calc(24px + var(--safe-bottom));
+      transition: background .25s ease;
     }
     header.app-header {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -48,7 +80,8 @@
       position: sticky;
       top: 0;
       z-index: 50;
-      box-shadow: 0 2px 16px rgba(0,0,0,.18);
+      box-shadow: 0 2px 16px var(--header-shadow);
+      transition: var(--theme-transition);
     }
     header h1 {
       font-size: 1.25rem;
@@ -125,7 +158,7 @@
     }
     input[type="text"]:focus, select:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(26,77,140,.15);
+      box-shadow: 0 0 0 3px var(--focus-ring);
     }
     button.btn {
       border: none;
@@ -154,11 +187,12 @@
 
     .teacher-banner {
       display: none;
-      background: linear-gradient(135deg, #e8f0fe, #f0faf6);
+      background: linear-gradient(135deg, var(--primary-soft), #fff);
       border: 1.5px solid var(--free-border);
       border-radius: var(--radius);
       padding: 12px 14px;
       margin-bottom: 12px;
+      transition: var(--theme-transition);
     }
     .teacher-banner.show { display: block; }
     .teacher-banner .code {
@@ -241,7 +275,7 @@
       margin-top: 10px;
       padding: 10px 12px;
       border-radius: 10px;
-      background: var(--primary-soft, #eef4ff);
+      background: var(--primary-soft);
       border: 1px solid var(--border);
       font-size: 0.9rem;
       line-height: 1.45;
@@ -332,6 +366,17 @@
     }
     .cal-banner .cal-sub { opacity: .85; font-weight: 500; font-size: 0.72rem; }
     .cal-banner.cal-off { background: rgba(0,0,0,.18); }
+    html[data-day-theme="bf"] .cal-banner:not(.cal-off) {
+      background: rgba(255,255,255,.16);
+      border-color: rgba(255,255,255,.28);
+    }
+    html[data-day-theme="holiday"] .cal-banner {
+      background: rgba(0,0,0,.14);
+      border-color: rgba(255,255,255,.28);
+    }
+    .tab, button.btn, .day-chip, .card h2, .teacher-banner .code {
+      transition: var(--theme-transition);
+    }
     .cal-banner .src-tag {
       font-size: 0.68rem;
       font-weight: 700;
@@ -1771,11 +1816,57 @@
   }
 
   /**
+   * Day-type theme for UI accents:
+   *   general — 一般上課日 (Day 1–4、6–9) → blue
+   *   bf      — BF 日 (Day 5、10) → green
+   *   holiday — 假期／無上課 → pink
+   */
+  function resolveCycleDayForTheme(ymd) {
+    ymd = ymd || state.browseDate || todayYmdHK();
+    if (ymd === todayYmdHK()) {
+      var r = resolveTodayCycle();
+      if (r.day != null) return { day: r.day, status: 'school' };
+      if (r.source === 'holiday' || r.source === 'missing') {
+        return { day: null, status: 'holiday' };
+      }
+      return { day: null, status: 'holiday' };
+    }
+    var info = lookupCalendarDate(ymd);
+    if (info.status === 'school' && info.day != null) {
+      return { day: info.day, status: 'school' };
+    }
+    return { day: null, status: 'holiday' };
+  }
+
+  function dayThemeId(ymd) {
+    var r = resolveCycleDayForTheme(ymd);
+    if (r.status !== 'school' || r.day == null) return 'holiday';
+    return scheduleIdForDay(r.day) === 'bf' ? 'bf' : 'general';
+  }
+
+  var THEME_COLORS = {
+    general: '#1a4d8c',
+    bf: '#157a52',
+    holiday: '#c2185b'
+  };
+
+  function applyDayTheme(ymd) {
+    var theme = dayThemeId(ymd);
+    var root = document.documentElement;
+    if (root.getAttribute('data-day-theme') !== theme) {
+      root.setAttribute('data-day-theme', theme);
+    }
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.general);
+  }
+
+  /**
    * Paint top header banner for the selected browse date (not only "today").
    * Shows calendar date + cycle day (or 無上課／假期). Banner is tappable → date picker.
    */
   function refreshCalBanner(ymd) {
     ymd = ymd || state.browseDate || todayYmdHK();
+    applyDayTheme(ymd);
     var info = lookupCalendarDate(ymd);
     var isToday = ymd === todayYmdHK();
     var wd = weekdayLabelHK(ymd);
