@@ -772,6 +772,35 @@
     .teacher-suggest button:last-child { border-bottom: none; }
 
 
+
+    /* Cover password gate (client-side only) */
+    .cover-gate-card .cover-gate-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .cover-gate-card input[type="password"] {
+      flex: 1;
+      min-width: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .cover-gate-card input[type="password"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+    .cover-gate-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    #coverUnlocked[hidden],
+    #coverGateCard[hidden] { display: none !important; }
+
     /* Cover / substitute assistant */
     .cover-controls {
       display: grid;
@@ -1409,6 +1438,19 @@
 
     <!-- Cover / substitute assistant -->
     <section class="panel" id="panel-cover">
+      <div class="card cover-gate-card" id="coverGateCard">
+        <h2>代堂助手</h2>
+        <p class="hint" style="margin-bottom:10px;">請輸入密碼以使用代堂助手。解鎖後本瀏覽器分頁／視窗有效（sessionStorage）。</p>
+        <label class="field-label" for="coverPassword">密碼</label>
+        <div class="cover-gate-row">
+          <input type="password" id="coverPassword" placeholder="輸入密碼…" autocomplete="current-password" />
+          <button class="btn" id="coverUnlockBtn" type="button">解鎖</button>
+        </div>
+        <div class="error-msg" id="coverGateError">密碼不正確，請再試。</div>
+        <p class="cover-gate-note">僅前端檢查，並非真正保安；請勿依賴此密碼保護敏感資料。</p>
+      </div>
+
+      <div id="coverUnlocked" hidden>
       <div class="card">
         <h2>代堂助手</h2>
         <p class="hint" style="margin-bottom:10px;">先揀缺席教師，再揀循環日（或跟頂部校曆日期），為當日每節課堂指派代堂老師同備註，最後匯出。</p>
@@ -1458,6 +1500,7 @@
         <pre class="cover-export-preview" id="coverExportPreview" aria-live="polite"></pre>
       </div>
       <div class="empty" id="coverEmpty">請先輸入缺席教師 ShortName，再按「載入課堂」。</div>
+      </div><!-- /#coverUnlocked -->
     </section>
 
 
@@ -2678,7 +2721,11 @@
       p.classList.toggle('active', p.id === 'panel-' + name);
     });
     if (name === 'nowfree') renderNowFree();
-    if (name === 'cover' && typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
+    if (name === 'cover') {
+      if (typeof applyCoverGate === 'function') applyCoverGate();
+      if (typeof isCoverUnlocked === 'function' && isCoverUnlocked() &&
+          typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
+    }
     if (name === 'cal' && typeof renderSchoolCal === 'function') renderSchoolCal();
   }
 
@@ -2729,6 +2776,70 @@
     suggestBox.classList.add('show');
   }
 
+
+  // --- Cover password gate (client-side only; not real security) ---
+  var COVER_GATE_KEY = 'lwfssCoverUnlocked';
+  var COVER_PASSWORD = '123';
+  var coverGateCard = document.getElementById('coverGateCard');
+  var coverUnlockedEl = document.getElementById('coverUnlocked');
+  var coverPassword = document.getElementById('coverPassword');
+  var coverUnlockBtn = document.getElementById('coverUnlockBtn');
+  var coverGateError = document.getElementById('coverGateError');
+
+  function isCoverUnlocked() {
+    try {
+      return sessionStorage.getItem(COVER_GATE_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setCoverUnlocked() {
+    try {
+      sessionStorage.setItem(COVER_GATE_KEY, '1');
+    } catch (e) { /* ignore quota / private mode */ }
+  }
+
+  function applyCoverGate() {
+    var unlocked = isCoverUnlocked();
+    if (coverGateCard) coverGateCard.hidden = unlocked;
+    if (coverUnlockedEl) coverUnlockedEl.hidden = !unlocked;
+    if (coverGateError) coverGateError.classList.remove('show');
+    if (!unlocked && coverPassword) {
+      coverPassword.value = '';
+      setTimeout(function () {
+        try { coverPassword.focus(); } catch (e) {}
+      }, 0);
+    }
+  }
+
+  function tryUnlockCover() {
+    var pw = coverPassword ? String(coverPassword.value || '') : '';
+    if (pw === COVER_PASSWORD) {
+      setCoverUnlocked();
+      applyCoverGate();
+      if (typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
+      return;
+    }
+    if (coverGateError) coverGateError.classList.add('show');
+    if (coverPassword) {
+      coverPassword.value = '';
+      coverPassword.focus();
+    }
+  }
+
+  if (coverUnlockBtn) {
+    coverUnlockBtn.addEventListener('click', tryUnlockCover);
+  }
+  if (coverPassword) {
+    coverPassword.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        tryUnlockCover();
+      }
+    });
+  }
+  applyCoverGate();
 
   // --- Cover / substitute assistant ---
   var coverDay = document.getElementById('coverDay');
