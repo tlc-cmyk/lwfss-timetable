@@ -269,20 +269,73 @@
     }
     .date-result.off .date-line { color: var(--muted); }
 
-    .cal-banner {
+    .cal-banner-wrap {
       margin-top: 10px;
-      padding: 8px 12px;
-      border-radius: 10px;
+      position: relative;
+    }
+    .cal-banner {
+      margin-top: 0;
+      padding: 10px 12px;
+      border-radius: 12px;
       background: rgba(255,255,255,.14);
       font-size: 0.88rem;
       font-weight: 600;
       display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 1.5px solid rgba(255,255,255,.22);
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      font-family: inherit;
+      transition: background .15s, border-color .15s, transform .1s;
+    }
+    .cal-banner:hover, .cal-banner:focus-visible {
+      background: rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.4);
+      outline: none;
+    }
+    .cal-banner:active { transform: scale(.985); }
+    .cal-banner-body {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .cal-banner .cal-date-line {
+      font-size: 0.78rem;
+      font-weight: 600;
+      opacity: .9;
+      letter-spacing: .01em;
+      display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
-    .cal-banner .cal-main { font-size: 0.95rem; }
-    .cal-banner .cal-sub { opacity: .85; font-weight: 500; font-size: 0.78rem; }
+    .cal-banner .cal-today-pill {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.28);
+    }
+    .cal-banner .cal-main {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .cal-banner .cal-sub-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 1px;
+    }
+    .cal-banner .cal-sub { opacity: .85; font-weight: 500; font-size: 0.72rem; }
     .cal-banner.cal-off { background: rgba(0,0,0,.18); }
     .cal-banner .src-tag {
       font-size: 0.68rem;
@@ -290,6 +343,36 @@
       padding: 2px 7px;
       border-radius: 999px;
       background: rgba(255,255,255,.22);
+    }
+    .cal-banner-affordance {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      opacity: .92;
+      min-width: 2.2rem;
+    }
+    .cal-banner-affordance .cal-icon { font-size: 1.15rem; line-height: 1; }
+    .cal-banner-affordance .cal-tap-hint {
+      font-size: 0.62rem;
+      font-weight: 700;
+      opacity: .85;
+      white-space: nowrap;
+    }
+    .cal-banner-date-input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      pointer-events: none;
+      font-size: 16px; /* avoid iOS zoom */
     }
 
     .duty-banner {
@@ -377,7 +460,7 @@
     .lesson-list { display: flex; flex-direction: column; gap: 8px; }
     .lesson {
       display: grid;
-      grid-template-columns: 52px 1fr;
+      grid-template-columns: 76px 1fr;
       gap: 10px;
       align-items: stretch;
       border-radius: 10px;
@@ -397,11 +480,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,.06);
+      background: rgba(26, 77, 140, .1);
       font-weight: 800;
-      font-size: 1.05rem;
-      padding: 10px 4px;
+      font-size: 1.1rem;
+      padding: 10px 6px;
       color: var(--primary-dark);
+      gap: 2px;
+    }
+    .period-badge .period-num {
+      font-size: 1.1rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
     }
     .period-badge small {
       font-size: 0.65rem;
@@ -409,25 +499,65 @@
       opacity: .7;
     }
     .period-badge .bell-time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+      line-height: 1.2;
+    }
+    .period-badge .bell-time .t-start,
+    .period-badge .bell-time .t-end {
       display: block;
-      font-size: 0.58rem;
-      font-weight: 700;
-      line-height: 1.15;
-      margin-top: 3px;
-      opacity: .85;
-      letter-spacing: -0.02em;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.01em;
       white-space: nowrap;
     }
+    .period-badge .bell-time .t-sep {
+      display: block;
+      font-size: 0.55rem;
+      font-weight: 700;
+      opacity: .55;
+      line-height: 1;
+      margin: 1px 0;
+    }
+    .lesson-time-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      margin-right: 6px;
+      padding: 3px 9px;
+      border-radius: 8px;
+      background: rgba(26, 77, 140, .12);
+      color: var(--primary-dark);
+      font-size: 0.88rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+      vertical-align: middle;
+    }
+    .lesson.free .lesson-time-chip {
+      background: rgba(26, 77, 140, .08);
+      color: var(--primary);
+    }
     .ov-cell .bell-time {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--muted);
-      margin-top: 1px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-top: 3px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
     }
     .day-bell-label {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
       margin: -4px 0 10px;
     }
     .lesson-body { padding: 10px 10px 10px 0; }
@@ -679,10 +809,22 @@
   <header class="app-header">
     <div class="school" id="schoolName">世界龍岡學校劉皇發中學</div>
     <h1>教師時間表</h1>
-    <div class="cal-banner" id="calBanner">
-      <span class="cal-main" id="calBannerMain">載入校曆…</span>
-      <span class="src-tag" id="calBannerSrc" hidden></span>
-      <span class="cal-sub" id="calBannerSub"></span>
+    <div class="cal-banner-wrap">
+      <button type="button" class="cal-banner" id="calBanner" aria-label="點擊選擇校曆日期">
+        <span class="cal-banner-body">
+          <span class="cal-date-line" id="calBannerDate">載入中…</span>
+          <span class="cal-main" id="calBannerMain">載入校曆…</span>
+          <span class="cal-sub-row">
+            <span class="src-tag" id="calBannerSrc" hidden></span>
+            <span class="cal-sub" id="calBannerSub"></span>
+          </span>
+        </span>
+        <span class="cal-banner-affordance" aria-hidden="true">
+          <span class="cal-icon">📅</span>
+          <span class="cal-tap-hint">改日期</span>
+        </span>
+      </button>
+      <input type="date" id="headerDateInput" class="cal-banner-date-input" tabindex="-1" aria-hidden="true" />
     </div>
     <div class="duty-banner" id="dutyBanner">
       <span class="duty-main" id="dutyBannerMain">載入當值…</span>
@@ -1035,6 +1177,8 @@
   var calBannerMain = document.getElementById('calBannerMain');
   var calBannerSub = document.getElementById('calBannerSub');
   var calBannerSrc = document.getElementById('calBannerSrc');
+  var calBannerDate = document.getElementById('calBannerDate');
+  var headerDateInput = document.getElementById('headerDateInput');
   var adminPin = document.getElementById('adminPin');
   var adminOverrideDay = document.getElementById('adminOverrideDay');
   var adminSaveBtn = document.getElementById('adminSaveBtn');
@@ -1087,10 +1231,24 @@
   }
 
   function periodBadgeHtml(d, p) {
+    var bell = periodBell(d, p);
+    var html = '<div class="period-badge"><span class="period-num">P' + p + '</span>';
+    if (bell && bell.start && bell.end) {
+      html += '<span class="bell-time">' +
+        '<span class="t-start">' + bell.start + '</span>' +
+        '<span class="t-sep">▾</span>' +
+        '<span class="t-end">' + bell.end + '</span>' +
+        '</span>';
+    } else {
+      html += '<small>節</small>';
+    }
+    return html + '</div>';
+  }
+
+  function lessonTimeChipHtml(d, p) {
     var range = formatBellRange(periodBell(d, p));
-    return '<div class="period-badge">P' + p +
-      (range ? '<span class="bell-time">' + range + '</span>' : '<small>節</small>') +
-      '</div>';
+    if (!range) return '';
+    return '<span class="lesson-time-chip" aria-label="上課時間">' + range + '</span>';
   }
 
   function subjClass(short) {
@@ -1162,6 +1320,8 @@
     if (!ymd) return;
     if (browseDateInput && browseDateInput.value !== ymd) browseDateInput.value = ymd;
     if (cycleDateInput && cycleDateInput.value !== ymd) cycleDateInput.value = ymd;
+    if (dutyDateInput && dutyDateInput.value !== ymd) dutyDateInput.value = ymd;
+    if (headerDateInput && headerDateInput.value !== ymd) headerDateInput.value = ymd;
   }
 
 
@@ -1312,6 +1472,7 @@
     paint(cycleDateResult, cycleDateLabelEl, cycleDateCycle);
     paintDutyLine(browseDateDuty, info.ymd);
     paintDutyLine(cycleDateDuty, info.ymd);
+    refreshCalBanner(info.ymd);
     refreshDutyBanner(info.ymd);
     refreshDutyPanel(info.ymd);
   }
@@ -1431,33 +1592,115 @@
     setLocalManualOverride(day);
   }
 
-  function refreshCycleUI() {
-    var r = resolveTodayCycle();
-    var ymd = r.ymd;
+  /**
+   * Paint top header banner for the selected browse date (not only "today").
+   * Shows calendar date + cycle day (or 無上課／假期). Banner is tappable → date picker.
+   */
+  function refreshCalBanner(ymd) {
+    ymd = ymd || state.browseDate || todayYmdHK();
+    var info = lookupCalendarDate(ymd);
+    var isToday = ymd === todayYmdHK();
+    var wd = weekdayLabelHK(ymd);
+    var nice = formatYmdZh(ymd);
+    var dateLine = nice + (wd ? '（' + wd + '）' : '');
+    if (calBannerDate) {
+      calBannerDate.textContent = '';
+      var dateSpan = document.createElement('span');
+      dateSpan.textContent = dateLine;
+      calBannerDate.appendChild(dateSpan);
+      if (isToday) {
+        var pill = document.createElement('span');
+        pill.className = 'cal-today-pill';
+        pill.textContent = '今日';
+        calBannerDate.appendChild(pill);
+      }
+    }
     var main = '';
-    var sub = ymd + '（香港時間）';
-    if (r.day != null) {
-      main = '今日校曆：循環日 ' + r.day;
-      todayCycleLabel.textContent = '循環日 ' + r.day;
-      gotoTodayBtn.hidden = false;
+    var sub = '';
+    var srcLabel = '校曆';
+    if (info.status === 'school' && info.day != null) {
+      var sched = scheduleForDay(info.day);
+      main = '循環日 Day ' + info.day;
+      if (sched && sched.label) sub = sched.label;
       if (calBanner) calBanner.classList.remove('cal-off');
-    } else if (r.source === 'holiday' || r.source === 'missing') {
-      main = '今日無上課／假期';
-      todayCycleLabel.textContent = '無上課／假期';
-      gotoTodayBtn.hidden = true;
+    } else if (info.status === 'holiday') {
+      main = '無上課／假期';
+      sub = isToday ? '今日無正規循環日課' : '是日無正規循環日課';
+      if (calBanner) calBanner.classList.add('cal-off');
+    } else if (info.status === 'missing') {
+      main = '校曆無此日期';
+      sub = ymd;
       if (calBanner) calBanner.classList.add('cal-off');
     } else {
-      main = '今日循環日未決定';
-      todayCycleLabel.textContent = '未設定';
-      gotoTodayBtn.hidden = true;
+      main = '循環日未決定';
+      sub = ymd;
       if (calBanner) calBanner.classList.add('cal-off');
+    }
+    // If selected date is today and overrides apply, reflect that in source tag
+    if (isToday) {
+      var r = resolveTodayCycle();
+      if (r.day != null && info.status === 'school') {
+        // overrides may change today's day vs raw calendar
+        if (r.source !== 'calendar' && r.source !== 'holiday' && r.source !== 'missing') {
+          main = '循環日 Day ' + r.day;
+          srcLabel = r.label;
+          var sched2 = scheduleForDay(r.day);
+          sub = (sched2 && sched2.label) ? sched2.label : sub;
+          if (calBanner) calBanner.classList.remove('cal-off');
+        } else {
+          srcLabel = r.label || '校曆';
+        }
+      } else if (r.day == null && (r.source === 'holiday' || r.source === 'missing')) {
+        srcLabel = r.label || '校曆';
+      } else if (r.day != null) {
+        main = '循環日 Day ' + r.day;
+        srcLabel = r.label;
+        if (calBanner) calBanner.classList.remove('cal-off');
+      }
     }
     if (calBannerMain) calBannerMain.textContent = main;
     if (calBannerSub) calBannerSub.textContent = sub;
     if (calBannerSrc) {
       calBannerSrc.hidden = false;
-      calBannerSrc.textContent = r.label;
+      calBannerSrc.textContent = srcLabel;
     }
+    if (calBanner) {
+      calBanner.setAttribute(
+        'aria-label',
+        '選取日期 ' + dateLine + '，' + main + '。點擊更改日期'
+      );
+    }
+  }
+
+  function openHeaderDatePicker() {
+    if (!headerDateInput) return;
+    var ymd = state.browseDate || todayYmdHK();
+    if (headerDateInput.value !== ymd) headerDateInput.value = ymd;
+    try {
+      if (typeof headerDateInput.showPicker === 'function') {
+        headerDateInput.showPicker();
+        return;
+      }
+    } catch (e) { /* fall through */ }
+    headerDateInput.focus();
+    headerDateInput.click();
+  }
+
+  function refreshCycleUI() {
+    var r = resolveTodayCycle();
+    var ymd = r.ymd;
+    if (r.day != null) {
+      todayCycleLabel.textContent = '循環日 ' + r.day;
+      gotoTodayBtn.hidden = false;
+    } else if (r.source === 'holiday' || r.source === 'missing') {
+      todayCycleLabel.textContent = '無上課／假期';
+      gotoTodayBtn.hidden = true;
+    } else {
+      todayCycleLabel.textContent = '未設定';
+      gotoTodayBtn.hidden = true;
+    }
+    // Keep top banner in sync with selected browse date (defaults to today)
+    refreshCalBanner(state.browseDate || ymd);
     if (cycleAutoInfo) {
       if (r.day != null) {
         cycleAutoInfo.textContent = '今日（' + ymd + '）：循環日 Day ' + r.day + ' · 來源：' + r.label;
@@ -1583,6 +1826,7 @@
             '<div class="detail">' + esc(L.classShort || L.class) +
               (L.subject !== L.subjectShort && L.subject ? ' · <span title="' + esc(L.subject) + '">完整代碼</span>' : '') +
             '</div>' +
+            lessonTimeChipHtml(d, p) +
             (L.room ? '<span class="room">' + esc(L.room) + '</span>' : '') +
           '</div>';
         if (L.subject !== L.subjectShort && L.subject) {
@@ -1592,7 +1836,9 @@
         el.className = 'lesson free';
         el.innerHTML =
           periodBadgeHtml(d, p) +
-          '<div class="lesson-body"><div class="subj">空堂</div></div>';
+          '<div class="lesson-body"><div class="subj">空堂</div>' +
+            lessonTimeChipHtml(d, p) +
+          '</div>';
       }
       lessonList.appendChild(el);
     }
@@ -2167,6 +2413,17 @@
 
   function onDatePicked(ymd) {
     applyBrowseDate(ymd);
+  }
+
+  if (calBanner) {
+    calBanner.addEventListener('click', function () {
+      openHeaderDatePicker();
+    });
+  }
+  if (headerDateInput) {
+    headerDateInput.addEventListener('change', function () {
+      if (headerDateInput.value) onDatePicked(headerDateInput.value);
+    });
   }
 
   if (browseDateInput) {
