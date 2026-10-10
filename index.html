@@ -50,15 +50,9 @@
       z-index: 50;
       box-shadow: 0 2px 16px rgba(0,0,0,.18);
     }
-    header .school {
-      font-size: 0.75rem;
-      opacity: .85;
-      letter-spacing: .02em;
-    }
     header h1 {
       font-size: 1.25rem;
       font-weight: 700;
-      margin-top: 2px;
     }
     .wrap { max-width: 720px; margin: 0 auto; padding: 12px 14px; }
 
@@ -400,12 +394,6 @@
       gap: 6px 10px;
     }
     .duty-banner .duty-main { font-size: 0.92rem; }
-    .duty-banner .duty-hint {
-      opacity: .8;
-      font-weight: 500;
-      font-size: 0.72rem;
-      width: 100%;
-    }
     .duty-banner.duty-off { background: rgba(0,0,0,.16); opacity: .92; }
     .date-result .duty-line {
       margin-top: 4px;
@@ -930,7 +918,6 @@
 </head>
 <body>
   <header class="app-header">
-    <div class="school" id="schoolName">世界龍岡學校劉皇發中學</div>
     <h1>教師時間表</h1>
     <div class="live-clock" id="liveClock" aria-live="polite">
       <span>香港時間</span>
@@ -958,7 +945,6 @@
     </div>
     <div class="duty-banner" id="dutyBanner">
       <span class="duty-main" id="dutyBannerMain">載入當值…</span>
-      <span class="duty-hint" id="dutyBannerHint"></span>
     </div>
   </header>
 
@@ -975,7 +961,6 @@
         </div>
         <button class="btn" id="lookupBtn" type="button">查詢</button>
       </div>
-      <div class="hint">不區分大小寫 · 資料已內嵌，可離線使用</div>
       <div class="error-msg" id="lookupError">找不到此教師代碼，請再試。</div>
     </div>
 
@@ -1260,7 +1245,6 @@
   var cycleDateDuty = document.getElementById('cycleDateDuty');
   var dutyBanner = document.getElementById('dutyBanner');
   var dutyBannerMain = document.getElementById('dutyBannerMain');
-  var dutyBannerHint = document.getElementById('dutyBannerHint');
   var dutyDateInput = document.getElementById('dutyDateInput');
   var dutyDateTodayBtn = document.getElementById('dutyDateTodayBtn');
   var dutyDateResult = document.getElementById('dutyDateResult');
@@ -1308,7 +1292,6 @@
     teacherList.appendChild(opt);
   });
 
-  document.getElementById('schoolName').textContent = DATA.meta.school || '世界龍岡學校劉皇發中學';
   var calYear = (CAL && CAL.meta && CAL.meta.schoolYear) ? CAL.meta.schoolYear : '';
   document.getElementById('appFooter').textContent =
     DATA.meta.school + ' · ' + DATA.meta.teacherCount + ' 位教師 · 校曆 ' + calYear +
@@ -1574,14 +1557,6 @@
     } else {
       dutyBannerMain.textContent = d.text;
       if (dutyBanner) dutyBanner.classList.add('duty-off');
-    }
-    if (dutyBannerHint) {
-      var roles = (DUTY && DUTY.meta && DUTY.meta.roles) || null;
-      if (roles) {
-        dutyBannerHint.textContent = 'T1 校門檢查／T2 巡堂 · ' + (DUTY.meta.title || '當值表');
-      } else {
-        dutyBannerHint.textContent = DUTY ? (DUTY.meta && DUTY.meta.title) || '' : '未載入當值資料';
-      }
     }
   }
 
