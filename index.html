@@ -456,22 +456,23 @@
       margin-bottom: 6px;
     }
 
-    /* Lesson cards */
-    .lesson-list { display: flex; flex-direction: column; gap: 8px; }
+    /* Lesson cards — mobile-first: left period+time, right subject */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
     .lesson {
       display: grid;
-      grid-template-columns: 76px 1fr;
-      gap: 10px;
+      grid-template-columns: 102px 1fr;
+      gap: 0;
       align-items: stretch;
-      border-radius: 10px;
+      border-radius: 14px;
       border: 1.5px solid var(--lesson-border);
       background: var(--lesson);
       overflow: hidden;
+      box-shadow: 0 1px 4px rgba(26, 77, 140, 0.06);
     }
     .lesson.free {
       background: var(--free);
       border-color: var(--free-border);
-      opacity: .92;
+      box-shadow: none;
     }
     .lesson.subj-ict { background: var(--ict); border-color: var(--ict-border); }
     .lesson.subj-math { background: var(--math); border-color: var(--math-border); }
@@ -480,107 +481,131 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(26, 77, 140, .1);
-      font-weight: 800;
-      font-size: 1.1rem;
-      padding: 10px 6px;
+      background: #e8eef8;
+      padding: 14px 8px;
       color: var(--primary-dark);
-      gap: 2px;
+      gap: 8px;
+      border-right: 1px solid rgba(26, 77, 140, .16);
+      min-height: 84px;
+    }
+    .lesson.free .period-badge {
+      background: #e3edf8;
+      border-right-color: rgba(144, 180, 232, .55);
     }
     .period-badge .period-num {
-      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.5rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.85rem;
       font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+      box-shadow: 0 1px 2px rgba(15, 52, 96, .2);
+    }
+    .lesson.free .period-badge .period-num {
+      background: #4a6f9a;
     }
     .period-badge small {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 600;
-      opacity: .7;
+      color: var(--muted);
     }
     .period-badge .bell-time {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0;
-      margin-top: 4px;
+      gap: 1px;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum";
-      line-height: 1.2;
+      line-height: 1.15;
     }
     .period-badge .bell-time .t-start,
     .period-badge .bell-time .t-end {
       display: block;
-      font-size: 0.82rem;
+      font-size: 1.08rem;
       font-weight: 800;
-      color: var(--primary-dark);
-      letter-spacing: -0.01em;
+      color: #0a2a4d;
+      letter-spacing: -0.02em;
       white-space: nowrap;
     }
     .period-badge .bell-time .t-sep {
       display: block;
-      font-size: 0.55rem;
-      font-weight: 700;
-      opacity: .55;
-      line-height: 1;
-      margin: 1px 0;
-    }
-    .lesson-time-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 6px;
-      margin-right: 6px;
-      padding: 3px 9px;
-      border-radius: 8px;
-      background: rgba(26, 77, 140, .12);
-      color: var(--primary-dark);
-      font-size: 0.88rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.01em;
-      vertical-align: middle;
-    }
-    .lesson.free .lesson-time-chip {
-      background: rgba(26, 77, 140, .08);
-      color: var(--primary);
+      width: 14px;
+      height: 2px;
+      margin: 3px 0;
+      border-radius: 2px;
+      background: rgba(26, 77, 140, .35);
+      font-size: 0;
+      line-height: 0;
+      overflow: hidden;
     }
     .ov-cell .bell-time {
-      font-size: 0.82rem;
+      font-size: 0.88rem;
       font-weight: 800;
       color: var(--primary-dark);
-      margin-top: 3px;
+      margin-top: 4px;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.01em;
       line-height: 1.2;
     }
     .day-bell-label {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--primary);
-      margin: -4px 0 10px;
+      margin: 2px 0 12px;
     }
-    .lesson-body { padding: 10px 10px 10px 0; }
+    .lesson-body {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+    }
     .lesson-body .subj {
       font-weight: 800;
-      font-size: 1.05rem;
+      font-size: 1.15rem;
+      color: var(--text);
+      line-height: 1.2;
     }
     .lesson-body .detail {
-      font-size: 0.88rem;
-      color: var(--muted);
-      margin-top: 2px;
+      font-size: 0.95rem;
+      color: #3d4f63;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .lesson-body .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
     }
     .lesson-body .room {
       display: inline-block;
-      margin-top: 4px;
-      background: rgba(255,255,255,.7);
-      border-radius: 6px;
-      padding: 2px 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      background: #fff;
+      border: 1px solid rgba(26, 77, 140, .18);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
       color: var(--primary-dark);
     }
-    .lesson.free .subj { color: var(--muted); font-weight: 600; font-size: 0.95rem; }
+    .lesson.free .subj {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .lesson.free .lesson-body .detail-free {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
 
     .day-title {
       font-size: 1.05rem;
@@ -1234,21 +1259,15 @@
     var bell = periodBell(d, p);
     var html = '<div class="period-badge"><span class="period-num">P' + p + '</span>';
     if (bell && bell.start && bell.end) {
-      html += '<span class="bell-time">' +
+      html += '<span class="bell-time" aria-label="' + bell.start + ' 至 ' + bell.end + '">' +
         '<span class="t-start">' + bell.start + '</span>' +
-        '<span class="t-sep">▾</span>' +
+        '<span class="t-sep" aria-hidden="true">–</span>' +
         '<span class="t-end">' + bell.end + '</span>' +
         '</span>';
     } else {
       html += '<small>節</small>';
     }
     return html + '</div>';
-  }
-
-  function lessonTimeChipHtml(d, p) {
-    var range = formatBellRange(periodBell(d, p));
-    if (!range) return '';
-    return '<span class="lesson-time-chip" aria-label="上課時間">' + range + '</span>';
   }
 
   function subjClass(short) {
@@ -1805,7 +1824,13 @@
       bellLabelEl = document.createElement('div');
       bellLabelEl.id = 'dayBellLabel';
       bellLabelEl.className = 'day-bell-label';
-      dayTitle.parentNode.insertBefore(bellLabelEl, dayTitle.nextSibling);
+      // Place below the whole .day-title row (not inside it)
+      var titleRow = dayTitle.parentNode;
+      if (titleRow && titleRow.parentNode) {
+        titleRow.parentNode.insertBefore(bellLabelEl, titleRow.nextSibling);
+      } else {
+        dayTitle.parentNode.insertBefore(bellLabelEl, dayTitle.nextSibling);
+      }
     }
     bellLabelEl.textContent = sched && sched.label ? ('鐘聲：' + sched.label) : '';
     Array.prototype.forEach.call(dayChips.querySelectorAll('.day-chip'), function (chip) {
@@ -1823,11 +1848,10 @@
           periodBadgeHtml(d, p) +
           '<div class="lesson-body">' +
             '<div class="subj">' + esc(L.subjectShort || L.subject) + '</div>' +
-            '<div class="detail">' + esc(L.classShort || L.class) +
-              (L.subject !== L.subjectShort && L.subject ? ' · <span title="' + esc(L.subject) + '">完整代碼</span>' : '') +
-            '</div>' +
-            lessonTimeChipHtml(d, p) +
-            (L.room ? '<span class="room">' + esc(L.room) + '</span>' : '') +
+            '<div class="detail">' + esc(L.classShort || L.class) + '</div>' +
+            (L.room
+              ? '<div class="meta-row"><span class="room">' + esc(L.room) + '</span></div>'
+              : '') +
           '</div>';
         if (L.subject !== L.subjectShort && L.subject) {
           el.title = L.subject;
@@ -1836,8 +1860,9 @@
         el.className = 'lesson free';
         el.innerHTML =
           periodBadgeHtml(d, p) +
-          '<div class="lesson-body"><div class="subj">空堂</div>' +
-            lessonTimeChipHtml(d, p) +
+          '<div class="lesson-body">' +
+            '<div class="subj">空堂</div>' +
+            '<div class="detail-free">Free period</div>' +
           '</div>';
       }
       lessonList.appendChild(el);
