@@ -1,0 +1,6 @@
+{
+  "overrideDay": null,
+  "pin": "1234",
+  "updated": null,
+  "note": "IT：若要全校強制指定今日循環日，將 overrideDay 設為 1–10（數字），並更新 updated（ISO 日期時間）。設為 null 則使用校曆 calendar.json 自動判斷。PIN 用於網頁「管理員覆寫」本機暫存（非伺服器端驗證）。"
+}
