@@ -13,7 +13,19 @@
    - **搜尋課室／班別**：例如搜 `604`、`5A`、`COMPUTER`。
    - **今日循環日**：預設跟校曆自動顯示「今日校曆：循環日 X」或「今日無上課／假期」；可選本機手動覆寫。
 
-不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`。
+不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`，鐘聲時間內嵌於 `bells.js`。
+
+
+## 鐘聲時間（上課時間表）
+
+循環日會自動套用對應鐘聲：
+
+| 循環日 | 時間表 |
+|--------|--------|
+| Day 1–4、6–9 | **一般上課時間** |
+| Day 5、10 | **BF 上課時間表** |
+
+各節開始／結束時間會顯示於「循環日課表」、全日概覽與代堂助手的節數選單。完整時段（含早會、小息、午飯、閱讀時段）見 `bells.json`。
 
 ## 今日循環日如何決定
 
@@ -81,10 +93,13 @@ python3 -m http.server 8765
 | `index.html` | 單頁應用 |
 | `data.js` / `data.json` | 時間表 |
 | `calendar.js` / `calendar.json` | 校曆循環日 |
+| `bells.js` / `bells.json` | 一般／BF 鐘聲時間 |
 | `cycle-config.json` | 可選全校覆寫 |
 | `README.md` | 說明 |
 
-**注意：** 本環境未能以已登入的 GitHub／Surge／Cloudflare 帳號代為公開部署；請 IT 將資料夾或 zip 上傳至學校選用的靜態托管。
+公開網址（GitHub Pages）：https://tlc-cmyk.github.io/lwfss-timetable/
+
+亦可將整個資料夾或 zip 上傳至學校其他靜態托管。
 
 ## 更新時間表資料（從 Google Sheet）
 
@@ -109,6 +124,7 @@ Sheet 格式：每行一位教師；欄位 `ShortName, EngName, ChiName`，其�
 | `index.html` | 單頁應用（UI／邏輯） |
 | `data.js` / `data.json` | 時間表 |
 | `calendar.js` / `calendar.json` | 校曆日期 → 循環日 |
+| `bells.js` / `bells.json` | 一般／BF 鐘聲時間 |
 | `cycle-config.json` | 全校循環日覆寫（可選） |
 | `calendar-2026-2027.txt` | 校曆文字來源（供重建） |
 | `scripts/build_data.py` | 由 Sheet 匯出重建時間表 |

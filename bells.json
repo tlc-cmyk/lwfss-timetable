@@ -1,0 +1,280 @@
+{
+  "meta": {
+    "school": "世界龍岡學校劉皇發中學",
+    "note": "一般上課時間用於循環日 1–4、6–9；BF 上課時間表用於循環日 5、10。特別上課時間表未納入本應用。",
+    "source": "教師時間表鐘聲時間欄（一般／BF）"
+  },
+  "byCycleDay": {
+    "1": "general",
+    "2": "general",
+    "3": "general",
+    "4": "general",
+    "5": "bf",
+    "6": "general",
+    "7": "general",
+    "8": "general",
+    "9": "general",
+    "10": "bf"
+  },
+  "schedules": {
+    "general": {
+      "id": "general",
+      "label": "一般上課時間",
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        9
+      ],
+      "slots": [
+        {
+          "key": "homeroom",
+          "label": "班主任／早會",
+          "start": "07:55",
+          "end": "08:30",
+          "period": null
+        },
+        {
+          "key": "p1",
+          "label": "第1節",
+          "start": "08:30",
+          "end": "09:15",
+          "period": 1
+        },
+        {
+          "key": "p2",
+          "label": "第2節",
+          "start": "09:15",
+          "end": "10:00",
+          "period": 2
+        },
+        {
+          "key": "recess",
+          "label": "小息",
+          "start": "10:00",
+          "end": "10:20",
+          "period": null
+        },
+        {
+          "key": "p3",
+          "label": "第3節",
+          "start": "10:20",
+          "end": "11:05",
+          "period": 3
+        },
+        {
+          "key": "p4",
+          "label": "第4節",
+          "start": "11:05",
+          "end": "11:50",
+          "period": 4
+        },
+        {
+          "key": "p5",
+          "label": "第5節",
+          "start": "11:50",
+          "end": "12:35",
+          "period": 5
+        },
+        {
+          "key": "lunch",
+          "label": "午飯",
+          "start": "12:35",
+          "end": "13:45",
+          "period": null
+        },
+        {
+          "key": "reading",
+          "label": "閱讀時段",
+          "start": "13:45",
+          "end": "14:05",
+          "period": null
+        },
+        {
+          "key": "p6",
+          "label": "第6節",
+          "start": "14:05",
+          "end": "14:50",
+          "period": 6
+        },
+        {
+          "key": "p7",
+          "label": "第7節",
+          "start": "14:50",
+          "end": "15:35",
+          "period": 7
+        }
+      ],
+      "periods": {
+        "1": {
+          "start": "08:30",
+          "end": "09:15",
+          "label": "第1節"
+        },
+        "2": {
+          "start": "09:15",
+          "end": "10:00",
+          "label": "第2節"
+        },
+        "3": {
+          "start": "10:20",
+          "end": "11:05",
+          "label": "第3節"
+        },
+        "4": {
+          "start": "11:05",
+          "end": "11:50",
+          "label": "第4節"
+        },
+        "5": {
+          "start": "11:50",
+          "end": "12:35",
+          "label": "第5節"
+        },
+        "6": {
+          "start": "14:05",
+          "end": "14:50",
+          "label": "第6節"
+        },
+        "7": {
+          "start": "14:50",
+          "end": "15:35",
+          "label": "第7節"
+        }
+      }
+    },
+    "bf": {
+      "id": "bf",
+      "label": "BF 上課時間表",
+      "days": [
+        5,
+        10
+      ],
+      "slots": [
+        {
+          "key": "homeroom",
+          "label": "班主任／早會",
+          "start": "07:55",
+          "end": "08:30",
+          "period": null
+        },
+        {
+          "key": "p1",
+          "label": "第1節",
+          "start": "08:30",
+          "end": "09:15",
+          "period": 1
+        },
+        {
+          "key": "p2",
+          "label": "第2節",
+          "start": "09:15",
+          "end": "10:00",
+          "period": 2
+        },
+        {
+          "key": "recess",
+          "label": "小息",
+          "start": "10:00",
+          "end": "10:20",
+          "period": null
+        },
+        {
+          "key": "p3",
+          "label": "第3節",
+          "start": "10:20",
+          "end": "11:05",
+          "period": 3
+        },
+        {
+          "key": "p4",
+          "label": "第4節",
+          "start": "11:05",
+          "end": "11:50",
+          "period": 4
+        },
+        {
+          "key": "p5",
+          "label": "第5節",
+          "start": "11:50",
+          "end": "12:35",
+          "period": 5
+        },
+        {
+          "key": "lunch",
+          "label": "午飯",
+          "start": "12:35",
+          "end": "13:45",
+          "period": null
+        },
+        {
+          "key": "p6",
+          "label": "第6節",
+          "start": "13:45",
+          "end": "14:30",
+          "period": 6
+        },
+        {
+          "key": "p7",
+          "label": "第7節",
+          "start": "14:30",
+          "end": "15:15",
+          "period": 7
+        },
+        {
+          "key": "p8",
+          "label": "第8節（BF）",
+          "start": "15:15",
+          "end": "16:45",
+          "period": 8
+        }
+      ],
+      "periods": {
+        "1": {
+          "start": "08:30",
+          "end": "09:15",
+          "label": "第1節"
+        },
+        "2": {
+          "start": "09:15",
+          "end": "10:00",
+          "label": "第2節"
+        },
+        "3": {
+          "start": "10:20",
+          "end": "11:05",
+          "label": "第3節"
+        },
+        "4": {
+          "start": "11:05",
+          "end": "11:50",
+          "label": "第4節"
+        },
+        "5": {
+          "start": "11:50",
+          "end": "12:35",
+          "label": "第5節"
+        },
+        "6": {
+          "start": "13:45",
+          "end": "14:30",
+          "label": "第6節"
+        },
+        "7": {
+          "start": "14:30",
+          "end": "15:15",
+          "label": "第7節"
+        },
+        "8": {
+          "start": "15:15",
+          "end": "16:45",
+          "label": "第8節（BF）"
+        }
+      }
+    }
+  }
+}

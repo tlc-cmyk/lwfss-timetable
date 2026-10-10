@@ -308,6 +308,28 @@
       font-weight: 600;
       opacity: .7;
     }
+    .period-badge .bell-time {
+      display: block;
+      font-size: 0.58rem;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-top: 3px;
+      opacity: .85;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .ov-cell .bell-time {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .day-bell-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin: -4px 0 10px;
+    }
     .lesson-body { padding: 10px 10px 10px 0; }
     .lesson-body .subj {
       font-weight: 800;
@@ -765,6 +787,7 @@
 
   <script src="data.js"></script>
   <script src="calendar.js"></script>
+  <script src="bells.js"></script>
   <script>
 (function () {
   'use strict';
@@ -853,6 +876,36 @@
 
   function periodsForDay(d) {
     return (d === 5 || d === 10) ? 8 : 7;
+  }
+
+  var BELLS = window.BELLS_DATA || null;
+
+  function scheduleIdForDay(d) {
+    if (!BELLS || !BELLS.byCycleDay) return (d === 5 || d === 10) ? 'bf' : 'general';
+    return BELLS.byCycleDay[String(d)] || ((d === 5 || d === 10) ? 'bf' : 'general');
+  }
+
+  function scheduleForDay(d) {
+    if (!BELLS || !BELLS.schedules) return null;
+    return BELLS.schedules[scheduleIdForDay(d)] || null;
+  }
+
+  function periodBell(d, p) {
+    var sched = scheduleForDay(d);
+    if (!sched || !sched.periods) return null;
+    return sched.periods[String(p)] || null;
+  }
+
+  function formatBellRange(bell) {
+    if (!bell || !bell.start || !bell.end) return '';
+    return bell.start + '–' + bell.end;
+  }
+
+  function periodBadgeHtml(d, p) {
+    var range = formatBellRange(periodBell(d, p));
+    return '<div class="period-badge">P' + p +
+      (range ? '<span class="bell-time">' + range + '</span>' : '<small>節</small>') +
+      '</div>';
   }
 
   function subjClass(short) {
@@ -1099,7 +1152,16 @@
     var daySched = (t.schedule[String(d)] || {});
     var busy = 0;
 
+    var sched = scheduleForDay(d);
     dayTitle.textContent = '循環日 Day ' + d;
+    var bellLabelEl = document.getElementById('dayBellLabel');
+    if (!bellLabelEl) {
+      bellLabelEl = document.createElement('div');
+      bellLabelEl.id = 'dayBellLabel';
+      bellLabelEl.className = 'day-bell-label';
+      dayTitle.parentNode.insertBefore(bellLabelEl, dayTitle.nextSibling);
+    }
+    bellLabelEl.textContent = sched && sched.label ? ('鐘聲：' + sched.label) : '';
     Array.prototype.forEach.call(dayChips.querySelectorAll('.day-chip'), function (chip) {
       chip.classList.toggle('active', parseInt(chip.dataset.day, 10) === d);
     });
@@ -1112,7 +1174,7 @@
         busy++;
         el.className = 'lesson ' + subjClass(L.subjectShort);
         el.innerHTML =
-          '<div class="period-badge">P' + p + '<small>節</small></div>' +
+          periodBadgeHtml(d, p) +
           '<div class="lesson-body">' +
             '<div class="subj">' + esc(L.subjectShort || L.subject) + '</div>' +
             '<div class="detail">' + esc(L.classShort || L.class) +
@@ -1126,7 +1188,7 @@
       } else {
         el.className = 'lesson free';
         el.innerHTML =
-          '<div class="period-badge">P' + p + '<small>節</small></div>' +
+          periodBadgeHtml(d, p) +
           '<div class="lesson-body"><div class="subj">空堂</div></div>';
       }
       lessonList.appendChild(el);
@@ -1153,18 +1215,22 @@
           cells +=
             '<div class="ov-cell busy ' + subjClass(L.subjectShort) + '">' +
               '<div class="p">P' + p + '</div>' +
+              (formatBellRange(periodBell(d, p)) ? '<div class="bell-time">' + formatBellRange(periodBell(d, p)) + '</div>' : '') +
               '<div class="s">' + esc(L.subjectShort || L.subject) + '</div>' +
               '<div class="c">' + esc(L.classShort || L.class) + '</div>' +
               '<div class="r">' + esc(L.room || '') + '</div>' +
             '</div>';
         } else {
           cells +=
-            '<div class="ov-cell"><div class="p">P' + p + '</div><div class="s" style="color:var(--muted)">空堂</div></div>';
+            '<div class="ov-cell"><div class="p">P' + p + '</div>' +
+              (formatBellRange(periodBell(d, p)) ? '<div class="bell-time">' + formatBellRange(periodBell(d, p)) + '</div>' : '') +
+              '<div class="s" style="color:var(--muted)">空堂</div></div>';
         }
       }
       html +=
         '<div class="card overview-day">' +
           '<h3>Day ' + d + ' · ' + busy + ' 節' +
+            (scheduleForDay(d) && scheduleForDay(d).label ? ' · <span style="font-weight:600;color:var(--muted);font-size:0.8em;">' + scheduleForDay(d).label + '</span>' : '') +
             ' <button class="btn btn-ghost btn-sm" type="button" data-jump-day="' + d + '" style="float:right;margin-top:-2px;">查看</button>' +
           '</h3>' +
           '<div class="ov-grid">' + cells + '</div>' +
@@ -1353,7 +1419,8 @@
     for (var p = 1; p <= maxp; p++) {
       var opt = document.createElement('option');
       opt.value = String(p);
-      opt.textContent = 'P' + p;
+      var range = formatBellRange(periodBell(d, p));
+      opt.textContent = range ? ('P' + p + ' · ' + range) : ('P' + p);
       coverPeriod.appendChild(opt);
     }
     if (prev && parseInt(prev, 10) <= maxp) coverPeriod.value = prev;
