@@ -224,11 +224,6 @@
     }
     .cycle-today-bar select { width: auto; min-width: 100px; padding: 6px 8px; font-size: 0.85rem; }
 
-    .date-pick-box {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px dashed var(--border);
-    }
     .date-pick-row {
       display: flex;
       flex-wrap: wrap;
@@ -272,6 +267,8 @@
     .cal-banner-wrap {
       margin-top: 10px;
       position: relative;
+      min-height: 48px;
+      -webkit-tap-highlight-color: transparent;
     }
     .cal-banner {
       margin-top: 0;
@@ -284,21 +281,25 @@
       align-items: center;
       gap: 10px;
       width: 100%;
+      box-sizing: border-box;
       border: 1.5px solid rgba(255,255,255,.22);
       color: inherit;
       text-align: left;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       position: relative;
+      z-index: 1;
       font-family: inherit;
       transition: background .15s, border-color .15s, transform .1s;
+      pointer-events: none; /* taps go to overlay date input */
+      min-height: 48px;
     }
-    .cal-banner:hover, .cal-banner:focus-visible {
+    .cal-banner-wrap:hover .cal-banner,
+    .cal-banner-wrap:focus-within .cal-banner {
       background: rgba(255,255,255,.22);
       border-color: rgba(255,255,255,.4);
-      outline: none;
     }
-    .cal-banner:active { transform: scale(.985); }
+    .cal-banner-wrap:active .cal-banner { transform: scale(.985); }
     .cal-banner-body {
       flex: 1 1 auto;
       min-width: 0;
@@ -361,18 +362,29 @@
       opacity: .85;
       white-space: nowrap;
     }
+    /* Overlay date input: must receive the real touch (iOS Safari).
+       opacity 0.01 (not 0) so WebKit still treats it as tappable. */
     .cal-banner-date-input {
       position: absolute;
       left: 0;
       top: 0;
+      right: 0;
+      bottom: 0;
       width: 100%;
       height: 100%;
-      opacity: 0;
+      z-index: 2;
+      opacity: 0.01;
       border: 0;
       padding: 0;
       margin: 0;
-      pointer-events: none;
+      cursor: pointer;
+      pointer-events: auto;
       font-size: 16px; /* avoid iOS zoom */
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      color: transparent;
+      box-sizing: border-box;
     }
 
     .duty-banner {
@@ -834,8 +846,8 @@
   <header class="app-header">
     <div class="school" id="schoolName">世界龍岡學校劉皇發中學</div>
     <h1>教師時間表</h1>
-    <div class="cal-banner-wrap">
-      <button type="button" class="cal-banner" id="calBanner" aria-label="點擊選擇校曆日期">
+    <div class="cal-banner-wrap" id="calBannerWrap">
+      <div class="cal-banner" id="calBanner" aria-hidden="true">
         <span class="cal-banner-body">
           <span class="cal-date-line" id="calBannerDate">載入中…</span>
           <span class="cal-main" id="calBannerMain">載入校曆…</span>
@@ -848,8 +860,9 @@
           <span class="cal-icon">📅</span>
           <span class="cal-tap-hint">改日期</span>
         </span>
-      </button>
-      <input type="date" id="headerDateInput" class="cal-banner-date-input" tabindex="-1" aria-hidden="true" />
+      </div>
+      <input type="date" id="headerDateInput" class="cal-banner-date-input"
+             aria-label="選擇校曆日期" />
     </div>
     <div class="duty-banner" id="dutyBanner">
       <span class="duty-main" id="dutyBannerMain">載入當值…</span>
@@ -898,20 +911,6 @@
           <span>今日校曆：</span>
           <strong id="todayCycleLabel">載入中…</strong>
           <button class="btn btn-ghost btn-sm" id="gotoTodayBtn" type="button" hidden>跳至今日</button>
-        </div>
-        <div class="date-pick-box">
-          <label class="field-label" for="browseDateInput">按校曆日期選循環日</label>
-          <div class="date-pick-row">
-            <div class="field">
-              <input type="date" id="browseDateInput" />
-            </div>
-            <button class="btn btn-ghost" id="browseDateTodayBtn" type="button">今日</button>
-          </div>
-          <div class="date-result" id="browseDateResult" aria-live="polite">
-            <div class="date-line" id="browseDateLabel">選取日期：—</div>
-            <div class="cycle-line" id="browseDateCycle">—</div>
-            <div class="duty-line" id="browseDateDuty">—</div>
-          </div>
         </div>
       </div>
       <div class="card" id="dayLessonsCard" hidden>
@@ -1165,12 +1164,6 @@
   var dayLessonCount = document.getElementById('dayLessonCount');
   var todayCycleLabel = document.getElementById('todayCycleLabel');
   var gotoTodayBtn = document.getElementById('gotoTodayBtn');
-  var browseDateInput = document.getElementById('browseDateInput');
-  var browseDateTodayBtn = document.getElementById('browseDateTodayBtn');
-  var browseDateResult = document.getElementById('browseDateResult');
-  var browseDateLabel = document.getElementById('browseDateLabel');
-  var browseDateCycle = document.getElementById('browseDateCycle');
-  var browseDateDuty = document.getElementById('browseDateDuty');
   var cycleDateDuty = document.getElementById('cycleDateDuty');
   var dutyBanner = document.getElementById('dutyBanner');
   var dutyBannerMain = document.getElementById('dutyBannerMain');
@@ -1198,6 +1191,7 @@
   var clearCycleBtn = document.getElementById('clearCycleBtn');
   var cycleSavedHint = document.getElementById('cycleSavedHint');
   var cycleAutoInfo = document.getElementById('cycleAutoInfo');
+  var calBannerWrap = document.getElementById('calBannerWrap');
   var calBanner = document.getElementById('calBanner');
   var calBannerMain = document.getElementById('calBannerMain');
   var calBannerSub = document.getElementById('calBannerSub');
@@ -1337,7 +1331,6 @@
 
   function syncDateInputs(ymd) {
     if (!ymd) return;
-    if (browseDateInput && browseDateInput.value !== ymd) browseDateInput.value = ymd;
     if (cycleDateInput && cycleDateInput.value !== ymd) cycleDateInput.value = ymd;
     if (dutyDateInput && dutyDateInput.value !== ymd) dutyDateInput.value = ymd;
     if (headerDateInput && headerDateInput.value !== ymd) headerDateInput.value = ymd;
@@ -1487,9 +1480,7 @@
       cycleEl.textContent = cycleText;
       box.classList.toggle('off', off);
     }
-    paint(browseDateResult, browseDateLabel, browseDateCycle);
     paint(cycleDateResult, cycleDateLabelEl, cycleDateCycle);
-    paintDutyLine(browseDateDuty, info.ymd);
     paintDutyLine(cycleDateDuty, info.ymd);
     refreshCalBanner(info.ymd);
     refreshDutyBanner(info.ymd);
@@ -1683,26 +1674,39 @@
       calBannerSrc.hidden = false;
       calBannerSrc.textContent = srcLabel;
     }
-    if (calBanner) {
-      calBanner.setAttribute(
+    if (headerDateInput) {
+      headerDateInput.setAttribute(
         'aria-label',
         '選取日期 ' + dateLine + '，' + main + '。點擊更改日期'
       );
     }
   }
 
+  /**
+   * Open the header date picker. Primary path on iPhone Safari is a direct
+   * touch on the overlay <input type="date">. This helper is for showPicker()
+   * (Chrome/desktop) plus click/focus fallback when that fails.
+   */
   function openHeaderDatePicker() {
     if (!headerDateInput) return;
     var ymd = state.browseDate || todayYmdHK();
     if (headerDateInput.value !== ymd) headerDateInput.value = ymd;
+    function fallbackActivate() {
+      try { headerDateInput.focus({ preventScroll: true }); } catch (e1) {
+        try { headerDateInput.focus(); } catch (e2) {}
+      }
+      try { headerDateInput.click(); } catch (e3) {}
+    }
     try {
       if (typeof headerDateInput.showPicker === 'function') {
-        headerDateInput.showPicker();
+        var maybePromise = headerDateInput.showPicker();
+        if (maybePromise && typeof maybePromise.catch === 'function') {
+          maybePromise.catch(function () { fallbackActivate(); });
+        }
         return;
       }
     } catch (e) { /* fall through */ }
-    headerDateInput.focus();
-    headerDateInput.click();
+    fallbackActivate();
   }
 
   function refreshCycleUI() {
@@ -2440,25 +2444,19 @@
     applyBrowseDate(ymd);
   }
 
-  if (calBanner) {
-    calBanner.addEventListener('click', function () {
-      openHeaderDatePicker();
-    });
-  }
+  /* Header date: overlay input receives the real touch (iOS). Also wire
+     pointer/click on the wrap so showPicker works when the visual is tapped
+     in browsers that ignore nearly-transparent inputs. */
   if (headerDateInput) {
     headerDateInput.addEventListener('change', function () {
       if (headerDateInput.value) onDatePicked(headerDateInput.value);
     });
   }
-
-  if (browseDateInput) {
-    browseDateInput.addEventListener('change', function () {
-      if (browseDateInput.value) onDatePicked(browseDateInput.value);
-    });
-  }
-  if (browseDateTodayBtn) {
-    browseDateTodayBtn.addEventListener('click', function () {
-      onDatePicked(todayYmdHK());
+  if (calBannerWrap) {
+    calBannerWrap.addEventListener('click', function (e) {
+      /* Overlay input normally receives the touch; if not, open via showPicker/click. */
+      if (e.target === headerDateInput) return;
+      openHeaderDatePicker();
     });
   }
   if (cycleDateInput) {
