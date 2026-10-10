@@ -834,6 +834,92 @@
       flex-wrap: wrap;
     }
 
+
+    /* Live HKT clock */
+    .live-clock {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      opacity: .92;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .02em;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .live-clock .clock-time {
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+    .live-clock .clock-status {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.2);
+    }
+    .live-clock .clock-status.is-break {
+      background: rgba(255, 200, 80, .35);
+    }
+    .live-clock .clock-status.is-period {
+      background: rgba(220, 60, 50, .45);
+    }
+
+    /* Calendar day events */
+    .cal-banner .cal-events {
+      font-size: 0.78rem;
+      font-weight: 650;
+      opacity: .95;
+      margin-top: 3px;
+      line-height: 1.35;
+    }
+    .cal-banner .cal-events:empty { display: none; }
+    .cal-banner .cal-events-label {
+      opacity: .8;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    /* Current / past lesson highlight (today only) */
+    .lesson.is-current {
+      border-color: #c0392b !important;
+      background: #fdecea !important;
+      box-shadow: 0 0 0 2px rgba(192, 57, 43, .35), 0 2px 10px rgba(192, 57, 43, .18);
+    }
+    .lesson.is-current .period-badge {
+      background: #f5c6c2;
+      border-right-color: rgba(192, 57, 43, .45);
+    }
+    .lesson.is-current .period-badge .period-num {
+      background: #c0392b;
+    }
+    .lesson.is-current .period-badge .bell-time .t-start,
+    .lesson.is-current .period-badge .bell-time .t-end {
+      color: #922b21;
+    }
+    .lesson.is-current .subj { color: #922b21; }
+    .lesson.is-past {
+      opacity: 0.55;
+    }
+    .now-slot-banner {
+      display: none;
+      margin: 0 0 10px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: #fff6e8;
+      border: 1.5px solid #e8b86a;
+      color: #7a4e12;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .now-slot-banner.show { display: block; }
+    .now-slot-banner.is-period {
+      background: #fdecea;
+      border-color: #e08a82;
+      color: #922b21;
+    }
+
     @media (min-width: 600px) {
       header.app-header { padding: 18px 24px 22px; }
       header h1 { font-size: 1.45rem; }
@@ -846,11 +932,17 @@
   <header class="app-header">
     <div class="school" id="schoolName">世界龍岡學校劉皇發中學</div>
     <h1>教師時間表</h1>
+    <div class="live-clock" id="liveClock" aria-live="polite">
+      <span>香港時間</span>
+      <span class="clock-time" id="liveClockTime">--:--</span>
+      <span class="clock-status" id="liveClockStatus" hidden></span>
+    </div>
     <div class="cal-banner-wrap" id="calBannerWrap">
       <div class="cal-banner" id="calBanner" aria-hidden="true">
         <span class="cal-banner-body">
           <span class="cal-date-line" id="calBannerDate">載入中…</span>
           <span class="cal-main" id="calBannerMain">載入校曆…</span>
+          <span class="cal-events" id="calBannerEvents"></span>
           <span class="cal-sub-row">
             <span class="src-tag" id="calBannerSrc" hidden></span>
             <span class="cal-sub" id="calBannerSub"></span>
@@ -918,6 +1010,7 @@
           <span id="dayTitle">Day 1</span>
           <span class="badge-count" id="dayLessonCount"></span>
         </div>
+        <div class="now-slot-banner" id="nowSlotBanner" hidden></div>
         <div class="lesson-list" id="lessonList"></div>
       </div>
       <div class="empty" id="dayEmpty">請先輸入教師代碼查詢。</div>
@@ -1288,6 +1381,102 @@
     }
   }
 
+  /** Current Hong Kong wall-clock parts. */
+  function nowHKTParts() {
+    try {
+      var parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Hong_Kong',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false, hourCycle: 'h23'
+      }).formatToParts(new Date());
+      var map = {};
+      parts.forEach(function (p) { if (p.type !== 'literal') map[p.type] = p.value; });
+      var hh = parseInt(map.hour, 10);
+      var mm = parseInt(map.minute, 10);
+      var ss = parseInt(map.second, 10);
+      return {
+        ymd: map.year + '-' + map.month + '-' + map.day,
+        hour: hh,
+        minute: mm,
+        second: ss,
+        hm: pad2(hh) + ':' + pad2(mm),
+        minutes: hh * 60 + mm
+      };
+    } catch (e) {
+      var now = new Date();
+      var t = new Date(now.getTime() + 8 * 3600 * 1000);
+      var hh = t.getUTCHours();
+      var mm = t.getUTCMinutes();
+      var ss = t.getUTCSeconds();
+      return {
+        ymd: t.getUTCFullYear() + '-' + pad2(t.getUTCMonth() + 1) + '-' + pad2(t.getUTCDate()),
+        hour: hh, minute: mm, second: ss,
+        hm: pad2(hh) + ':' + pad2(mm),
+        minutes: hh * 60 + mm
+      };
+    }
+  }
+
+  function hmToMinutes(hm) {
+    if (!hm || hm.indexOf(':') < 0) return null;
+    var parts = hm.split(':');
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+  }
+
+  /**
+   * Given a cycle day, find which bells.js slot contains current HKT clock time.
+   * Returns { kind:'period'|'break'|'before'|'after', period, key, label, slot }
+   * kind period → lesson period; break → recess/lunch/homeroom/reading; before/after school.
+   */
+  function findCurrentSlot(cycleDay) {
+    var sched = scheduleForDay(cycleDay);
+    if (!sched || !sched.slots || !sched.slots.length) return null;
+    var now = nowHKTParts();
+    var mins = now.minutes;
+    var slots = sched.slots;
+    var firstStart = hmToMinutes(slots[0].start);
+    var lastEnd = hmToMinutes(slots[slots.length - 1].end);
+    if (firstStart != null && mins < firstStart) {
+      return { kind: 'before', period: null, key: null, label: '上課前', slot: null };
+    }
+    if (lastEnd != null && mins >= lastEnd) {
+      return { kind: 'after', period: null, key: null, label: '放學後', slot: null };
+    }
+    for (var i = 0; i < slots.length; i++) {
+      var s = slots[i];
+      var a = hmToMinutes(s.start);
+      var b = hmToMinutes(s.end);
+      if (a == null || b == null) continue;
+      if (mins >= a && mins < b) {
+        if (s.period != null) {
+          return { kind: 'period', period: s.period, key: s.key, label: s.label, slot: s };
+        }
+        var label = s.label || '';
+        if (s.key === 'recess') label = '小息中';
+        else if (s.key === 'lunch') label = '午飯中';
+        else if (s.key === 'homeroom') label = '班主任／早會中';
+        else if (s.key === 'reading') label = '閱讀時段中';
+        else label = label ? (label + '中') : '休息中';
+        return { kind: 'break', period: null, key: s.key, label: label, slot: s };
+      }
+      // Between slots (gap)
+      if (i + 1 < slots.length) {
+        var nextA = hmToMinutes(slots[i + 1].start);
+        if (nextA != null && mins >= b && mins < nextA) {
+          return { kind: 'break', period: null, key: 'gap', label: '小息／轉堂中', slot: null };
+        }
+      }
+    }
+    return null;
+  }
+
+  function eventsFor(ymd) {
+    if (!CAL || !CAL.events || !ymd) return [];
+    var list = CAL.events[ymd];
+    return Array.isArray(list) ? list.slice() : [];
+  }
+
   function calendarCycleFor(ymd) {
     if (!CAL || !CAL.days) return undefined;
     if (!Object.prototype.hasOwnProperty.call(CAL.days, ymd)) return undefined;
@@ -1473,6 +1662,10 @@
       cycleText = info.label + (sched && sched.label ? ' · ' + sched.label : '');
     } else {
       cycleText = info.label;
+    }
+    var dayEvs = eventsFor(info.ymd);
+    if (dayEvs.length) {
+      cycleText += ' · 當日事項：' + dayEvs.join('、');
     }
     function paint(box, dateEl, cycleEl) {
       if (!box || !dateEl || !cycleEl) return;
@@ -1674,10 +1867,26 @@
       calBannerSrc.hidden = false;
       calBannerSrc.textContent = srcLabel;
     }
+    var evEl = document.getElementById('calBannerEvents');
+    if (evEl) {
+      var evs = eventsFor(ymd);
+      if (evs.length) {
+        evEl.innerHTML = '';
+        var lab = document.createElement('span');
+        lab.className = 'cal-events-label';
+        lab.textContent = '當日事項';
+        evEl.appendChild(lab);
+        evEl.appendChild(document.createTextNode(evs.join(' · ')));
+      } else {
+        evEl.textContent = '';
+      }
+    }
     if (headerDateInput) {
+      var evs2 = eventsFor(ymd);
+      var evPart = evs2.length ? '，事項：' + evs2.join('、') : '';
       headerDateInput.setAttribute(
         'aria-label',
-        '選取日期 ' + dateLine + '，' + main + '。點擊更改日期'
+        '選取日期 ' + dateLine + '，' + main + evPart + '。點擊更改日期'
       );
     }
   }
@@ -1841,13 +2050,58 @@
       chip.classList.toggle('active', parseInt(chip.dataset.day, 10) === d);
     });
 
+    // Live highlight only when browsing today AND showing today's cycle day
+    var browse = state.browseDate || todayYmdHK();
+    var isTodayBrowse = browse === todayYmdHK();
+    var todayResolved = resolveTodayCycle();
+    var highlightLive = isTodayBrowse && todayResolved.day != null && todayResolved.day === d;
+    var curSlot = highlightLive ? findCurrentSlot(d) : null;
+    var curPeriod = (curSlot && curSlot.kind === 'period') ? curSlot.period : null;
+    var nowMins = nowHKTParts().minutes;
+
+    var nowBanner = document.getElementById('nowSlotBanner');
+    if (nowBanner) {
+      if (highlightLive && curSlot && curSlot.kind === 'break') {
+        nowBanner.hidden = false;
+        nowBanner.classList.add('show');
+        nowBanner.classList.remove('is-period');
+        nowBanner.textContent = '⏱ ' + curSlot.label;
+      } else if (highlightLive && curSlot && curSlot.kind === 'period') {
+        nowBanner.hidden = false;
+        nowBanner.classList.add('show');
+        nowBanner.classList.add('is-period');
+        nowBanner.textContent = '⏱ 現正：' + (curSlot.label || ('第' + curSlot.period + '節'));
+      } else if (highlightLive && curSlot && (curSlot.kind === 'before' || curSlot.kind === 'after')) {
+        nowBanner.hidden = false;
+        nowBanner.classList.add('show');
+        nowBanner.classList.remove('is-period');
+        nowBanner.textContent = '⏱ ' + curSlot.label;
+      } else {
+        nowBanner.hidden = true;
+        nowBanner.classList.remove('show');
+        nowBanner.textContent = '';
+      }
+    }
+
     lessonList.innerHTML = '';
     for (var p = 1; p <= maxp; p++) {
       var L = daySched[String(p)];
       var el = document.createElement('div');
+      var extraClass = '';
+      if (highlightLive) {
+        if (curPeriod != null && p === curPeriod) {
+          extraClass += ' is-current';
+        } else {
+          var bell = periodBell(d, p);
+          var endM = bell ? hmToMinutes(bell.end) : null;
+          if (endM != null && nowMins >= endM) {
+            extraClass += ' is-past';
+          }
+        }
+      }
       if (L) {
         busy++;
-        el.className = 'lesson ' + subjClass(L.subjectShort);
+        el.className = ('lesson ' + subjClass(L.subjectShort) + extraClass).trim();
         el.innerHTML =
           periodBadgeHtml(d, p) +
           '<div class="lesson-body">' +
@@ -1861,13 +2115,16 @@
           el.title = L.subject;
         }
       } else {
-        el.className = 'lesson free';
+        el.className = ('lesson free' + extraClass).trim();
         el.innerHTML =
           periodBadgeHtml(d, p) +
           '<div class="lesson-body">' +
             '<div class="subj">空堂</div>' +
             '<div class="detail-free">Free period</div>' +
           '</div>';
+      }
+      if (extraClass.indexOf('is-current') >= 0) {
+        el.setAttribute('aria-current', 'true');
       }
       lessonList.appendChild(el);
     }
@@ -2480,10 +2737,66 @@
     });
   }
 
+  function tickLiveClock() {
+    var timeEl = document.getElementById('liveClockTime');
+    var statusEl = document.getElementById('liveClockStatus');
+    var parts = nowHKTParts();
+    if (timeEl) timeEl.textContent = parts.hm;
+    var browse = state.browseDate || parts.ymd;
+    var isToday = browse === parts.ymd;
+    var statusText = '';
+    var statusClass = 'clock-status';
+    if (isToday) {
+      var r = resolveTodayCycle();
+      if (r.day != null) {
+        var slot = findCurrentSlot(r.day);
+        if (slot) {
+          if (slot.kind === 'period') {
+            statusText = '現正 P' + slot.period;
+            statusClass += ' is-period';
+          } else if (slot.kind === 'break') {
+            statusText = slot.label;
+            statusClass += ' is-break';
+          } else {
+            statusText = slot.label;
+          }
+        }
+      } else {
+        statusText = '今日無正規日課';
+      }
+    }
+    if (statusEl) {
+      if (statusText) {
+        statusEl.hidden = false;
+        statusEl.className = statusClass;
+        statusEl.textContent = statusText;
+      } else {
+        statusEl.hidden = true;
+        statusEl.textContent = '';
+      }
+    }
+    // Refresh day-view highlight when viewing today
+    if (state.teacher && isToday) {
+      renderDayView();
+    }
+  }
+
+  function startLiveClock() {
+    tickLiveClock();
+    // Align to next minute boundary, then every 60s
+    var parts = nowHKTParts();
+    var msToNext = Math.max(1000, (60 - (parts.second || 0)) * 1000);
+    setTimeout(function () {
+      tickLiveClock();
+      setInterval(tickLiveClock, 60 * 1000);
+    }, msToNext);
+  }
+
   function boot() {
     buildDayChips();
     applyResolvedDayToUI();
     applyBrowseDate(todayYmdHK());
+    startLiveClock();
     try {
       var last = localStorage.getItem(LS_TEACHER);
       if (last && lookupTeacher(last)) {
