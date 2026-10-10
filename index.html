@@ -291,6 +291,61 @@
       border-radius: 999px;
       background: rgba(255,255,255,.22);
     }
+
+    .duty-banner {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.12);
+      font-size: 0.86rem;
+      font-weight: 600;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px 10px;
+    }
+    .duty-banner .duty-main { font-size: 0.92rem; }
+    .duty-banner .duty-hint {
+      opacity: .8;
+      font-weight: 500;
+      font-size: 0.72rem;
+      width: 100%;
+    }
+    .duty-banner.duty-off { background: rgba(0,0,0,.16); opacity: .92; }
+    .date-result .duty-line {
+      margin-top: 4px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+    .date-result.off .duty-line { color: var(--muted); font-weight: 600; }
+    .duty-upcoming-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .duty-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      align-items: baseline;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--card-soft, #f4f7fb);
+      border: 1px solid var(--border, #e2e8f0);
+    }
+    .duty-row .duty-date { font-weight: 800; min-width: 7.5rem; }
+    .duty-row .duty-codes { font-weight: 700; color: var(--primary-dark); }
+    .duty-row .duty-cycle {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(37,99,235,.1);
+      color: var(--primary);
+    }
+    .duty-role-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 0 0 10px;
+    }
     .room-free-card { margin-top: 12px; }
     .room-free-list {
       display: flex;
@@ -629,6 +684,10 @@
       <span class="src-tag" id="calBannerSrc" hidden></span>
       <span class="cal-sub" id="calBannerSub"></span>
     </div>
+    <div class="duty-banner" id="dutyBanner">
+      <span class="duty-main" id="dutyBannerMain">載入當值…</span>
+      <span class="duty-hint" id="dutyBannerHint"></span>
+    </div>
   </header>
 
   <div class="wrap">
@@ -660,6 +719,7 @@
       <button class="tab" data-tab="cover" type="button">代堂助手</button>
       <button class="tab" data-tab="search" type="button">搜尋課室／班別</button>
       <button class="tab" data-tab="cycle" type="button">今日循環日</button>
+      <button class="tab" data-tab="duty" type="button">當值</button>
     </nav>
 
     <!-- Day view -->
@@ -683,6 +743,7 @@
           <div class="date-result" id="browseDateResult" aria-live="polite">
             <div class="date-line" id="browseDateLabel">選取日期：—</div>
             <div class="cycle-line" id="browseDateCycle">—</div>
+            <div class="duty-line" id="browseDateDuty">—</div>
           </div>
         </div>
       </div>
@@ -786,6 +847,32 @@
       <div class="empty" id="coverEmpty">請選擇循環日同節數，然後按「查詢」。</div>
     </section>
 
+
+    <!-- Duty roster -->
+    <section class="panel" id="panel-duty">
+      <div class="card">
+        <h2>當值老師</h2>
+        <p class="duty-role-hint" id="dutyRoleHint">
+          Teacher 1：校門檢查校服；小息／午膳巡堂（2/F–6/F）。<br />
+          Teacher 2：巡堂維持秩序（3/F–6/F、G/F、小賣部）；放學校門檢查。
+        </p>
+        <label class="field-label" for="dutyDateInput">查某日當值</label>
+        <div class="date-pick-row" style="margin-bottom:8px;">
+          <div class="field">
+            <input type="date" id="dutyDateInput" />
+          </div>
+          <button class="btn btn-ghost" id="dutyDateTodayBtn" type="button">今日</button>
+        </div>
+        <div class="date-result" id="dutyDateResult" aria-live="polite" style="margin-bottom:14px;">
+          <div class="date-line" id="dutyDateLabel">選取日期：—</div>
+          <div class="duty-line" id="dutyDateDuty">—</div>
+        </div>
+        <h2 style="font-size:1rem;margin-top:4px;">即將當值</h2>
+        <p class="hint" style="margin-bottom:6px;">由選取日期起計未來當值日子（來源：2026–2027 當值表）</p>
+        <div class="duty-upcoming-list" id="dutyUpcomingList"></div>
+      </div>
+    </section>
+
     <!-- Cycle day setting -->
     <section class="panel" id="panel-cycle">
       <div class="card">
@@ -803,6 +890,7 @@
         <div class="date-result" id="cycleDateResult" aria-live="polite" style="margin-bottom:14px;">
           <div class="date-line" id="cycleDateLabel">選取日期：—</div>
           <div class="cycle-line" id="cycleDateCycle">—</div>
+          <div class="duty-line" id="cycleDateDuty">—</div>
         </div>
 
         <label class="field-label" for="cycleSelect">本機手動覆寫（可選）</label>
@@ -859,6 +947,7 @@
   <script src="data.js"></script>
   <script src="calendar.js"></script>
   <script src="bells.js"></script>
+  <script src="duty.js"></script>
   <script>
 (function () {
   'use strict';
@@ -914,6 +1003,19 @@
   var browseDateResult = document.getElementById('browseDateResult');
   var browseDateLabel = document.getElementById('browseDateLabel');
   var browseDateCycle = document.getElementById('browseDateCycle');
+  var browseDateDuty = document.getElementById('browseDateDuty');
+  var cycleDateDuty = document.getElementById('cycleDateDuty');
+  var dutyBanner = document.getElementById('dutyBanner');
+  var dutyBannerMain = document.getElementById('dutyBannerMain');
+  var dutyBannerHint = document.getElementById('dutyBannerHint');
+  var dutyDateInput = document.getElementById('dutyDateInput');
+  var dutyDateTodayBtn = document.getElementById('dutyDateTodayBtn');
+  var dutyDateResult = document.getElementById('dutyDateResult');
+  var dutyDateLabel = document.getElementById('dutyDateLabel');
+  var dutyDateDuty = document.getElementById('dutyDateDuty');
+  var dutyUpcomingList = document.getElementById('dutyUpcomingList');
+  var dutyRoleHint = document.getElementById('dutyRoleHint');
+
   var cycleDateInput = document.getElementById('cycleDateInput');
   var cycleDateTodayBtn = document.getElementById('cycleDateTodayBtn');
   var cycleDateResult = document.getElementById('cycleDateResult');
@@ -961,6 +1063,7 @@
   }
 
   var BELLS = window.BELLS_DATA || null;
+  var DUTY = window.DUTY_DATA || null;
 
   function scheduleIdForDay(d) {
     if (!BELLS || !BELLS.byCycleDay) return (d === 5 || d === 10) ? 'bf' : 'general';
@@ -1061,6 +1164,132 @@
     if (cycleDateInput && cycleDateInput.value !== ymd) cycleDateInput.value = ymd;
   }
 
+
+  function dutyFor(ymd) {
+    if (!DUTY || !DUTY.days || !ymd) return null;
+    return DUTY.days[ymd] || null;
+  }
+
+  function formatTeacherDuty(t) {
+    if (!t || !t.code) return '—';
+    var name = t.chi || t.eng || '';
+    return name ? (t.code + '（' + name + '）') : t.code;
+  }
+
+  function formatDutyPair(entry) {
+    if (!entry) return '';
+    return formatTeacherDuty(entry.teacher1) + '、' + formatTeacherDuty(entry.teacher2);
+  }
+
+  /** Label + text for a date's duty. */
+  function dutyDisplay(ymd) {
+    var entry = dutyFor(ymd);
+    var isToday = ymd === todayYmdHK();
+    var prefix = isToday ? '今日當值' : '當日當值';
+    if (!entry) {
+      return { prefix: prefix, text: '是日無當值記錄', hasDuty: false, entry: null };
+    }
+    return {
+      prefix: prefix,
+      text: prefix + '：' + formatDutyPair(entry),
+      hasDuty: true,
+      entry: entry
+    };
+  }
+
+  function paintDutyLine(el, ymd) {
+    if (!el) return;
+    var d = dutyDisplay(ymd);
+    el.textContent = d.hasDuty ? d.text : d.text;
+  }
+
+  function refreshDutyBanner(ymd) {
+    if (!dutyBannerMain) return;
+    ymd = ymd || state.browseDate || todayYmdHK();
+    var d = dutyDisplay(ymd);
+    if (d.hasDuty) {
+      dutyBannerMain.textContent = d.text;
+      if (dutyBanner) dutyBanner.classList.remove('duty-off');
+    } else {
+      dutyBannerMain.textContent = d.text;
+      if (dutyBanner) dutyBanner.classList.add('duty-off');
+    }
+    if (dutyBannerHint) {
+      var roles = (DUTY && DUTY.meta && DUTY.meta.roles) || null;
+      if (roles) {
+        dutyBannerHint.textContent = 'T1 校門檢查／T2 巡堂 · ' + (DUTY.meta.title || '當值表');
+      } else {
+        dutyBannerHint.textContent = DUTY ? (DUTY.meta && DUTY.meta.title) || '' : '未載入當值資料';
+      }
+    }
+  }
+
+  function renderDutyUpcoming(fromYmd) {
+    if (!dutyUpcomingList) return;
+    dutyUpcomingList.innerHTML = '';
+    if (!DUTY || !DUTY.days) {
+      dutyUpcomingList.innerHTML = '<div class="empty">未載入當值資料。</div>';
+      return;
+    }
+    fromYmd = fromYmd || todayYmdHK();
+    var keys = Object.keys(DUTY.days).filter(function (k) { return k >= fromYmd; }).sort();
+    var limit = 21;
+    var slice = keys.slice(0, limit);
+    if (!slice.length) {
+      dutyUpcomingList.innerHTML = '<div class="empty">此日期之後暫無當值記錄。</div>';
+      return;
+    }
+    slice.forEach(function (ymd) {
+      var entry = DUTY.days[ymd];
+      var row = document.createElement('div');
+      row.className = 'duty-row';
+      var dateSpan = document.createElement('span');
+      dateSpan.className = 'duty-date';
+      dateSpan.textContent = formatYmdZh(ymd) + (weekdayLabelHK(ymd) ? '（' + weekdayLabelHK(ymd) + '）' : '');
+      var codes = document.createElement('span');
+      codes.className = 'duty-codes';
+      codes.textContent = formatDutyPair(entry);
+      row.appendChild(dateSpan);
+      row.appendChild(codes);
+      if (entry.cycleDay != null) {
+        var cyc = document.createElement('span');
+        cyc.className = 'duty-cycle';
+        cyc.textContent = 'Day ' + entry.cycleDay;
+        row.appendChild(cyc);
+      }
+      row.style.cursor = 'pointer';
+      row.title = '點擊查閱此日';
+      row.addEventListener('click', function () { onDatePicked(ymd); });
+      dutyUpcomingList.appendChild(row);
+    });
+    if (keys.length > limit) {
+      var more = document.createElement('div');
+      more.className = 'hint';
+      more.textContent = '另有 ' + (keys.length - limit) + ' 日當值（共 ' + keys.length + ' 日由今日起）';
+      dutyUpcomingList.appendChild(more);
+    }
+  }
+
+  function refreshDutyPanel(ymd) {
+    ymd = ymd || state.browseDate || todayYmdHK();
+    if (dutyDateInput && dutyDateInput.value !== ymd) dutyDateInput.value = ymd;
+    if (dutyDateLabel) {
+      var nice = formatYmdZh(ymd);
+      var wd = weekdayLabelHK(ymd);
+      dutyDateLabel.textContent = '選取日期：' + nice + (wd ? '（' + wd + '）' : '') + ' · ' + ymd;
+    }
+    paintDutyLine(dutyDateDuty, ymd);
+    if (dutyDateResult) {
+      dutyDateResult.classList.toggle('off', !dutyFor(ymd));
+    }
+    renderDutyUpcoming(ymd);
+    if (dutyRoleHint && DUTY && DUTY.meta && DUTY.meta.roles) {
+      var r = DUTY.meta.roles;
+      dutyRoleHint.innerHTML =
+        'Teacher 1：' + (r.teacher1 || '') + '<br />Teacher 2：' + (r.teacher2 || '');
+    }
+  }
+
   function updateDateResultUI(info) {
     var nice = formatYmdZh(info.ymd);
     var wd = weekdayLabelHK(info.ymd);
@@ -1081,6 +1310,10 @@
     }
     paint(browseDateResult, browseDateLabel, browseDateCycle);
     paint(cycleDateResult, cycleDateLabelEl, cycleDateCycle);
+    paintDutyLine(browseDateDuty, info.ymd);
+    paintDutyLine(cycleDateDuty, info.ymd);
+    refreshDutyBanner(info.ymd);
+    refreshDutyPanel(info.ymd);
   }
 
   /** Apply a picked calendar date: update UI; if school day, jump cycle day. */
@@ -1953,6 +2186,16 @@
   }
   if (cycleDateTodayBtn) {
     cycleDateTodayBtn.addEventListener('click', function () {
+      onDatePicked(todayYmdHK());
+    });
+  }
+  if (dutyDateInput) {
+    dutyDateInput.addEventListener('change', function () {
+      if (dutyDateInput.value) onDatePicked(dutyDateInput.value);
+    });
+  }
+  if (dutyDateTodayBtn) {
+    dutyDateTodayBtn.addEventListener('click', function () {
       onDatePicked(todayYmdHK());
     });
   }

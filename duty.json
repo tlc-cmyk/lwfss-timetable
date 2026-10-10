@@ -1,0 +1,2454 @@
+{
+  "meta": {
+    "school": "世界龍岡學校劉皇發中學",
+    "title": "Duty Roster (Sep 2026 – July 2027)",
+    "source": "duty-roster.txt",
+    "pdf": "當值表.pdf",
+    "updated": "2026-09-01",
+    "timezone": "Asia/Hong_Kong",
+    "dutyDayCount": 187,
+    "roles": {
+      "teacher1": "校門檢查校服（早／放學）；小息／午膳巡堂 2/F–6/F",
+      "teacher2": "巡堂維持秩序（3/F–6/F、G/F、小賣部）；放學校門檢查"
+    },
+    "note": "Teacher 1／Teacher 2 職責見當值表第 1 頁（Regular／BF／Half-day）。",
+    "unresolvedCodes": [
+      "LTTA",
+      "WWKF"
+    ],
+    "generatedBy": "scripts/build_duty.py"
+  },
+  "days": {
+    "2026-09-01": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 4
+    },
+    "2026-09-02": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 3
+    },
+    "2026-09-03": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 4
+    },
+    "2026-09-04": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 5
+    },
+    "2026-09-07": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 6
+    },
+    "2026-09-08": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 7
+    },
+    "2026-09-09": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 8
+    },
+    "2026-09-10": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 9
+    },
+    "2026-09-11": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 10
+    },
+    "2026-09-14": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 1
+    },
+    "2026-09-15": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 2
+    },
+    "2026-09-16": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 3
+    },
+    "2026-09-17": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 4
+    },
+    "2026-09-18": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 5
+    },
+    "2026-09-21": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 6
+    },
+    "2026-09-22": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 7
+    },
+    "2026-09-23": {
+      "teacher1": {
+        "code": "NHH",
+        "chi": "吳學軒",
+        "eng": "NG HOK HIN"
+      },
+      "teacher2": {
+        "code": "TSC",
+        "chi": "鄧瑞貞",
+        "eng": "TANG SUI CHING CRYSTAL"
+      },
+      "cycleDay": 8
+    },
+    "2026-09-24": {
+      "teacher1": {
+        "code": "PYL",
+        "chi": "潘蕊蘭",
+        "eng": "PUN YUI LAN"
+      },
+      "teacher2": {
+        "code": "SCL",
+        "chi": "蘇智亮",
+        "eng": "SO CHI LEONG"
+      },
+      "cycleDay": 9
+    },
+    "2026-09-25": {
+      "teacher1": {
+        "code": "TLP",
+        "chi": "徐麗寶",
+        "eng": "TSUI LAI PO"
+      },
+      "teacher2": {
+        "code": "WCY",
+        "chi": "黃俊賢",
+        "eng": "WONG CHUN YIN"
+      },
+      "cycleDay": 10
+    },
+    "2026-09-28": {
+      "teacher1": {
+        "code": "WKS",
+        "chi": "黃啟成",
+        "eng": "WONG KAI SHING"
+      },
+      "teacher2": {
+        "code": "WKYT",
+        "chi": "黃嘉燕",
+        "eng": "WONG KA YIN"
+      },
+      "cycleDay": 1
+    },
+    "2026-09-29": {
+      "teacher1": {
+        "code": "WSF",
+        "chi": "王笑芬",
+        "eng": "WONG SIU FUN"
+      },
+      "teacher2": {
+        "code": "YTH",
+        "chi": "余子海",
+        "eng": "YU TSZ HOI"
+      },
+      "cycleDay": 2
+    },
+    "2026-10-02": {
+      "teacher1": {
+        "code": "WSFA",
+        "chi": "黃雪芳",
+        "eng": "WONG SUET FONG"
+      },
+      "teacher2": {
+        "code": "CYK",
+        "chi": "蔡仁桂",
+        "eng": "CHOI YAN KWAI VICTOR"
+      },
+      "cycleDay": 5
+    },
+    "2026-10-05": {
+      "teacher1": {
+        "code": "WWKF",
+        "chi": "",
+        "eng": ""
+      },
+      "teacher2": {
+        "code": "YSHC",
+        "chi": "姚善珩",
+        "eng": "YIU SIN HANG"
+      },
+      "cycleDay": 6
+    },
+    "2026-10-06": {
+      "teacher1": {
+        "code": "LPC",
+        "chi": "呂佩姿",
+        "eng": "LUI PUI CHI"
+      },
+      "teacher2": {
+        "code": "HTY",
+        "chi": "何芷如",
+        "eng": "HO HELEN TSZ YU"
+      },
+      "cycleDay": 7
+    },
+    "2026-10-07": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 8
+    },
+    "2026-10-08": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 9
+    },
+    "2026-10-09": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 10
+    },
+    "2026-10-12": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 1
+    },
+    "2026-10-13": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 2
+    },
+    "2026-10-14": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 3
+    },
+    "2026-10-15": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 4
+    },
+    "2026-10-16": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 5
+    },
+    "2026-10-20": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 7
+    },
+    "2026-10-21": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 8
+    },
+    "2026-10-22": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 9
+    },
+    "2026-10-23": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 10
+    },
+    "2026-10-26": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 1
+    },
+    "2026-10-27": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 2
+    },
+    "2026-10-28": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 3
+    },
+    "2026-10-29": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 4
+    },
+    "2026-10-30": {
+      "teacher1": {
+        "code": "NHH",
+        "chi": "吳學軒",
+        "eng": "NG HOK HIN"
+      },
+      "teacher2": {
+        "code": "TSC",
+        "chi": "鄧瑞貞",
+        "eng": "TANG SUI CHING CRYSTAL"
+      },
+      "cycleDay": 4
+    },
+    "2026-11-02": {
+      "teacher1": {
+        "code": "PYL",
+        "chi": "潘蕊蘭",
+        "eng": "PUN YUI LAN"
+      },
+      "teacher2": {
+        "code": "SCL",
+        "chi": "蘇智亮",
+        "eng": "SO CHI LEONG"
+      },
+      "cycleDay": 4
+    },
+    "2026-11-03": {
+      "teacher1": {
+        "code": "TLP",
+        "chi": "徐麗寶",
+        "eng": "TSUI LAI PO"
+      },
+      "teacher2": {
+        "code": "WCY",
+        "chi": "黃俊賢",
+        "eng": "WONG CHUN YIN"
+      },
+      "cycleDay": 4
+    },
+    "2026-11-04": {
+      "teacher1": {
+        "code": "WKS",
+        "chi": "黃啟成",
+        "eng": "WONG KAI SHING"
+      },
+      "teacher2": {
+        "code": "WKYT",
+        "chi": "黃嘉燕",
+        "eng": "WONG KA YIN"
+      },
+      "cycleDay": 4
+    },
+    "2026-11-09": {
+      "teacher1": {
+        "code": "WSF",
+        "chi": "王笑芬",
+        "eng": "WONG SIU FUN"
+      },
+      "teacher2": {
+        "code": "YTH",
+        "chi": "余子海",
+        "eng": "YU TSZ HOI"
+      },
+      "cycleDay": 6
+    },
+    "2026-11-10": {
+      "teacher1": {
+        "code": "WSFA",
+        "chi": "黃雪芳",
+        "eng": "WONG SUET FONG"
+      },
+      "teacher2": {
+        "code": "CYK",
+        "chi": "蔡仁桂",
+        "eng": "CHOI YAN KWAI VICTOR"
+      },
+      "cycleDay": 7
+    },
+    "2026-11-11": {
+      "teacher1": {
+        "code": "WWKF",
+        "chi": "",
+        "eng": ""
+      },
+      "teacher2": {
+        "code": "YSHC",
+        "chi": "姚善珩",
+        "eng": "YIU SIN HANG"
+      },
+      "cycleDay": 8
+    },
+    "2026-11-12": {
+      "teacher1": {
+        "code": "LPC",
+        "chi": "呂佩姿",
+        "eng": "LUI PUI CHI"
+      },
+      "teacher2": {
+        "code": "HTY",
+        "chi": "何芷如",
+        "eng": "HO HELEN TSZ YU"
+      },
+      "cycleDay": 9
+    },
+    "2026-11-13": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 10
+    },
+    "2026-11-16": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 1
+    },
+    "2026-11-17": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 2
+    },
+    "2026-11-18": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 3
+    },
+    "2026-11-19": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 4
+    },
+    "2026-11-20": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 5
+    },
+    "2026-11-23": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 6
+    },
+    "2026-11-24": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 7
+    },
+    "2026-11-25": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 8
+    },
+    "2026-11-26": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 9
+    },
+    "2026-11-27": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 10
+    },
+    "2026-11-30": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 1
+    },
+    "2026-12-01": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 2
+    },
+    "2026-12-02": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 3
+    },
+    "2026-12-03": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 4
+    },
+    "2026-12-04": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 5
+    },
+    "2026-12-07": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 6
+    },
+    "2026-12-08": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 7
+    },
+    "2026-12-09": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 8
+    },
+    "2026-12-10": {
+      "teacher1": {
+        "code": "NHH",
+        "chi": "吳學軒",
+        "eng": "NG HOK HIN"
+      },
+      "teacher2": {
+        "code": "TSC",
+        "chi": "鄧瑞貞",
+        "eng": "TANG SUI CHING CRYSTAL"
+      },
+      "cycleDay": 9
+    },
+    "2026-12-11": {
+      "teacher1": {
+        "code": "PYL",
+        "chi": "潘蕊蘭",
+        "eng": "PUN YUI LAN"
+      },
+      "teacher2": {
+        "code": "SCL",
+        "chi": "蘇智亮",
+        "eng": "SO CHI LEONG"
+      },
+      "cycleDay": 10
+    },
+    "2026-12-15": {
+      "teacher1": {
+        "code": "TLP",
+        "chi": "徐麗寶",
+        "eng": "TSUI LAI PO"
+      },
+      "teacher2": {
+        "code": "WCY",
+        "chi": "黃俊賢",
+        "eng": "WONG CHUN YIN"
+      },
+      "cycleDay": 2
+    },
+    "2026-12-16": {
+      "teacher1": {
+        "code": "WKS",
+        "chi": "黃啟成",
+        "eng": "WONG KAI SHING"
+      },
+      "teacher2": {
+        "code": "WKYT",
+        "chi": "黃嘉燕",
+        "eng": "WONG KA YIN"
+      },
+      "cycleDay": 3
+    },
+    "2026-12-17": {
+      "teacher1": {
+        "code": "WSF",
+        "chi": "王笑芬",
+        "eng": "WONG SIU FUN"
+      },
+      "teacher2": {
+        "code": "YTH",
+        "chi": "余子海",
+        "eng": "YU TSZ HOI"
+      },
+      "cycleDay": 4
+    },
+    "2027-01-04": {
+      "teacher1": {
+        "code": "WSFA",
+        "chi": "黃雪芳",
+        "eng": "WONG SUET FONG"
+      },
+      "teacher2": {
+        "code": "CYK",
+        "chi": "蔡仁桂",
+        "eng": "CHOI YAN KWAI VICTOR"
+      },
+      "cycleDay": 4
+    },
+    "2027-01-05": {
+      "teacher1": {
+        "code": "WWKF",
+        "chi": "",
+        "eng": ""
+      },
+      "teacher2": {
+        "code": "YSHC",
+        "chi": "姚善珩",
+        "eng": "YIU SIN HANG"
+      },
+      "cycleDay": 4
+    },
+    "2027-01-06": {
+      "teacher1": {
+        "code": "LPC",
+        "chi": "呂佩姿",
+        "eng": "LUI PUI CHI"
+      },
+      "teacher2": {
+        "code": "HTY",
+        "chi": "何芷如",
+        "eng": "HO HELEN TSZ YU"
+      },
+      "cycleDay": 3
+    },
+    "2027-01-07": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 4
+    },
+    "2027-01-08": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 5
+    },
+    "2027-01-11": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 6
+    },
+    "2027-01-12": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 7
+    },
+    "2027-01-13": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 8
+    },
+    "2027-01-14": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 9
+    },
+    "2027-01-15": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 10
+    },
+    "2027-01-18": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 1
+    },
+    "2027-01-19": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 4
+    },
+    "2027-01-20": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 4
+    },
+    "2027-01-21": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-01-22": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 5
+    },
+    "2027-01-25": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 6
+    },
+    "2027-01-26": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 7
+    },
+    "2027-01-27": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 8
+    },
+    "2027-01-28": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 9
+    },
+    "2027-01-29": {
+      "teacher1": {
+        "code": "NHH",
+        "chi": "吳學軒",
+        "eng": "NG HOK HIN"
+      },
+      "teacher2": {
+        "code": "TSC",
+        "chi": "鄧瑞貞",
+        "eng": "TANG SUI CHING CRYSTAL"
+      },
+      "cycleDay": 10
+    },
+    "2027-02-01": {
+      "teacher1": {
+        "code": "PYL",
+        "chi": "潘蕊蘭",
+        "eng": "PUN YUI LAN"
+      },
+      "teacher2": {
+        "code": "SCL",
+        "chi": "蘇智亮",
+        "eng": "SO CHI LEONG"
+      },
+      "cycleDay": 1
+    },
+    "2027-02-02": {
+      "teacher1": {
+        "code": "TLP",
+        "chi": "徐麗寶",
+        "eng": "TSUI LAI PO"
+      },
+      "teacher2": {
+        "code": "WCY",
+        "chi": "黃俊賢",
+        "eng": "WONG CHUN YIN"
+      },
+      "cycleDay": 2
+    },
+    "2027-02-15": {
+      "teacher1": {
+        "code": "WKS",
+        "chi": "黃啟成",
+        "eng": "WONG KAI SHING"
+      },
+      "teacher2": {
+        "code": "WKYT",
+        "chi": "黃嘉燕",
+        "eng": "WONG KA YIN"
+      },
+      "cycleDay": 6
+    },
+    "2027-02-16": {
+      "teacher1": {
+        "code": "WSF",
+        "chi": "王笑芬",
+        "eng": "WONG SIU FUN"
+      },
+      "teacher2": {
+        "code": "YTH",
+        "chi": "余子海",
+        "eng": "YU TSZ HOI"
+      },
+      "cycleDay": 7
+    },
+    "2027-02-17": {
+      "teacher1": {
+        "code": "WSFA",
+        "chi": "黃雪芳",
+        "eng": "WONG SUET FONG"
+      },
+      "teacher2": {
+        "code": "CYK",
+        "chi": "蔡仁桂",
+        "eng": "CHOI YAN KWAI VICTOR"
+      },
+      "cycleDay": 8
+    },
+    "2027-02-18": {
+      "teacher1": {
+        "code": "WWKF",
+        "chi": "",
+        "eng": ""
+      },
+      "teacher2": {
+        "code": "YSHC",
+        "chi": "姚善珩",
+        "eng": "YIU SIN HANG"
+      },
+      "cycleDay": 9
+    },
+    "2027-02-19": {
+      "teacher1": {
+        "code": "LPC",
+        "chi": "呂佩姿",
+        "eng": "LUI PUI CHI"
+      },
+      "teacher2": {
+        "code": "HTY",
+        "chi": "何芷如",
+        "eng": "HO HELEN TSZ YU"
+      },
+      "cycleDay": 10
+    },
+    "2027-02-22": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 1
+    },
+    "2027-02-23": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 2
+    },
+    "2027-02-24": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 3
+    },
+    "2027-02-25": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 4
+    },
+    "2027-02-26": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 5
+    },
+    "2027-03-01": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 6
+    },
+    "2027-03-02": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 7
+    },
+    "2027-03-03": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 8
+    },
+    "2027-03-04": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 9
+    },
+    "2027-03-05": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 10
+    },
+    "2027-03-08": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 1
+    },
+    "2027-03-09": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 2
+    },
+    "2027-03-10": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 3
+    },
+    "2027-03-11": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 4
+    },
+    "2027-03-12": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 5
+    },
+    "2027-03-15": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 2
+    },
+    "2027-03-16": {
+      "teacher1": {
+        "code": "NHH",
+        "chi": "吳學軒",
+        "eng": "NG HOK HIN"
+      },
+      "teacher2": {
+        "code": "TSC",
+        "chi": "鄧瑞貞",
+        "eng": "TANG SUI CHING CRYSTAL"
+      },
+      "cycleDay": 3
+    },
+    "2027-03-17": {
+      "teacher1": {
+        "code": "PYL",
+        "chi": "潘蕊蘭",
+        "eng": "PUN YUI LAN"
+      },
+      "teacher2": {
+        "code": "SCL",
+        "chi": "蘇智亮",
+        "eng": "SO CHI LEONG"
+      },
+      "cycleDay": 8
+    },
+    "2027-03-18": {
+      "teacher1": {
+        "code": "TLP",
+        "chi": "徐麗寶",
+        "eng": "TSUI LAI PO"
+      },
+      "teacher2": {
+        "code": "WCY",
+        "chi": "黃俊賢",
+        "eng": "WONG CHUN YIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-03-19": {
+      "teacher1": {
+        "code": "WKS",
+        "chi": "黃啟成",
+        "eng": "WONG KAI SHING"
+      },
+      "teacher2": {
+        "code": "WKYT",
+        "chi": "黃嘉燕",
+        "eng": "WONG KA YIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-03-22": {
+      "teacher1": {
+        "code": "WSF",
+        "chi": "王笑芬",
+        "eng": "WONG SIU FUN"
+      },
+      "teacher2": {
+        "code": "YTH",
+        "chi": "余子海",
+        "eng": "YU TSZ HOI"
+      },
+      "cycleDay": 4
+    },
+    "2027-03-23": {
+      "teacher1": {
+        "code": "WSFA",
+        "chi": "黃雪芳",
+        "eng": "WONG SUET FONG"
+      },
+      "teacher2": {
+        "code": "CYK",
+        "chi": "蔡仁桂",
+        "eng": "CHOI YAN KWAI VICTOR"
+      },
+      "cycleDay": 4
+    },
+    "2027-04-01": {
+      "teacher1": {
+        "code": "WWKF",
+        "chi": "",
+        "eng": ""
+      },
+      "teacher2": {
+        "code": "YSHC",
+        "chi": "姚善珩",
+        "eng": "YIU SIN HANG"
+      },
+      "cycleDay": 4
+    },
+    "2027-04-02": {
+      "teacher1": {
+        "code": "LPC",
+        "chi": "呂佩姿",
+        "eng": "LUI PUI CHI"
+      },
+      "teacher2": {
+        "code": "HTY",
+        "chi": "何芷如",
+        "eng": "HO HELEN TSZ YU"
+      },
+      "cycleDay": 5
+    },
+    "2027-04-06": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 7
+    },
+    "2027-04-07": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 8
+    },
+    "2027-04-08": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 9
+    },
+    "2027-04-09": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 10
+    },
+    "2027-04-12": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 1
+    },
+    "2027-04-13": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 2
+    },
+    "2027-04-14": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 3
+    },
+    "2027-04-15": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-04-16": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 5
+    },
+    "2027-04-19": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 6
+    },
+    "2027-04-20": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 7
+    },
+    "2027-04-21": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 8
+    },
+    "2027-04-22": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 9
+    },
+    "2027-04-23": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 10
+    },
+    "2027-04-26": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 1
+    },
+    "2027-04-27": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 2
+    },
+    "2027-04-28": {
+      "teacher1": {
+        "code": "NHH",
+        "chi": "吳學軒",
+        "eng": "NG HOK HIN"
+      },
+      "teacher2": {
+        "code": "TSC",
+        "chi": "鄧瑞貞",
+        "eng": "TANG SUI CHING CRYSTAL"
+      },
+      "cycleDay": 3
+    },
+    "2027-04-29": {
+      "teacher1": {
+        "code": "PYL",
+        "chi": "潘蕊蘭",
+        "eng": "PUN YUI LAN"
+      },
+      "teacher2": {
+        "code": "SCL",
+        "chi": "蘇智亮",
+        "eng": "SO CHI LEONG"
+      },
+      "cycleDay": 4
+    },
+    "2027-05-03": {
+      "teacher1": {
+        "code": "TLP",
+        "chi": "徐麗寶",
+        "eng": "TSUI LAI PO"
+      },
+      "teacher2": {
+        "code": "WCY",
+        "chi": "黃俊賢",
+        "eng": "WONG CHUN YIN"
+      },
+      "cycleDay": 6
+    },
+    "2027-05-04": {
+      "teacher1": {
+        "code": "WKS",
+        "chi": "黃啟成",
+        "eng": "WONG KAI SHING"
+      },
+      "teacher2": {
+        "code": "WKYT",
+        "chi": "黃嘉燕",
+        "eng": "WONG KA YIN"
+      },
+      "cycleDay": 7
+    },
+    "2027-05-05": {
+      "teacher1": {
+        "code": "WSF",
+        "chi": "王笑芬",
+        "eng": "WONG SIU FUN"
+      },
+      "teacher2": {
+        "code": "YTH",
+        "chi": "余子海",
+        "eng": "YU TSZ HOI"
+      },
+      "cycleDay": 8
+    },
+    "2027-05-06": {
+      "teacher1": {
+        "code": "WSFA",
+        "chi": "黃雪芳",
+        "eng": "WONG SUET FONG"
+      },
+      "teacher2": {
+        "code": "CYK",
+        "chi": "蔡仁桂",
+        "eng": "CHOI YAN KWAI VICTOR"
+      },
+      "cycleDay": 9
+    },
+    "2027-05-07": {
+      "teacher1": {
+        "code": "WWKF",
+        "chi": "",
+        "eng": ""
+      },
+      "teacher2": {
+        "code": "YSHC",
+        "chi": "姚善珩",
+        "eng": "YIU SIN HANG"
+      },
+      "cycleDay": 10
+    },
+    "2027-05-10": {
+      "teacher1": {
+        "code": "LPC",
+        "chi": "呂佩姿",
+        "eng": "LUI PUI CHI"
+      },
+      "teacher2": {
+        "code": "HTY",
+        "chi": "何芷如",
+        "eng": "HO HELEN TSZ YU"
+      },
+      "cycleDay": 1
+    },
+    "2027-05-11": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 2
+    },
+    "2027-05-12": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 3
+    },
+    "2027-05-14": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 5
+    },
+    "2027-05-17": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 6
+    },
+    "2027-05-18": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 7
+    },
+    "2027-05-19": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 8
+    },
+    "2027-05-20": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 9
+    },
+    "2027-05-21": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 10
+    },
+    "2027-05-24": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 1
+    },
+    "2027-05-25": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 2
+    },
+    "2027-05-26": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 3
+    },
+    "2027-05-27": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 4
+    },
+    "2027-05-28": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 5
+    },
+    "2027-05-31": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 6
+    },
+    "2027-06-01": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-02": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-03": {
+      "teacher1": {
+        "code": "NHH",
+        "chi": "吳學軒",
+        "eng": "NG HOK HIN"
+      },
+      "teacher2": {
+        "code": "TSC",
+        "chi": "鄧瑞貞",
+        "eng": "TANG SUI CHING CRYSTAL"
+      },
+      "cycleDay": 9
+    },
+    "2027-06-04": {
+      "teacher1": {
+        "code": "PYL",
+        "chi": "潘蕊蘭",
+        "eng": "PUN YUI LAN"
+      },
+      "teacher2": {
+        "code": "SCL",
+        "chi": "蘇智亮",
+        "eng": "SO CHI LEONG"
+      },
+      "cycleDay": 10
+    },
+    "2027-06-07": {
+      "teacher1": {
+        "code": "TLP",
+        "chi": "徐麗寶",
+        "eng": "TSUI LAI PO"
+      },
+      "teacher2": {
+        "code": "WCY",
+        "chi": "黃俊賢",
+        "eng": "WONG CHUN YIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-08": {
+      "teacher1": {
+        "code": "WKS",
+        "chi": "黃啟成",
+        "eng": "WONG KAI SHING"
+      },
+      "teacher2": {
+        "code": "WKYT",
+        "chi": "黃嘉燕",
+        "eng": "WONG KA YIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-10": {
+      "teacher1": {
+        "code": "WSF",
+        "chi": "王笑芬",
+        "eng": "WONG SIU FUN"
+      },
+      "teacher2": {
+        "code": "YTH",
+        "chi": "余子海",
+        "eng": "YU TSZ HOI"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-11": {
+      "teacher1": {
+        "code": "WSFA",
+        "chi": "黃雪芳",
+        "eng": "WONG SUET FONG"
+      },
+      "teacher2": {
+        "code": "CYK",
+        "chi": "蔡仁桂",
+        "eng": "CHOI YAN KWAI VICTOR"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-14": {
+      "teacher1": {
+        "code": "WWKF",
+        "chi": "",
+        "eng": ""
+      },
+      "teacher2": {
+        "code": "YSHC",
+        "chi": "姚善珩",
+        "eng": "YIU SIN HANG"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-15": {
+      "teacher1": {
+        "code": "LPC",
+        "chi": "呂佩姿",
+        "eng": "LUI PUI CHI"
+      },
+      "teacher2": {
+        "code": "HTY",
+        "chi": "何芷如",
+        "eng": "HO HELEN TSZ YU"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-17": {
+      "teacher1": {
+        "code": "CCC",
+        "chi": "曹治聰",
+        "eng": "CHO CHI CHUNG"
+      },
+      "teacher2": {
+        "code": "AYWS",
+        "chi": "歐陽瑋珊",
+        "eng": "AU-YEUNG WAI SHEAN"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-18": {
+      "teacher1": {
+        "code": "CCY",
+        "chi": "陳卓賢",
+        "eng": "CHAN CHEUK YIN"
+      },
+      "teacher2": {
+        "code": "LTTA",
+        "chi": "",
+        "eng": ""
+      },
+      "cycleDay": 4
+    },
+    "2027-06-21": {
+      "teacher1": {
+        "code": "CKH",
+        "chi": "陳家曦",
+        "eng": "CHAN KA HAI"
+      },
+      "teacher2": {
+        "code": "HSY",
+        "chi": "何倩儀",
+        "eng": "HO SIN YEE"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-22": {
+      "teacher1": {
+        "code": "CKYI",
+        "chi": "周潔瑩",
+        "eng": "CHOW KIT YING"
+      },
+      "teacher2": {
+        "code": "HCS",
+        "chi": "洪澤生",
+        "eng": "HUNG CHAK SANG JONSON"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-23": {
+      "teacher1": {
+        "code": "CKYT",
+        "chi": "張家如",
+        "eng": "CHEUNG KA YU TEACHER"
+      },
+      "teacher2": {
+        "code": "LCHJ",
+        "chi": "李卓熙",
+        "eng": "LI CHEUK HEI"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-24": {
+      "teacher1": {
+        "code": "CMWE",
+        "chi": "陳文慧(英)",
+        "eng": "CHAN MAN WAI EMILY"
+      },
+      "teacher2": {
+        "code": "LYF",
+        "chi": "林耀輝",
+        "eng": "LAM YIU FAI"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-25": {
+      "teacher1": {
+        "code": "CWL",
+        "chi": "陳永利",
+        "eng": "CHAN WING LI"
+      },
+      "teacher2": {
+        "code": "SYT",
+        "chi": "蘇妍彤",
+        "eng": "SO YIN TUNG"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-28": {
+      "teacher1": {
+        "code": "CYT",
+        "chi": "陳逸婷",
+        "eng": "CHAN YAT TING"
+      },
+      "teacher2": {
+        "code": "FWK",
+        "chi": "馮永健",
+        "eng": "FUNG WING KIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-29": {
+      "teacher1": {
+        "code": "HSM",
+        "chi": "許秀文",
+        "eng": "HUI SAU MAN"
+      },
+      "teacher2": {
+        "code": "KMW",
+        "chi": "紀文偉",
+        "eng": "KEI MAN WAI JOE"
+      },
+      "cycleDay": 4
+    },
+    "2027-06-30": {
+      "teacher1": {
+        "code": "KKH",
+        "chi": "姜國雄",
+        "eng": "KEUNG KWOK HUNG"
+      },
+      "teacher2": {
+        "code": "NCY",
+        "chi": "吳早恩",
+        "eng": "NG CHO YAN"
+      },
+      "cycleDay": 4
+    },
+    "2027-07-02": {
+      "teacher1": {
+        "code": "KNS",
+        "chi": "高雅詩",
+        "eng": "KO NGA SZE REBEKAH"
+      },
+      "teacher2": {
+        "code": "KWY",
+        "chi": "郭偉賢",
+        "eng": "KWOK WAI YIN"
+      },
+      "cycleDay": 4
+    },
+    "2027-07-05": {
+      "teacher1": {
+        "code": "LKH",
+        "chi": "梁儉恒",
+        "eng": "LEUNG KIM HANG"
+      },
+      "teacher2": {
+        "code": "LNA",
+        "chi": "李諾",
+        "eng": "LI NOK ARIA"
+      },
+      "cycleDay": 4
+    },
+    "2027-07-06": {
+      "teacher1": {
+        "code": "LPL",
+        "chi": "李佩蕾",
+        "eng": "LI PUI LUI"
+      },
+      "teacher2": {
+        "code": "NCKK",
+        "chi": "吳志權",
+        "eng": "NG CHI KUEN"
+      },
+      "cycleDay": 4
+    },
+    "2027-07-07": {
+      "teacher1": {
+        "code": "LTC",
+        "chi": "林梓仲",
+        "eng": "LAM TSZ CHUNG"
+      },
+      "teacher2": {
+        "code": "LTY",
+        "chi": "梁德恩",
+        "eng": "LEUNG TAK YAM"
+      },
+      "cycleDay": 4
+    },
+    "2027-07-08": {
+      "teacher1": {
+        "code": "LTT",
+        "chi": "劉清翠",
+        "eng": "LOW TSING TSUI"
+      },
+      "teacher2": {
+        "code": "NYW",
+        "chi": "吳耀榮",
+        "eng": "NG YIU WING"
+      },
+      "cycleDay": 4
+    },
+    "2027-07-09": {
+      "teacher1": {
+        "code": "LWY",
+        "chi": "李穎欣",
+        "eng": "LI WING YAN"
+      },
+      "teacher2": {
+        "code": "WPC",
+        "chi": "黃柏琮",
+        "eng": "WONG PAK CHUNG"
+      },
+      "cycleDay": 4
+    }
+  }
+}

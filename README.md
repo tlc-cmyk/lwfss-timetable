@@ -94,6 +94,7 @@ python3 -m http.server 8765
 | `data.js` / `data.json` | 時間表 |
 | `calendar.js` / `calendar.json` | 校曆循環日 |
 | `bells.js` / `bells.json` | 一般／BF 鐘聲時間 |
+| `duty.js` / `duty.json` | 當值表日期 → Teacher1／Teacher2 |
 | `cycle-config.json` | 可選全校覆寫 |
 | `README.md` | 說明 |
 
@@ -125,11 +126,23 @@ Sheet 格式：每行一位教師；欄位 `ShortName, EngName, ChiName`，其�
 | `data.js` / `data.json` | 時間表 |
 | `calendar.js` / `calendar.json` | 校曆日期 → 循環日 |
 | `bells.js` / `bells.json` | 一般／BF 鐘聲時間 |
+| `duty.js` / `duty.json` | 當值表日期 → Teacher1／Teacher2 |
 | `cycle-config.json` | 全校循環日覆寫（可選） |
 | `calendar-2026-2027.txt` | 校曆文字來源（供重建） |
 | `scripts/build_data.py` | 由 Sheet 匯出重建時間表 |
 | `scripts/build_calendar.py` | 由校曆文字重建 calendar 檔 |
+| `scripts/build_duty.py` | 由當值表文字重建 duty 檔 |
 | `README.md` | 本說明 |
+
+## 當值老師
+
+來源：Duty Roster（Sep 2026 – July 2027），更新於 1/9/2026。
+
+```bash
+python3 scripts/build_duty.py /path/to/duty-roster.txt
+```
+
+會覆寫 `duty.js` 與 `duty.json`。介面頂部與日期選擇會顯示「今日／當日當值」；「當值」分頁可查即將當值日子。
 
 ## 注意事項
 
