@@ -1066,6 +1066,206 @@
       margin-top: 8px;
     }
 
+
+    /* 校曆 mini-tool */
+    .cal-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .cal-toolbar .cal-title {
+      flex: 1 1 auto;
+      min-width: 8rem;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--primary-dark);
+      text-align: center;
+    }
+    .cal-mode-toggle {
+      display: inline-flex;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .cal-mode-toggle button {
+      border: none;
+      background: transparent;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .cal-mode-toggle button.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .cal-nav-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+    }
+    .cal-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .cal-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .cal-legend i {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .cal-legend .lg-general { background: #d6e6f8; }
+    .cal-legend .lg-bf { background: #c8ebd9; }
+    .cal-legend .lg-holiday { background: #f8d4e0; }
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .cal-weekdays span {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 2px 0;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .cal-cell {
+      min-height: 68px;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+      padding: 4px 5px 5px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: #f4f6f8;
+      transition: transform .1s, box-shadow .15s, border-color .15s;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cal-cell:active { transform: scale(.97); }
+    .cal-cell.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+      min-height: 24px;
+      pointer-events: none;
+    }
+    .cal-cell.type-general {
+      background: #e8f0fe;
+      border-color: #b8d0f0;
+    }
+    .cal-cell.type-bf {
+      background: #e0f2ea;
+      border-color: #a0d4b8;
+    }
+    .cal-cell.type-holiday {
+      background: #fce4ec;
+      border-color: #f0b8c8;
+    }
+    .cal-cell.type-missing {
+      background: #f4f5f7;
+      border-color: var(--border);
+      opacity: .7;
+    }
+    .cal-cell.is-today {
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    .cal-cell.is-selected {
+      border-color: var(--primary-dark);
+      border-width: 2px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
+    .cal-cell .cd-num {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+    .cal-cell .cd-cycle {
+      font-size: 0.92rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: .02em;
+    }
+    .cal-cell.type-general .cd-cycle { color: #1a4d8c; }
+    .cal-cell.type-bf .cd-cycle { color: #0d5238; }
+    .cal-cell.type-holiday .cd-cycle { color: #8e0e42; }
+    .cal-cell .cd-events {
+      font-size: 0.62rem;
+      line-height: 1.25;
+      color: var(--text);
+      opacity: .88;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-all;
+    }
+    .cal-cell .cd-duty {
+      font-size: 0.58rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: auto;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cal-week-strip {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .cal-week-strip .cal-cell {
+      min-height: 110px;
+    }
+    .cal-week-strip .cd-events {
+      -webkit-line-clamp: 4;
+      font-size: 0.68rem;
+    }
+    .cal-detail {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--primary-soft);
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+    .cal-detail strong { color: var(--primary-dark); }
+    .cal-detail .cd-detail-events { margin-top: 4px; color: var(--text); }
+    .cal-detail .cd-detail-duty { margin-top: 4px; color: var(--muted); font-size: 0.82rem; }
+    @media (max-width: 420px) {
+      .cal-cell { min-height: 58px; padding: 3px 3px 4px; }
+      .cal-cell .cd-cycle { font-size: 0.82rem; }
+      .cal-cell .cd-events { font-size: 0.55rem; -webkit-line-clamp: 2; }
+      .cal-week-strip .cal-cell { min-height: 96px; }
+    }
+
     @media (min-width: 600px) {
       header.app-header { padding: 18px 24px 22px; }
       header h1 { font-size: 1.45rem; }
@@ -1134,6 +1334,7 @@
       <button class="tab" data-tab="cover" type="button">代堂助手</button>
       <button class="tab" data-tab="search" type="button">搜尋課室／班別</button>
       <button class="tab" data-tab="cycle" type="button">今日循環日</button>
+      <button class="tab" data-tab="cal" type="button">校曆</button>
       <button class="tab" data-tab="duty" type="button">當值</button>
     </nav>
 
@@ -1260,8 +1461,33 @@
     </section>
 
 
-    <!-- Duty roster -->    </section>
-
+    <!-- 校曆 -->
+    <section class="panel" id="panel-cal">
+      <div class="card">
+        <h2>校曆</h2>
+        <p class="hint" style="margin-bottom:10px;">按月／按週瀏覽 2026–2027 校曆循環日與事項。點選日子會同步頂部日期與循環日。</p>
+        <div class="cal-toolbar">
+          <div class="cal-mode-toggle" role="group" aria-label="檢視模式">
+            <button type="button" id="calModeMonth" class="active" data-cal-mode="month">月</button>
+            <button type="button" id="calModeWeek" data-cal-mode="week">週</button>
+          </div>
+          <div class="cal-title" id="calViewTitle">—</div>
+        </div>
+        <div class="cal-nav-row" style="margin-bottom:10px;">
+          <button class="btn btn-ghost btn-sm" id="calPrevBtn" type="button">上一個</button>
+          <button class="btn btn-sm" id="calTodayBtn" type="button">今日</button>
+          <button class="btn btn-ghost btn-sm" id="calNextBtn" type="button">下一個</button>
+        </div>
+        <div class="cal-legend">
+          <span><i class="lg-general"></i>一般上課</span>
+          <span><i class="lg-bf"></i>BF（Day 5／10）</span>
+          <span><i class="lg-holiday"></i>假期／無上課</span>
+        </div>
+        <div class="cal-weekdays" id="calWeekdays" aria-hidden="true"></div>
+        <div class="cal-grid" id="calGrid" role="grid" aria-label="校曆"></div>
+        <div class="cal-detail" id="calDetail" aria-live="polite"></div>
+      </div>
+    </section>
 
     <!-- Duty roster -->
     <section class="panel" id="panel-duty">
@@ -1850,6 +2076,8 @@
       // keep current day chips; still refresh title area if needed
       renderDayView();
     }
+    if (typeof syncSchoolCalCursor === 'function') syncSchoolCalCursor(ymd);
+    if (state.tab === 'cal' && typeof renderSchoolCal === 'function') renderSchoolCal();
     return info;
   }
 
@@ -2451,6 +2679,7 @@
     });
     if (name === 'nowfree') renderNowFree();
     if (name === 'cover' && typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
+    if (name === 'cal' && typeof renderSchoolCal === 'function') renderSchoolCal();
   }
 
   function esc(s) {
@@ -3085,6 +3314,302 @@
     });
   }
 
+
+
+  // --- 校曆檢視 (month / week) ---
+  var CIRCLE_DAYS = ['', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
+  var WEEKDAY_SHORT = ['日', '一', '二', '三', '四', '五', '六'];
+
+  var calState = {
+    mode: 'month', // month | week
+    cursorYmd: null // day anchoring visible month/week
+  };
+
+  var calViewTitle = document.getElementById('calViewTitle');
+  var calGrid = document.getElementById('calGrid');
+  var calWeekdays = document.getElementById('calWeekdays');
+  var calDetail = document.getElementById('calDetail');
+  var calPrevBtn = document.getElementById('calPrevBtn');
+  var calNextBtn = document.getElementById('calNextBtn');
+  var calTodayBtn = document.getElementById('calTodayBtn');
+  var calModeMonth = document.getElementById('calModeMonth');
+  var calModeWeek = document.getElementById('calModeWeek');
+
+  function parseYmdParts(ymd) {
+    var p = (ymd || '').split('-');
+    if (p.length !== 3) return null;
+    return {
+      y: parseInt(p[0], 10),
+      m: parseInt(p[1], 10),
+      d: parseInt(p[2], 10)
+    };
+  }
+
+  function ymdFromParts(y, m, d) {
+    return y + '-' + pad2(m) + '-' + pad2(d);
+  }
+
+  function addDaysYmd(ymd, delta) {
+    var p = parseYmdParts(ymd);
+    if (!p) return ymd;
+    var dt = new Date(Date.UTC(p.y, p.m - 1, p.d + delta));
+    return ymdFromParts(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate());
+  }
+
+  function weekdayIndexSun0(ymd) {
+    var p = parseYmdParts(ymd);
+    if (!p) return 0;
+    var dt = new Date(Date.UTC(p.y, p.m - 1, p.d, 4, 0, 0));
+    return dt.getUTCDay(); // 0=Sun
+  }
+
+  function startOfWeekSun(ymd) {
+    return addDaysYmd(ymd, -weekdayIndexSun0(ymd));
+  }
+
+  function daysInMonth(y, m) {
+    return new Date(Date.UTC(y, m, 0)).getUTCDate();
+  }
+
+  function cycleCircleLabel(day) {
+    if (day == null) return '';
+    return CIRCLE_DAYS[day] || ('D' + day);
+  }
+
+  function dayTypeForCal(ymd) {
+    var info = lookupCalendarDate(ymd);
+    if (info.status === 'school' && info.day != null) {
+      return scheduleIdForDay(info.day) === 'bf' ? 'bf' : 'general';
+    }
+    if (info.status === 'missing') return 'missing';
+    return 'holiday';
+  }
+
+  function dutyCodesShort(ymd) {
+    var entry = dutyFor(ymd);
+    if (!entry) return '';
+    var a = (entry.teacher1 && entry.teacher1.code) || '';
+    var b = (entry.teacher2 && entry.teacher2.code) || '';
+    if (!a && !b) return '';
+    return [a, b].filter(Boolean).join('/');
+  }
+
+  function syncSchoolCalCursor(ymd) {
+    if (!ymd) return;
+    calState.cursorYmd = ymd;
+  }
+
+  function ensureCalCursor() {
+    if (!calState.cursorYmd) {
+      calState.cursorYmd = state.browseDate || todayYmdHK();
+    }
+  }
+
+  function paintCalWeekdays() {
+    if (!calWeekdays) return;
+    calWeekdays.innerHTML = '';
+    WEEKDAY_SHORT.forEach(function (w) {
+      var s = document.createElement('span');
+      s.textContent = w;
+      calWeekdays.appendChild(s);
+    });
+  }
+
+  function buildCalCell(ymd, opts) {
+    opts = opts || {};
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cal-cell';
+    if (!ymd) {
+      btn.classList.add('empty');
+      btn.disabled = true;
+      btn.setAttribute('aria-hidden', 'true');
+      return btn;
+    }
+    btn.dataset.ymd = ymd;
+    var p = parseYmdParts(ymd);
+    var info = lookupCalendarDate(ymd);
+    var type = dayTypeForCal(ymd);
+    btn.classList.add('type-' + type);
+    var today = todayYmdHK();
+    var selected = state.browseDate || today;
+    if (ymd === today) btn.classList.add('is-today');
+    if (ymd === selected) btn.classList.add('is-selected');
+
+    var num = document.createElement('div');
+    num.className = 'cd-num';
+    num.textContent = String(p.d);
+    btn.appendChild(num);
+
+    var cycle = document.createElement('div');
+    cycle.className = 'cd-cycle';
+    if (info.status === 'school' && info.day != null) {
+      cycle.textContent = cycleCircleLabel(info.day);
+      cycle.title = 'Day ' + info.day;
+    } else if (info.status === 'holiday') {
+      cycle.textContent = '休';
+      cycle.style.fontSize = '0.78rem';
+    } else {
+      cycle.textContent = '—';
+      cycle.style.fontSize = '0.78rem';
+      cycle.style.opacity = '0.5';
+    }
+    btn.appendChild(cycle);
+
+    var evs = eventsFor(ymd);
+    if (evs.length) {
+      var evEl = document.createElement('div');
+      evEl.className = 'cd-events';
+      evEl.textContent = evs.join('、');
+      btn.appendChild(evEl);
+    }
+
+    if (opts.showDuty !== false) {
+      var dutyTxt = dutyCodesShort(ymd);
+      if (dutyTxt) {
+        var dutyEl = document.createElement('div');
+        dutyEl.className = 'cd-duty';
+        dutyEl.textContent = '值 ' + dutyTxt;
+        dutyEl.title = dutyDisplay(ymd).text;
+        btn.appendChild(dutyEl);
+      }
+    }
+
+    var aria = formatYmdZh(ymd) + '（' + weekdayLabelHK(ymd) + '）';
+    if (info.status === 'school' && info.day != null) aria += '，循環日 Day ' + info.day;
+    else aria += '，' + info.label;
+    if (evs.length) aria += '，' + evs.join('、');
+    btn.setAttribute('aria-label', aria);
+
+    btn.addEventListener('click', function () {
+      applyBrowseDate(ymd);
+      renderSchoolCal();
+    });
+    return btn;
+  }
+
+  function updateCalDetail(ymd) {
+    if (!calDetail) return;
+    ymd = ymd || state.browseDate || todayYmdHK();
+    var info = lookupCalendarDate(ymd);
+    var nice = formatYmdZh(ymd);
+    var wd = weekdayLabelHK(ymd);
+    var html = '<strong>' + esc(nice) + (wd ? '（' + esc(wd) + '）' : '') + '</strong>';
+    if (info.status === 'school' && info.day != null) {
+      var sched = scheduleForDay(info.day);
+      html += ' · ' + esc(cycleCircleLabel(info.day)) + ' Day ' + info.day;
+      if (sched && sched.label) html += ' · ' + esc(sched.label);
+    } else {
+      html += ' · ' + esc(info.label);
+    }
+    var evs = eventsFor(ymd);
+    if (evs.length) {
+      html += '<div class="cd-detail-events">事項：' + esc(evs.join('、')) + '</div>';
+    }
+    var d = dutyDisplay(ymd);
+    html += '<div class="cd-detail-duty">' + esc(d.hasDuty ? d.text : '是日無當值記錄') + '</div>';
+    calDetail.innerHTML = html;
+  }
+
+  function renderSchoolCalMonth() {
+    ensureCalCursor();
+    var p = parseYmdParts(calState.cursorYmd);
+    var y = p.y, m = p.m;
+    if (calViewTitle) calViewTitle.textContent = y + '年' + m + '月';
+    if (calGrid) {
+      calGrid.className = 'cal-grid';
+      calGrid.innerHTML = '';
+      var firstYmd = ymdFromParts(y, m, 1);
+      var lead = weekdayIndexSun0(firstYmd);
+      var dim = daysInMonth(y, m);
+      var i;
+      for (i = 0; i < lead; i++) calGrid.appendChild(buildCalCell(null));
+      for (i = 1; i <= dim; i++) {
+        calGrid.appendChild(buildCalCell(ymdFromParts(y, m, i)));
+      }
+      var total = lead + dim;
+      var trail = (7 - (total % 7)) % 7;
+      for (i = 0; i < trail; i++) calGrid.appendChild(buildCalCell(null));
+    }
+  }
+
+  function renderSchoolCalWeek() {
+    ensureCalCursor();
+    var start = startOfWeekSun(calState.cursorYmd);
+    var end = addDaysYmd(start, 6);
+    var sp = parseYmdParts(start);
+    var ep = parseYmdParts(end);
+    var title;
+    if (sp.y === ep.y && sp.m === ep.m) {
+      title = sp.y + '年' + sp.m + '月' + sp.d + '–' + ep.d + '日';
+    } else if (sp.y === ep.y) {
+      title = sp.y + '年' + sp.m + '月' + sp.d + '日 – ' + ep.m + '月' + ep.d + '日';
+    } else {
+      title = formatYmdZh(start) + ' – ' + formatYmdZh(end);
+    }
+    if (calViewTitle) calViewTitle.textContent = title;
+    if (calGrid) {
+      calGrid.className = 'cal-week-strip';
+      calGrid.innerHTML = '';
+      for (var i = 0; i < 7; i++) {
+        calGrid.appendChild(buildCalCell(addDaysYmd(start, i), { showDuty: true }));
+      }
+    }
+  }
+
+  function renderSchoolCal() {
+    if (!calGrid) return;
+    paintCalWeekdays();
+    if (calModeMonth) calModeMonth.classList.toggle('active', calState.mode === 'month');
+    if (calModeWeek) calModeWeek.classList.toggle('active', calState.mode === 'week');
+    if (calPrevBtn) calPrevBtn.textContent = calState.mode === 'month' ? '上月' : '上週';
+    if (calNextBtn) calNextBtn.textContent = calState.mode === 'month' ? '下月' : '下週';
+    if (calState.mode === 'week') renderSchoolCalWeek();
+    else renderSchoolCalMonth();
+    updateCalDetail(state.browseDate || todayYmdHK());
+  }
+
+  function calShift(dir) {
+    ensureCalCursor();
+    if (calState.mode === 'month') {
+      var p = parseYmdParts(calState.cursorYmd);
+      var nm = p.m + dir;
+      var ny = p.y;
+      while (nm < 1) { nm += 12; ny -= 1; }
+      while (nm > 12) { nm -= 12; ny += 1; }
+      var dim = daysInMonth(ny, nm);
+      var day = Math.min(p.d, dim);
+      calState.cursorYmd = ymdFromParts(ny, nm, day);
+    } else {
+      calState.cursorYmd = addDaysYmd(calState.cursorYmd, dir * 7);
+    }
+    renderSchoolCal();
+  }
+
+  if (calPrevBtn) calPrevBtn.addEventListener('click', function () { calShift(-1); });
+  if (calNextBtn) calNextBtn.addEventListener('click', function () { calShift(1); });
+  if (calTodayBtn) {
+    calTodayBtn.addEventListener('click', function () {
+      var t = todayYmdHK();
+      calState.cursorYmd = t;
+      applyBrowseDate(t);
+      renderSchoolCal();
+    });
+  }
+  if (calModeMonth) {
+    calModeMonth.addEventListener('click', function () {
+      calState.mode = 'month';
+      if (state.browseDate) calState.cursorYmd = state.browseDate;
+      renderSchoolCal();
+    });
+  }
+  if (calModeWeek) {
+    calModeWeek.addEventListener('click', function () {
+      calState.mode = 'week';
+      if (state.browseDate) calState.cursorYmd = state.browseDate;
+      renderSchoolCal();
+    });
+  }
 
   // --- 即時空堂 (live free teachers) ---
   var nowfreeTime = document.getElementById('nowfreeTime');
