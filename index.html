@@ -953,6 +953,82 @@
       color: #922b21;
     }
 
+
+    /* 即時空堂 (live free teachers) */
+    .nowfree-status {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .nowfree-status .nf-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 14px;
+      font-size: 0.92rem;
+    }
+    .nowfree-status .nf-label {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .nowfree-status .nf-value {
+      font-weight: 800;
+      color: var(--primary-dark);
+      font-variant-numeric: tabular-nums;
+    }
+    .nowfree-status .nf-value.nf-hot {
+      color: #c0392b;
+    }
+    .nowfree-banner {
+      margin: 0 0 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #fff6e8;
+      border: 1.5px solid #e8b86a;
+      color: #7a4e12;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .nowfree-banner.is-period {
+      background: #eef8f0;
+      border-color: #7cbc8a;
+      color: #1e6b3a;
+    }
+    .nowfree-banner.is-break {
+      background: #fff6e8;
+      border-color: #e8b86a;
+      color: #7a4e12;
+    }
+    .nowfree-banner.is-idle {
+      background: #f4f5f7;
+      border-color: var(--border);
+      color: var(--muted);
+    }
+    .nowfree-banner.is-holiday {
+      background: #fdeef2;
+      border-color: #e8a0b0;
+      color: #8b2e4a;
+    }
+    .tab[data-tab="nowfree"] {
+      font-weight: 800;
+    }
+    .nowfree-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .nowfree-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
     @media (min-width: 600px) {
       header.app-header { padding: 18px 24px 22px; }
       header h1 { font-size: 1.45rem; }
@@ -1016,6 +1092,7 @@
 
     <nav class="tabs" id="mainTabs">
       <button class="tab active" data-tab="day" type="button">循環日課表</button>
+      <button class="tab" data-tab="nowfree" type="button">即時空堂</button>
       <button class="tab" data-tab="overview" type="button">全日概覽</button>
       <button class="tab" data-tab="cover" type="button">代堂助手</button>
       <button class="tab" data-tab="search" type="button">搜尋課室／班別</button>
@@ -1043,6 +1120,32 @@
         <div class="lesson-list" id="lessonList"></div>
       </div>
       <div class="empty" id="dayEmpty">請先輸入教師代碼查詢。</div>
+    </section>
+
+
+    <!-- 即時空堂: live free teachers -->
+    <section class="panel" id="panel-nowfree">
+      <div class="card">
+        <h2>即時空堂</h2>
+        <p class="hint" style="margin-bottom:10px;">根據今日校曆循環日同鐘聲（一般／BF），自動顯示<strong>現正空堂</strong>嘅老師。約每分鐘自動更新。</p>
+        <div class="nowfree-status" id="nowfreeStatus">
+          <div class="nf-row"><span class="nf-label">香港時間</span><span class="nf-value" id="nowfreeTime">--:--</span></div>
+          <div class="nf-row"><span class="nf-label">循環日</span><span class="nf-value" id="nowfreeDay">—</span></div>
+          <div class="nf-row"><span class="nf-label">時段</span><span class="nf-value nf-hot" id="nowfreeSlot">—</span></div>
+        </div>
+        <div class="nowfree-banner is-idle" id="nowfreeBanner">載入中…</div>
+        <div class="nowfree-refresh" id="nowfreeRefreshHint">自動更新 · 約每分鐘</div>
+      </div>
+
+      <div class="card" id="nowfreeResultsCard" hidden>
+        <div class="cover-summary-bar">
+          <h2 style="margin:0;" id="nowfreeListTitle">現正空堂老師</h2>
+          <span class="badge-count" id="nowfreeCount"></span>
+        </div>
+        <p class="hint" id="nowfreeListHint" style="margin-bottom:8px;"></p>
+        <div class="cover-list" id="nowfreeList"></div>
+      </div>
+      <div class="empty" id="nowfreeEmpty" hidden></div>
     </section>
 
     <!-- Overview -->
@@ -2323,6 +2426,7 @@
     document.querySelectorAll('.panel').forEach(function (p) {
       p.classList.toggle('active', p.id === 'panel-' + name);
     });
+    if (name === 'nowfree') renderNowFree();
   }
 
   function esc(s) {
@@ -2802,7 +2906,231 @@
     });
   }
 
-  function tickLiveClock() {
+
+  // --- 即時空堂 (live free teachers) ---
+  var nowfreeTime = document.getElementById('nowfreeTime');
+  var nowfreeDay = document.getElementById('nowfreeDay');
+  var nowfreeSlot = document.getElementById('nowfreeSlot');
+  var nowfreeBanner = document.getElementById('nowfreeBanner');
+  var nowfreeResultsCard = document.getElementById('nowfreeResultsCard');
+  var nowfreeList = document.getElementById('nowfreeList');
+  var nowfreeCount = document.getElementById('nowfreeCount');
+  var nowfreeListTitle = document.getElementById('nowfreeListTitle');
+  var nowfreeListHint = document.getElementById('nowfreeListHint');
+  var nowfreeEmpty = document.getElementById('nowfreeEmpty');
+  var nowfreeRefreshHint = document.getElementById('nowfreeRefreshHint');
+
+  /** Next lesson period number after current HKT time on this cycle day, or null. */
+  function findNextPeriod(cycleDay) {
+    var sched = scheduleForDay(cycleDay);
+    if (!sched || !sched.slots) return null;
+    var mins = nowHKTParts().minutes;
+    var best = null;
+    for (var i = 0; i < sched.slots.length; i++) {
+      var s = sched.slots[i];
+      if (s.period == null) continue;
+      var a = hmToMinutes(s.start);
+      if (a == null) continue;
+      if (a > mins) {
+        if (best == null || a < best.start) {
+          best = { period: s.period, start: a, label: s.label, slot: s };
+        }
+      }
+    }
+    return best;
+  }
+
+  function listFreeTeachersForPeriod(day, period) {
+    var free = [];
+    DATA.teachers.forEach(function (t) {
+      var daySched = t.schedule[String(day)] || {};
+      if (!daySched[String(period)]) {
+        free.push({
+          teacher: t,
+          freeCount: countFreePeriodsOnDay(t, day)
+        });
+      }
+    });
+    free.sort(function (a, b) {
+      if (b.freeCount !== a.freeCount) return b.freeCount - a.freeCount;
+      return a.teacher.code.localeCompare(b.teacher.code);
+    });
+    return free;
+  }
+
+  function renderNowFreeTeacherList(free, day) {
+    nowfreeList.innerHTML = '';
+    if (!free.length) {
+      nowfreeList.innerHTML = '<div class="empty" style="padding:16px 0;">呢節冇空堂老師。</div>';
+      return;
+    }
+    free.forEach(function (item) {
+      var t = item.teacher;
+      var div = document.createElement('div');
+      div.className = 'cover-item';
+      var left = document.createElement('div');
+      left.style.flex = '1 1 160px';
+      left.innerHTML =
+        '<div class="who"><span class="code">' + esc(t.code) + '</span></div>' +
+        '<div class="names">' +
+          esc(t.chi || '') +
+          (t.eng ? (t.chi ? ' · ' : '') + esc(t.eng) : '') +
+        '</div>';
+      var right = document.createElement('div');
+      right.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:6px;';
+      var pill = document.createElement('span');
+      pill.className = 'hint-pill';
+      pill.textContent = '當日空堂 ' + item.freeCount + ' 節';
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn btn-ghost btn-sm';
+      b.textContent = '查看時間表';
+      b.addEventListener('click', function () {
+        selectTeacher(t, { keepDay: false });
+        state.day = day;
+        switchTab('day');
+        renderDayView();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      right.appendChild(pill);
+      right.appendChild(b);
+      div.appendChild(left);
+      div.appendChild(right);
+      nowfreeList.appendChild(div);
+    });
+  }
+
+  function setNowfreeBanner(cls, text) {
+    if (!nowfreeBanner) return;
+    nowfreeBanner.className = 'nowfree-banner ' + cls;
+    nowfreeBanner.textContent = text;
+  }
+
+  function renderNowFree() {
+    if (!nowfreeTime) return;
+    var parts = nowHKTParts();
+    nowfreeTime.textContent = parts.hm + (parts.second != null ? '' : '');
+    var r = resolveTodayCycle();
+    var day = r.day;
+
+    if (nowfreeRefreshHint) {
+      nowfreeRefreshHint.textContent = '自動更新 · 約每分鐘 · 上次更新 ' + parts.hm;
+    }
+
+    // Holiday / no school day
+    if (day == null) {
+      nowfreeDay.textContent = (r.source === 'holiday' || r.source === 'missing')
+        ? '今日無正規日課'
+        : '—';
+      nowfreeSlot.textContent = '—';
+      nowfreeResultsCard.hidden = true;
+      nowfreeEmpty.hidden = false;
+      var holidayMsg = (r.source === 'holiday')
+        ? '今日校曆為假期／無上課／活動日，冇正規空堂可顯示。'
+        : (r.source === 'missing')
+          ? '校曆無今日日期，無法判斷循環日。'
+          : '今日無正規日課，無法顯示空堂老師。';
+      setNowfreeBanner('is-holiday', holidayMsg);
+      nowfreeEmpty.textContent = holidayMsg;
+      return;
+    }
+
+    nowfreeDay.textContent = 'Day ' + day +
+      (scheduleIdForDay(day) === 'bf' ? '（BF）' : '（一般）');
+
+    var slot = findCurrentSlot(day);
+    if (!slot) {
+      nowfreeSlot.textContent = '—';
+      nowfreeResultsCard.hidden = true;
+      nowfreeEmpty.hidden = false;
+      setNowfreeBanner('is-idle', '未能判斷目前時段。');
+      nowfreeEmpty.textContent = '未能判斷目前時段。';
+      return;
+    }
+
+    if (slot.kind === 'before') {
+      nowfreeSlot.textContent = slot.label || '上課前';
+      var nextP = findNextPeriod(day);
+      nowfreeResultsCard.hidden = true;
+      nowfreeEmpty.hidden = false;
+      if (nextP) {
+        var bell0 = periodBell(day, nextP.period);
+        var range0 = formatBellRange(bell0);
+        setNowfreeBanner('is-idle',
+          '尚未上課。下一節係 P' + nextP.period +
+          (range0 ? '（' + range0 + '）' : '') + '。');
+        // Optionally preview free for first period
+        var free0 = listFreeTeachersForPeriod(day, nextP.period);
+        nowfreeResultsCard.hidden = false;
+        nowfreeEmpty.hidden = true;
+        nowfreeListTitle.textContent = '下一節（P' + nextP.period + '）空堂老師';
+        nowfreeCount.textContent = free0.length + ' 位空堂';
+        nowfreeListHint.textContent = '上課前預覽 · 正式空堂以鐘聲開始後為準';
+        renderNowFreeTeacherList(free0, day);
+      } else {
+        setNowfreeBanner('is-idle', '尚未上課。');
+        nowfreeEmpty.textContent = '尚未上課。';
+      }
+      return;
+    }
+
+    if (slot.kind === 'after') {
+      nowfreeSlot.textContent = slot.label || '放學後';
+      nowfreeResultsCard.hidden = true;
+      nowfreeEmpty.hidden = false;
+      setNowfreeBanner('is-idle', '已經放學，今日日課完結。');
+      nowfreeEmpty.textContent = '已經放學，今日日課完結。';
+      return;
+    }
+
+    if (slot.kind === 'break') {
+      var breakLabel = slot.label || '休息中';
+      nowfreeSlot.textContent = breakLabel;
+      var next = findNextPeriod(day);
+      if (next) {
+        var bellN = periodBell(day, next.period);
+        var rangeN = formatBellRange(bellN);
+        setNowfreeBanner('is-break',
+          breakLabel + ' · 下一節 P' + next.period +
+          (rangeN ? '（' + rangeN + '）' : '') +
+          ' · 下列為下一節空堂老師');
+        var freeN = listFreeTeachersForPeriod(day, next.period);
+        nowfreeResultsCard.hidden = false;
+        nowfreeEmpty.hidden = true;
+        nowfreeListTitle.textContent = '下一節（P' + next.period + '）空堂老師';
+        nowfreeCount.textContent = freeN.length + ' 位空堂';
+        nowfreeListHint.textContent = breakLabel + ' · 預覽下一節可代堂人選';
+        renderNowFreeTeacherList(freeN, day);
+      } else {
+        setNowfreeBanner('is-break', breakLabel + ' · 之後已無正式節次。');
+        nowfreeResultsCard.hidden = true;
+        nowfreeEmpty.hidden = false;
+        nowfreeEmpty.textContent = breakLabel + ' · 之後已無正式節次。';
+      }
+      return;
+    }
+
+    // Lesson period
+    var period = slot.period;
+    var bell = periodBell(day, period);
+    var range = formatBellRange(bell);
+    nowfreeSlot.textContent = 'P' + period + (range ? ' · ' + range : '');
+    setNowfreeBanner('is-period',
+      '現正：' + (slot.label || ('第' + period + '節')) +
+      (range ? '（' + range + '）' : '') +
+      ' · 下列老師呢節空堂');
+
+    var free = listFreeTeachersForPeriod(day, period);
+    nowfreeResultsCard.hidden = false;
+    nowfreeEmpty.hidden = true;
+    nowfreeListTitle.textContent = '現正空堂老師';
+    nowfreeCount.textContent = free.length + ' 位空堂';
+    nowfreeListHint.textContent = 'Day ' + day + ' · P' + period + ' · 共 ' + DATA.teachers.length + ' 位教師';
+    renderNowFreeTeacherList(free, day);
+  }
+
+
+    function tickLiveClock() {
     var timeEl = document.getElementById('liveClockTime');
     var statusEl = document.getElementById('liveClockStatus');
     var parts = nowHKTParts();
@@ -2844,6 +3172,8 @@
     if (state.teacher && isToday) {
       renderDayView();
     }
+    // Keep 即時空堂 in sync every minute
+    renderNowFree();
   }
 
   function startLiveClock() {
