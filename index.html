@@ -775,29 +775,103 @@
     /* Cover / substitute assistant */
     .cover-controls {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 10px;
     }
     @media (min-width: 520px) {
-      .cover-controls { grid-template-columns: 1fr 1fr 1fr; }
+      .cover-controls { grid-template-columns: 1fr 1fr; }
     }
     .cover-controls .full { grid-column: 1 / -1; }
-    .cover-absent-box {
-      display: none;
-      margin-top: 10px;
+    .cover-step {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: .02em;
+      margin-bottom: 4px;
+    }
+    .cover-date-hint {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .cover-list { display: flex; flex-direction: column; gap: 10px; }
+    .cover-lesson {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cover-lesson .lesson-main {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px 12px;
+    }
+    .cover-lesson .period-tag {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 0.95rem;
+    }
+    .cover-lesson .lesson-meta {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .cover-lesson .lesson-time {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .cover-lesson-assign {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    @media (min-width: 560px) {
+      .cover-lesson-assign { grid-template-columns: minmax(160px, 1.2fr) minmax(140px, 1fr); }
+    }
+    .cover-lesson-assign label.field-label { margin-bottom: 2px; }
+    .cover-lesson-assign select,
+    .cover-lesson-assign input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      font-size: 0.9rem;
+      background: #fff;
+    }
+    .cover-export-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+    }
+    .cover-export-preview {
+      margin-top: 12px;
       padding: 12px;
       border-radius: 10px;
-      border: 1.5px solid var(--danger);
-      background: #fdf0ef;
+      border: 1px dashed var(--border);
+      background: var(--bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 280px;
+      overflow: auto;
+      display: none;
     }
-    .cover-absent-box.show { display: block; }
-    .cover-absent-box .title {
-      font-weight: 800;
-      color: var(--danger);
-      font-size: 0.9rem;
-      margin-bottom: 6px;
+    .cover-export-preview.show { display: block; }
+    .cover-summary-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
-    .cover-list { display: flex; flex-direction: column; gap: 8px; }
     .cover-item {
       border: 1.5px solid var(--free-border);
       border-radius: 10px;
@@ -808,10 +882,6 @@
       align-items: flex-start;
       gap: 10px;
       flex-wrap: wrap;
-    }
-    .cover-item.busy-item {
-      background: #fff;
-      border-color: var(--border);
     }
     .cover-item .who { font-weight: 700; }
     .cover-item .who .code {
@@ -832,39 +902,6 @@
       padding: 3px 8px;
       border-radius: 999px;
       white-space: nowrap;
-    }
-    .cover-item .lesson-line {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-    details.cover-busy {
-      margin-top: 8px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #fff;
-      padding: 8px 12px;
-    }
-    details.cover-busy summary {
-      cursor: pointer;
-      font-weight: 700;
-      color: var(--muted);
-      font-size: 0.9rem;
-      list-style: none;
-    }
-    details.cover-busy summary::-webkit-details-marker { display: none; }
-    details.cover-busy summary::before {
-      content: "▸ ";
-      color: var(--primary);
-    }
-    details.cover-busy[open] summary::before { content: "▾ "; }
-    .cover-summary-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
     }
 
 
@@ -1173,70 +1210,57 @@
     <section class="panel" id="panel-cover">
       <div class="card">
         <h2>代堂助手</h2>
-        <p class="hint" style="margin-bottom:10px;">揀循環日同節數，列出嗰節空堂嘅老師（可代堂），並顯示當日空堂數量作工作量參考。</p>
+        <p class="hint" style="margin-bottom:10px;">先揀缺席教師，再揀循環日（或跟頂部校曆日期），為當日每節課堂指派代堂老師同備註，最後匯出。</p>
         <div class="cover-controls">
-          <div>
-            <label class="field-label" for="coverDay">循環日</label>
-            <select id="coverDay">
-              <option value="1">Day 1</option>
-              <option value="2">Day 2</option>
-              <option value="3">Day 3</option>
-              <option value="4">Day 4</option>
-              <option value="5">Day 5</option>
-              <option value="6">Day 6</option>
-              <option value="7">Day 7</option>
-              <option value="8">Day 8</option>
-              <option value="9">Day 9</option>
-              <option value="10">Day 10</option>
-            </select>
-          </div>
-          <div>
-            <label class="field-label" for="coverPeriod">節數</label>
-            <select id="coverPeriod"></select>
-          </div>
           <div class="full">
-            <label class="field-label" for="coverSubject">科目專長篩選（可選）</label>
-            <select id="coverSubject">
-              <option value="">— 全部 —</option>
-            </select>
-          </div>
-          <div class="full">
-            <label class="field-label" for="coverAbsent">缺席教師 ShortName（可選）</label>
+            <div class="cover-step">① 缺席教師</div>
+            <label class="field-label" for="coverAbsent">ShortName</label>
             <div class="row">
-              <input type="text" id="coverAbsent" list="teacherList" placeholder="例如缺席老師代碼…" autocomplete="off" autocapitalize="characters" />
-              <button class="btn" id="coverFindBtn" type="button">查詢</button>
+              <input type="text" id="coverAbsent" list="teacherList" placeholder="例如 TLC…" autocomplete="off" autocapitalize="characters" />
+              <button class="btn" id="coverLoadBtn" type="button">載入課堂</button>
             </div>
           </div>
+          <div class="full">
+            <div class="cover-step">② 循環日</div>
+            <label class="field-label" for="coverDay">循環日</label>
+            <div class="row">
+              <select id="coverDay">
+                <option value="1">Day 1</option>
+                <option value="2">Day 2</option>
+                <option value="3">Day 3</option>
+                <option value="4">Day 4</option>
+                <option value="5">Day 5</option>
+                <option value="6">Day 6</option>
+                <option value="7">Day 7</option>
+                <option value="8">Day 8</option>
+                <option value="9">Day 9</option>
+                <option value="10">Day 10</option>
+              </select>
+              <button class="btn btn-ghost" id="coverUseHeaderDayBtn" type="button">用頂部日期</button>
+            </div>
+            <div class="cover-date-hint" id="coverDateHint"></div>
+          </div>
         </div>
-        <div class="hint">唔使先查教師時間表都可以用 · 缺席教師若果嗰節有課會特別標示</div>
-      </div>
-
-      <div class="cover-absent-box" id="coverAbsentBox">
-        <div class="title">缺席教師該節課堂（須代堂）</div>
-        <div id="coverAbsentDetail"></div>
       </div>
 
       <div class="card" id="coverResultsCard" hidden>
         <div class="cover-summary-bar">
-          <h2 style="margin:0;">可代堂（空堂）老師</h2>
-          <span class="badge-count" id="coverFreeCount"></span>
+          <h2 style="margin:0;" id="coverLessonsTitle">須代堂課堂</h2>
+          <span class="badge-count" id="coverLessonCount"></span>
         </div>
-        <div class="cover-list" id="coverFreeList"></div>
-        <details class="cover-busy" id="coverBusyDetails">
-          <summary id="coverBusySummary">嗰節有課嘅老師</summary>
-          <div class="cover-list" id="coverBusyList" style="margin-top:10px;"></div>
-        </details>
-        <div class="room-free-card" id="coverRoomsBox">
-          <div class="cover-summary-bar" style="margin-top:14px;">
-            <h2 style="margin:0;font-size:1rem;">該節空置課室</h2>
-            <span class="badge-count" id="coverRoomCount"></span>
-          </div>
-          <p class="hint" style="margin-top:4px;">時間表有出現過、但呢節無人用嘅課室（供調課／代堂參考）</p>
-          <div class="room-free-list" id="coverFreeRooms"></div>
+        <p class="hint" id="coverAbsentInfo" style="margin-bottom:10px;"></p>
+        <div class="cover-list" id="coverLessonList"></div>
+        <div class="cover-export-bar">
+          <button class="btn" id="coverExportCsvBtn" type="button">匯出 CSV</button>
+          <button class="btn btn-ghost" id="coverExportTextBtn" type="button">列印／複製文字</button>
         </div>
+        <pre class="cover-export-preview" id="coverExportPreview" aria-live="polite"></pre>
       </div>
-      <div class="empty" id="coverEmpty">請選擇循環日同節數，然後按「查詢」。</div>
+      <div class="empty" id="coverEmpty">請先輸入缺席教師 ShortName，再按「載入課堂」。</div>
     </section>
+
+
+    <!-- Duty roster -->    </section>
 
 
     <!-- Duty roster -->
@@ -1427,8 +1451,6 @@
   var adminSaveBtn = document.getElementById('adminSaveBtn');
   var adminClearBtn = document.getElementById('adminClearBtn');
   var adminHint = document.getElementById('adminHint');
-  var coverFreeRooms = document.getElementById('coverFreeRooms');
-  var coverRoomCount = document.getElementById('coverRoomCount');
 
   // Init datalist
   codes.forEach(function (c) {
@@ -1814,7 +1836,8 @@
       state.day = info.day;
       if (coverDay) {
         coverDay.value = String(info.day);
-        fillCoverPeriods();
+        if (typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
+        if (typeof maybeRerenderCover === 'function') maybeRerenderCover();
       }
       if (state.teacher) renderDayView();
       else if (typeof buildDayChips === 'function') {
@@ -2427,6 +2450,7 @@
       p.classList.toggle('active', p.id === 'panel-' + name);
     });
     if (name === 'nowfree') renderNowFree();
+    if (name === 'cover' && typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
   }
 
   function esc(s) {
@@ -2479,31 +2503,23 @@
 
   // --- Cover / substitute assistant ---
   var coverDay = document.getElementById('coverDay');
-  var coverPeriod = document.getElementById('coverPeriod');
-  var coverSubject = document.getElementById('coverSubject');
   var coverAbsent = document.getElementById('coverAbsent');
-  var coverFindBtn = document.getElementById('coverFindBtn');
-  var coverAbsentBox = document.getElementById('coverAbsentBox');
-  var coverAbsentDetail = document.getElementById('coverAbsentDetail');
+  var coverLoadBtn = document.getElementById('coverLoadBtn');
+  var coverUseHeaderDayBtn = document.getElementById('coverUseHeaderDayBtn');
+  var coverDateHint = document.getElementById('coverDateHint');
   var coverResultsCard = document.getElementById('coverResultsCard');
-  var coverFreeList = document.getElementById('coverFreeList');
-  var coverBusyList = document.getElementById('coverBusyList');
-  var coverFreeCount = document.getElementById('coverFreeCount');
-  var coverBusySummary = document.getElementById('coverBusySummary');
+  var coverLessonList = document.getElementById('coverLessonList');
+  var coverLessonCount = document.getElementById('coverLessonCount');
+  var coverLessonsTitle = document.getElementById('coverLessonsTitle');
+  var coverAbsentInfo = document.getElementById('coverAbsentInfo');
   var coverEmpty = document.getElementById('coverEmpty');
+  var coverExportCsvBtn = document.getElementById('coverExportCsvBtn');
+  var coverExportTextBtn = document.getElementById('coverExportTextBtn');
+  var coverExportPreview = document.getElementById('coverExportPreview');
 
-  function teacherSubjects(t) {
-    var set = {};
-    for (var d = 1; d <= 10; d++) {
-      var daySched = t.schedule[String(d)] || {};
-      Object.keys(daySched).forEach(function (p) {
-        var L = daySched[p];
-        if (L && L.subjectShort) set[L.subjectShort] = true;
-        else if (L && L.subject) set[L.subject] = true;
-      });
-    }
-    return Object.keys(set).sort();
-  }
+  /** period(string) -> { coverCode, note } */
+  var coverAssignments = {};
+  var coverLoadedAbsent = null; // teacher object last loaded
 
   function countFreePeriodsOnDay(t, day) {
     var maxp = periodsForDay(day);
@@ -2515,261 +2531,424 @@
     return free;
   }
 
-  function fillCoverPeriods() {
-    var d = parseInt(coverDay.value, 10) || 1;
-    var maxp = periodsForDay(d);
-    var prev = coverPeriod.value;
-    coverPeriod.innerHTML = '';
-    for (var p = 1; p <= maxp; p++) {
-      var opt = document.createElement('option');
-      opt.value = String(p);
-      var range = formatBellRange(periodBell(d, p));
-      opt.textContent = range ? ('P' + p + ' · ' + range) : ('P' + p);
-      coverPeriod.appendChild(opt);
-    }
-    if (prev && parseInt(prev, 10) <= maxp) coverPeriod.value = prev;
-  }
-
-  function fillCoverSubjects() {
-    var set = {};
+  function freeTeachersForPeriod(day, period, excludeCode) {
+    var list = [];
     DATA.teachers.forEach(function (t) {
-      teacherSubjects(t).forEach(function (s) { set[s] = true; });
-    });
-    var list = Object.keys(set).sort(function (a, b) {
-      return a.localeCompare(b, 'zh-HK');
-    });
-    coverSubject.innerHTML = '<option value="">— 全部 —</option>';
-    list.forEach(function (s) {
-      var opt = document.createElement('option');
-      opt.value = s;
-      opt.textContent = s;
-      coverSubject.appendChild(opt);
-    });
-  }
-
-  function teacherTeachesSubject(t, subj) {
-    if (!subj) return true;
-    var subs = teacherSubjects(t);
-    return subs.indexOf(subj) !== -1;
-  }
-
-  function renderCoverResults() {
-    var day = parseInt(coverDay.value, 10) || 1;
-    var period = parseInt(coverPeriod.value, 10) || 1;
-    var subjFilter = coverSubject.value || '';
-    var absentCode = (coverAbsent.value || '').trim().toUpperCase();
-
-    var free = [];
-    var busy = [];
-
-    DATA.teachers.forEach(function (t) {
+      if (excludeCode && t.code === excludeCode) return;
       var daySched = t.schedule[String(day)] || {};
-      var L = daySched[String(period)];
-      if (L) {
-        busy.push({ teacher: t, lesson: L });
-      } else {
-        if (teacherTeachesSubject(t, subjFilter)) {
-          free.push({
-            teacher: t,
-            freeCount: countFreePeriodsOnDay(t, day)
-          });
-        }
+      if (!daySched[String(period)]) {
+        list.push({
+          teacher: t,
+          freeCount: countFreePeriodsOnDay(t, day)
+        });
       }
     });
-
-    free.sort(function (a, b) {
+    list.sort(function (a, b) {
       if (b.freeCount !== a.freeCount) return b.freeCount - a.freeCount;
       return a.teacher.code.localeCompare(b.teacher.code);
     });
-    busy.sort(function (a, b) {
-      return a.teacher.code.localeCompare(b.teacher.code);
-    });
+    return list;
+  }
 
-    // Absent teacher highlight
-    coverAbsentBox.classList.remove('show');
-    coverAbsentDetail.innerHTML = '';
-    if (absentCode) {
-      var at = lookupTeacher(absentCode);
-      if (!at) {
-        coverAbsentBox.classList.add('show');
-        coverAbsentDetail.innerHTML =
-          '<div class="lesson-line">找不到教師代碼「' + esc(absentCode) + '」。</div>';
-      } else {
-        var aSched = at.schedule[String(day)] || {};
-        var aL = aSched[String(period)];
-        coverAbsentBox.classList.add('show');
-        if (aL) {
-          coverAbsentDetail.innerHTML =
-            '<div class="who"><span class="code">' + esc(at.code) + '</span>' +
-              (at.chi ? ' · ' + esc(at.chi) : '') +
-              (at.eng ? ' · ' + esc(at.eng) : '') +
-            '</div>' +
-            '<div class="lesson-line">Day ' + day + ' · P' + period + ' · ' +
-              esc(aL.subjectShort || aL.subject) + ' · ' +
-              esc(aL.classShort || aL.class) +
-              (aL.room ? ' @ ' + esc(aL.room) : '') +
-            '</div>';
-        } else {
-          coverAbsentDetail.innerHTML =
-            '<div class="who"><span class="code">' + esc(at.code) + '</span>' +
-              (at.chi ? ' · ' + esc(at.chi) : '') +
-            '</div>' +
-            '<div class="lesson-line">Day ' + day + ' · P' + period + ' 本身已經係空堂，唔使代堂。</div>';
-        }
+  function absentLessonsForDay(teacher, day) {
+    var daySched = teacher.schedule[String(day)] || {};
+    var maxp = periodsForDay(day);
+    var lessons = [];
+    for (var p = 1; p <= maxp; p++) {
+      var L = daySched[String(p)];
+      if (L) {
+        lessons.push({ period: p, lesson: L, bell: periodBell(day, p) });
       }
     }
+    return lessons;
+  }
 
+  function refreshCoverDateHint() {
+    if (!coverDateHint) return;
+    var ymd = state.browseDate || todayYmdHK();
+    var info = lookupCalendarDate(ymd);
+    var nice = formatYmdZh(ymd);
+    var wd = weekdayLabelHK(ymd);
+    var parts = ['頂部日期：' + nice + (wd ? '（' + wd + '）' : '')];
+    if (info.status === 'school' && info.day != null) {
+      parts.push('循環日 Day ' + info.day);
+    } else {
+      parts.push(info.label || '非上課日');
+    }
+    var sel = parseInt(coverDay && coverDay.value, 10);
+    if (info.status === 'school' && info.day != null && sel === info.day) {
+      parts.push('已跟頂部日期');
+    } else if (sel) {
+      parts.push('目前揀 Day ' + sel);
+    }
+    coverDateHint.textContent = parts.join(' · ');
+  }
+
+  function coverExportDateLabel() {
+    var ymd = state.browseDate || todayYmdHK();
+    var info = lookupCalendarDate(ymd);
+    var day = parseInt(coverDay.value, 10) || 1;
+    if (info.status === 'school' && info.day === day) {
+      return { ymd: ymd, dateText: formatYmdZh(ymd) + '（' + (weekdayLabelHK(ymd) || '') + '）', day: day, matched: true };
+    }
+    return { ymd: '', dateText: '（未綁定日期）', day: day, matched: false };
+  }
+
+  function readCoverAssignmentsFromDom() {
+    if (!coverLessonList) return;
+    coverLessonList.querySelectorAll('[data-cover-period]').forEach(function (row) {
+      var p = row.getAttribute('data-cover-period');
+      var sel = row.querySelector('select.cover-teacher-select');
+      var note = row.querySelector('input.cover-note-input');
+      coverAssignments[p] = {
+        coverCode: sel ? (sel.value || '') : '',
+        note: note ? (note.value || '') : ''
+      };
+    });
+  }
+
+  function renderCoverLessons() {
+    var absentCode = (coverAbsent.value || '').trim().toUpperCase();
+    var day = parseInt(coverDay.value, 10) || 1;
+
+    refreshCoverDateHint();
+
+    if (!absentCode) {
+      coverResultsCard.hidden = true;
+      coverEmpty.hidden = false;
+      coverEmpty.textContent = '請先輸入缺席教師 ShortName，再按「載入課堂」。';
+      coverLoadedAbsent = null;
+      return;
+    }
+
+    var at = lookupTeacher(absentCode);
+    if (!at) {
+      coverResultsCard.hidden = true;
+      coverEmpty.hidden = false;
+      coverEmpty.textContent = '找不到教師代碼「' + absentCode + '」。';
+      coverLoadedAbsent = null;
+      return;
+    }
+
+    // Preserve assignments if same teacher; reset if teacher changed
+    if (!coverLoadedAbsent || coverLoadedAbsent.code !== at.code) {
+      coverAssignments = {};
+    } else {
+      readCoverAssignmentsFromDom();
+    }
+    coverLoadedAbsent = at;
+
+    var lessons = absentLessonsForDay(at, day);
     coverEmpty.hidden = true;
     coverResultsCard.hidden = false;
-    coverFreeCount.textContent = free.length + ' 位空堂';
 
-    coverFreeList.innerHTML = '';
-    if (!free.length) {
-      coverFreeList.innerHTML = '<div class="empty" style="padding:16px 0;">呢節冇符合條件嘅空堂老師。</div>';
-    } else {
-      free.forEach(function (item) {
-        var t = item.teacher;
-        var div = document.createElement('div');
-        div.className = 'cover-item';
-        var left = document.createElement('div');
-        left.style.flex = '1 1 160px';
-        left.innerHTML =
-          '<div class="who"><span class="code">' + esc(t.code) + '</span></div>' +
-          '<div class="names">' +
-            esc(t.chi || '') +
-            (t.eng ? (t.chi ? ' · ' : '') + esc(t.eng) : '') +
-          '</div>';
-        var right = document.createElement('div');
-        right.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:6px;';
-        var pill = document.createElement('span');
-        pill.className = 'hint-pill';
-        pill.textContent = '當日空堂 ' + item.freeCount + ' 節';
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'btn btn-ghost btn-sm';
-        b.textContent = '查看時間表';
-        b.addEventListener('click', function () {
-          selectTeacher(t, { keepDay: false });
-          state.day = day;
-          switchTab('day');
-          renderDayView();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        right.appendChild(pill);
-        right.appendChild(b);
-        div.appendChild(left);
-        div.appendChild(right);
-        coverFreeList.appendChild(div);
-      });
+    var nameBits = [at.code];
+    if (at.chi) nameBits.push(at.chi);
+    if (at.eng) nameBits.push(at.eng);
+    coverLessonsTitle.textContent = '須代堂課堂';
+    coverLessonCount.textContent = lessons.length + ' 節';
+    coverAbsentInfo.textContent =
+      '缺席：' + nameBits.join(' · ') + ' · Day ' + day +
+      (lessons.length ? '' : ' · 當日冇課堂，唔使代堂。');
+
+    coverLessonList.innerHTML = '';
+    if (coverExportPreview) {
+      coverExportPreview.classList.remove('show');
+      coverExportPreview.textContent = '';
     }
 
-    coverBusyList.innerHTML = '';
-    coverBusySummary.textContent = '嗰節有課嘅老師（' + busy.length + ' 位）';
-    busy.forEach(function (item) {
-      var t = item.teacher;
+    if (!lessons.length) {
+      coverLessonList.innerHTML =
+        '<div class="empty" style="padding:12px 0;">呢位教師喺 Day ' + day + ' 冇課堂。</div>';
+      return;
+    }
+
+    lessons.forEach(function (item) {
+      var p = item.period;
       var L = item.lesson;
-      var div = document.createElement('div');
-      div.className = 'cover-item busy-item';
-      div.innerHTML =
-        '<div>' +
-          '<div class="who"><span class="code">' + esc(t.code) + '</span>' +
-            (t.chi ? ' · ' + esc(t.chi) : '') +
-          '</div>' +
-          '<div class="lesson-line">' +
-            esc(L.subjectShort || L.subject) + ' · ' +
-            esc(L.classShort || L.class) +
-            (L.room ? ' @ ' + esc(L.room) : '') +
-          '</div>' +
-        '</div>';
-      coverBusyList.appendChild(div);
-    });
+      var range = formatBellRange(item.bell);
+      var prev = coverAssignments[String(p)] || { coverCode: '', note: '' };
+      var free = freeTeachersForPeriod(day, p, at.code);
 
-    // Free rooms: rooms that appear in timetable but are not occupied this slot
-    var allRooms = {};
-    var busyRooms = {};
-    DATA.teachers.forEach(function (t) {
-      var sched = t.schedule || {};
-      Object.keys(sched).forEach(function (dd) {
-        var daySched = sched[dd] || {};
-        Object.keys(daySched).forEach(function (pp) {
-          var L = daySched[pp];
-          if (L && L.room) {
-            var rn = String(L.room).trim();
-            if (rn) allRooms[rn] = true;
-          }
-        });
+      var row = document.createElement('div');
+      row.className = 'cover-lesson';
+      row.setAttribute('data-cover-period', String(p));
+
+      var main = document.createElement('div');
+      main.className = 'lesson-main';
+      main.innerHTML =
+        '<span class="period-tag">P' + p + '</span>' +
+        (range ? '<span class="lesson-time">' + esc(range) + '</span>' : '') +
+        '<span class="lesson-meta">' +
+          esc(L.subjectShort || L.subject || '') + ' · ' +
+          esc(L.classShort || L.class || '') +
+          (L.room ? ' · ' + esc(L.room) : '') +
+        '</span>';
+
+      var assign = document.createElement('div');
+      assign.className = 'cover-lesson-assign';
+
+      var left = document.createElement('div');
+      var lab1 = document.createElement('label');
+      lab1.className = 'field-label';
+      lab1.textContent = '代堂老師（該節空堂）';
+      lab1.setAttribute('for', 'coverSel' + p);
+      var sel = document.createElement('select');
+      sel.className = 'cover-teacher-select';
+      sel.id = 'coverSel' + p;
+      var opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = '— 未指派（' + free.length + ' 位可選）—';
+      sel.appendChild(opt0);
+      free.forEach(function (f) {
+        var t = f.teacher;
+        var opt = document.createElement('option');
+        opt.value = t.code;
+        opt.textContent =
+          t.code +
+          (t.chi ? ' · ' + t.chi : '') +
+          '（當日空堂 ' + f.freeCount + '）';
+        if (prev.coverCode === t.code) opt.selected = true;
+        sel.appendChild(opt);
       });
-      var ds = t.schedule[String(day)] || {};
-      var slot = ds[String(period)];
-      if (slot && slot.room) {
-        var br = String(slot.room).trim();
-        if (br) busyRooms[br] = true;
+      if (prev.coverCode && !free.some(function (f) { return f.teacher.code === prev.coverCode; })) {
+        // previously chosen teacher no longer free — keep as stale option
+        var stale = document.createElement('option');
+        stale.value = prev.coverCode;
+        stale.textContent = prev.coverCode + '（而家唔空）';
+        stale.selected = true;
+        sel.appendChild(stale);
       }
+      left.appendChild(lab1);
+      left.appendChild(sel);
+
+      var right = document.createElement('div');
+      var lab2 = document.createElement('label');
+      lab2.className = 'field-label';
+      lab2.textContent = '備註';
+      lab2.setAttribute('for', 'coverNote' + p);
+      var note = document.createElement('input');
+      note.type = 'text';
+      note.className = 'cover-note-input';
+      note.id = 'coverNote' + p;
+      note.placeholder = '可選填…';
+      note.value = prev.note || '';
+      right.appendChild(lab2);
+      right.appendChild(note);
+
+      assign.appendChild(left);
+      assign.appendChild(right);
+      row.appendChild(main);
+      row.appendChild(assign);
+      coverLessonList.appendChild(row);
+
+      sel.addEventListener('change', function () {
+        coverAssignments[String(p)] = coverAssignments[String(p)] || { coverCode: '', note: '' };
+        coverAssignments[String(p)].coverCode = sel.value || '';
+      });
+      note.addEventListener('input', function () {
+        coverAssignments[String(p)] = coverAssignments[String(p)] || { coverCode: '', note: '' };
+        coverAssignments[String(p)].note = note.value || '';
+      });
     });
-    var freeRooms = Object.keys(allRooms).filter(function (r) {
-      return !busyRooms[r];
-    }).sort(function (a, b) {
-      return a.localeCompare(b, 'en', { numeric: true });
-    });
-    if (coverFreeRooms && coverRoomCount) {
-      coverRoomCount.textContent = freeRooms.length + ' 間';
-      coverFreeRooms.innerHTML = '';
-      if (!freeRooms.length) {
-        coverFreeRooms.innerHTML = '<span class="hint">呢節冇偵測到空置課室。</span>';
-      } else {
-        freeRooms.forEach(function (r) {
-          var span = document.createElement('span');
-          span.className = 'room-chip';
-          span.textContent = r;
-          coverFreeRooms.appendChild(span);
-        });
-      }
+  }
+
+  function maybeRerenderCover() {
+    if (coverResultsCard && !coverResultsCard.hidden && coverLoadedAbsent) {
+      renderCoverLessons();
+    } else {
+      refreshCoverDateHint();
     }
   }
 
-  function collectAllRooms() {
-    var allRooms = {};
-    DATA.teachers.forEach(function (t) {
-      var sched = t.schedule || {};
-      Object.keys(sched).forEach(function (dd) {
-        var daySched = sched[dd] || {};
-        Object.keys(daySched).forEach(function (pp) {
-          var L = daySched[pp];
-          if (L && L.room) {
-            var rn = String(L.room).trim();
-            if (rn) allRooms[rn] = true;
-          }
-        });
-      });
+  function buildCoverRowsForExport() {
+    readCoverAssignmentsFromDom();
+    if (!coverLoadedAbsent) return null;
+    var day = parseInt(coverDay.value, 10) || 1;
+    var lessons = absentLessonsForDay(coverLoadedAbsent, day);
+    var meta = coverExportDateLabel();
+    var rows = lessons.map(function (item) {
+      var p = item.period;
+      var L = item.lesson;
+      var asg = coverAssignments[String(p)] || { coverCode: '', note: '' };
+      var coverT = asg.coverCode ? lookupTeacher(asg.coverCode) : null;
+      var coverLabel = asg.coverCode
+        ? (asg.coverCode + (coverT && coverT.chi ? '（' + coverT.chi + '）' : ''))
+        : '';
+      return {
+        period: p,
+        time: formatBellRange(item.bell) || '',
+        subject: L.subjectShort || L.subject || '',
+        className: L.classShort || L.class || '',
+        room: L.room || '',
+        coverCode: asg.coverCode || '',
+        coverLabel: coverLabel,
+        note: asg.note || ''
+      };
     });
-    return allRooms;
+    return {
+      absent: coverLoadedAbsent,
+      day: day,
+      meta: meta,
+      rows: rows
+    };
   }
 
-  fillCoverPeriods();
-  fillCoverSubjects();
-  coverDay.addEventListener('change', function () {
-    fillCoverPeriods();
+  function csvEscape(v) {
+    var s = String(v == null ? '' : v);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function buildCoverCsv(bundle) {
+    var headers = ['缺席教師', '中文名', '日期', '循環日', '節數', '時間', '科目', '班別', '課室', '代堂老師', '代堂老師中文名', '備註'];
+    var lines = [headers.join(',')];
+    var a = bundle.absent;
+    var dateStr = bundle.meta.matched ? bundle.meta.ymd : '';
+    bundle.rows.forEach(function (r) {
+      var ct = r.coverCode ? lookupTeacher(r.coverCode) : null;
+      lines.push([
+        a.code,
+        a.chi || '',
+        dateStr,
+        'Day ' + bundle.day,
+        'P' + r.period,
+        r.time,
+        r.subject,
+        r.className,
+        r.room,
+        r.coverCode,
+        ct && ct.chi ? ct.chi : '',
+        r.note
+      ].map(csvEscape).join(','));
+    });
+    return lines.join('\n');
+  }
+
+  function buildCoverText(bundle) {
+    var a = bundle.absent;
+    var lines = [];
+    lines.push('代堂安排');
+    lines.push('缺席教師：' + a.code + (a.chi ? ' · ' + a.chi : '') + (a.eng ? ' · ' + a.eng : ''));
+    lines.push('日期：' + (bundle.meta.matched ? bundle.meta.dateText + ' · ' + bundle.meta.ymd : bundle.meta.dateText));
+    lines.push('循環日：Day ' + bundle.day);
+    lines.push('');
+    if (!bundle.rows.length) {
+      lines.push('（當日冇課堂）');
+    } else {
+      bundle.rows.forEach(function (r) {
+        lines.push(
+          'P' + r.period +
+          (r.time ? ' · ' + r.time : '') +
+          ' · ' + r.subject +
+          ' · ' + r.className +
+          (r.room ? ' · ' + r.room : '')
+        );
+        lines.push('  代堂老師：' + (r.coverLabel || '（未指派）'));
+        if (r.note) lines.push('  備註：' + r.note);
+        lines.push('');
+      });
+    }
+    return lines.join('\n').trim() + '\n';
+  }
+
+  function downloadTextFile(filename, content, mime) {
+    var blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+      a.remove();
+    }, 0);
+  }
+
+  function exportCoverCsv() {
+    var bundle = buildCoverRowsForExport();
+    if (!bundle) {
+      alert('請先載入缺席教師課堂。');
+      return;
+    }
+    if (!bundle.rows.length) {
+      alert('當日冇課堂可匯出。');
+      return;
+    }
+    var csv = '\uFEFF' + buildCoverCsv(bundle);
+    var stamp = bundle.meta.matched ? bundle.meta.ymd : ('day' + bundle.day);
+    downloadTextFile('代堂_' + bundle.absent.code + '_' + stamp + '.csv', csv, 'text/csv;charset=utf-8');
+    if (coverExportPreview) {
+      coverExportPreview.textContent = buildCoverCsv(bundle);
+      coverExportPreview.classList.add('show');
+    }
+  }
+
+  function exportCoverText() {
+    var bundle = buildCoverRowsForExport();
+    if (!bundle) {
+      alert('請先載入缺席教師課堂。');
+      return;
+    }
+    var textOut = buildCoverText(bundle);
+    if (coverExportPreview) {
+      coverExportPreview.textContent = textOut;
+      coverExportPreview.classList.add('show');
+    }
+    var stamp = bundle.meta.matched ? bundle.meta.ymd : ('day' + bundle.day);
+    downloadTextFile('代堂_' + bundle.absent.code + '_' + stamp + '.txt', textOut, 'text/plain;charset=utf-8');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textOut).then(function () {
+        /* copied */
+      }).catch(function () {});
+    }
+    try {
+      var w = window.open('', '_blank');
+      if (w) {
+        w.document.write('<pre style="font:14px/1.5 sans-serif;padding:16px;white-space:pre-wrap;">' +
+          esc(textOut) + '</pre>');
+        w.document.title = '代堂安排 · ' + bundle.absent.code;
+        w.document.close();
+        w.focus();
+        w.print();
+      }
+    } catch (e) {}
+  }
+
+  function useHeaderCycleDay() {
+    var ymd = state.browseDate || todayYmdHK();
+    var info = lookupCalendarDate(ymd);
+    if (info.status === 'school' && info.day != null) {
+      coverDay.value = String(info.day);
+      maybeRerenderCover();
+      refreshCoverDateHint();
+    } else {
+      refreshCoverDateHint();
+      alert('頂部日期唔係上課日（' + (info.label || '非上課日') + '），請改頂部日期或手動揀循環日。');
+    }
+  }
+
+  if (coverLoadBtn) coverLoadBtn.addEventListener('click', renderCoverLessons);
+  if (coverDay) coverDay.addEventListener('change', function () {
+    refreshCoverDateHint();
+    if (coverLoadedAbsent) renderCoverLessons();
   });
-  coverFindBtn.addEventListener('click', renderCoverResults);
-  coverPeriod.addEventListener('change', function () {
-    if (!coverResultsCard.hidden) renderCoverResults();
-  });
-  coverDay.addEventListener('change', function () {
-    if (!coverResultsCard.hidden) renderCoverResults();
-  });
-  coverSubject.addEventListener('change', function () {
-    if (!coverResultsCard.hidden) renderCoverResults();
-  });
-  coverAbsent.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') { e.preventDefault(); renderCoverResults(); }
-  });
+  if (coverAbsent) {
+    coverAbsent.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); renderCoverLessons(); }
+    });
+  }
+  if (coverUseHeaderDayBtn) coverUseHeaderDayBtn.addEventListener('click', useHeaderCycleDay);
+  if (coverExportCsvBtn) coverExportCsvBtn.addEventListener('click', exportCoverCsv);
+  if (coverExportTextBtn) coverExportTextBtn.addEventListener('click', exportCoverText);
 
   function applyResolvedDayToUI() {
     var c = getStoredCycle();
     if (c && c >= 1 && c <= 10) {
-      coverDay.value = String(c);
-      fillCoverPeriods();
+      if (coverDay) coverDay.value = String(c);
       state.day = c;
+      refreshCoverDateHint();
     }
   }
 
