@@ -1362,7 +1362,7 @@
       <button class="tab" data-tab="overview" type="button">全日概覽</button>
       <button class="tab" data-tab="cover" type="button">代堂助手</button>
       <button class="tab" data-tab="search" type="button">搜尋課室／班別</button>
-      <button class="tab" data-tab="cycle" type="button">今日循環日</button>
+      <button class="tab" data-tab="cycle" type="button">循環日覆寫</button>
       <button class="tab" data-tab="cal" type="button">校曆</button>
       <button class="tab" data-tab="duty" type="button">當值</button>
     </nav>
@@ -1371,11 +1371,10 @@
     <section class="panel active" id="panel-day">
       <div class="card" id="dayPickerCard" hidden>
         <h2>選擇循環日</h2>
+        <p class="hint" style="margin-bottom:8px;">日期、循環日、鐘聲類型見頂部。此處只揀要睇嘅 Day 課表。</p>
         <div class="day-chips" id="dayChips"></div>
-        <div class="cycle-today-bar">
-          <span>今日校曆：</span>
-          <strong id="todayCycleLabel">載入中…</strong>
-          <button class="btn btn-ghost btn-sm" id="gotoTodayBtn" type="button" hidden>跳至今日</button>
+        <div class="cycle-today-bar" id="gotoTodayBar" hidden>
+          <button class="btn btn-ghost btn-sm" id="gotoTodayBtn" type="button">跳至今日循環日</button>
         </div>
       </div>
       <div class="card" id="dayLessonsCard" hidden>
@@ -1394,11 +1393,9 @@
     <section class="panel" id="panel-nowfree">
       <div class="card">
         <h2>即時空堂</h2>
-        <p class="hint" style="margin-bottom:10px;">根據今日校曆循環日同鐘聲（一般／BF），自動顯示<strong>現正空堂</strong>嘅老師。約每分鐘自動更新。</p>
+        <p class="hint" style="margin-bottom:10px;">根據頂部校曆循環日同鐘聲（一般／BF）判斷<strong>現正時段</strong>，列出空堂老師。時間／循環日見頂部；約每分鐘自動更新。</p>
         <div class="nowfree-status" id="nowfreeStatus">
-          <div class="nf-row"><span class="nf-label">香港時間</span><span class="nf-value" id="nowfreeTime">--:--</span></div>
-          <div class="nf-row"><span class="nf-label">循環日</span><span class="nf-value" id="nowfreeDay">—</span></div>
-          <div class="nf-row"><span class="nf-label">時段</span><span class="nf-value nf-hot" id="nowfreeSlot">—</span></div>
+          <div class="nf-row"><span class="nf-label">現正時段</span><span class="nf-value nf-hot" id="nowfreeSlot">—</span></div>
         </div>
         <div class="nowfree-banner is-idle" id="nowfreeBanner">載入中…</div>
         <div class="nowfree-refresh" id="nowfreeRefreshHint">自動更新 · 約每分鐘</div>
@@ -1528,7 +1525,7 @@
         </div>
         <div class="cal-weekdays" id="calWeekdays" aria-hidden="true"></div>
         <div class="cal-grid" id="calGrid" role="grid" aria-label="校曆"></div>
-        <div class="cal-detail" id="calDetail" aria-live="polite"></div>
+        <div class="cal-detail" id="calDetail" aria-live="polite">點選日子會同步頂部（日期、循環日、事項、當值）。</div>
       </div>
     </section>
 
@@ -1536,23 +1533,13 @@
     <section class="panel" id="panel-duty">
       <div class="card">
         <h2>當值老師</h2>
+        <p class="hint" style="margin-bottom:8px;">當日當值見頂部。改期請點頂部校曆橫幅；以下為職責說明同即將當值。</p>
         <p class="duty-role-hint" id="dutyRoleHint">
           Teacher 1：校門檢查校服；小息／午膳巡堂（2/F–6/F）。<br />
           Teacher 2：巡堂維持秩序（3/F–6/F、G/F、小賣部）；放學校門檢查。
         </p>
-        <label class="field-label" for="dutyDateInput">查某日當值</label>
-        <div class="date-pick-row" style="margin-bottom:8px;">
-          <div class="field">
-            <input type="date" id="dutyDateInput" />
-          </div>
-          <button class="btn btn-ghost" id="dutyDateTodayBtn" type="button">今日</button>
-        </div>
-        <div class="date-result" id="dutyDateResult" aria-live="polite" style="margin-bottom:14px;">
-          <div class="date-line" id="dutyDateLabel">選取日期：—</div>
-          <div class="duty-line" id="dutyDateDuty">—</div>
-        </div>
         <h2 style="font-size:1rem;margin-top:4px;">即將當值</h2>
-        <p class="hint" style="margin-bottom:6px;">由選取日期起計未來當值日子（來源：2026–2027 當值表）</p>
+        <p class="hint" style="margin-bottom:6px;">由頂部日期起計未來當值日子（來源：2026–2027 當值表）。點一列可改頂部日期。</p>
         <div class="duty-upcoming-list" id="dutyUpcomingList"></div>
       </div>
     </section>
@@ -1560,22 +1547,8 @@
     <!-- Cycle day setting -->
     <section class="panel" id="panel-cycle">
       <div class="card">
-        <h2>今日循環日（校曆）</h2>
-        <p class="hint" style="margin-bottom:10px;">預設跟據 <strong>2026–2027 校曆表</strong> 自動判斷（香港時間）。通常唔使手動改。</p>
-        <div id="cycleAutoInfo" style="margin-bottom:12px;font-weight:700;color:var(--primary);"></div>
-
-        <label class="field-label" for="cycleDateInput">揀校曆日期查循環日</label>
-        <div class="date-pick-row" style="margin-bottom:8px;">
-          <div class="field">
-            <input type="date" id="cycleDateInput" />
-          </div>
-          <button class="btn btn-ghost" id="cycleDateTodayBtn" type="button">今日</button>
-        </div>
-        <div class="date-result" id="cycleDateResult" aria-live="polite" style="margin-bottom:14px;">
-          <div class="date-line" id="cycleDateLabel">選取日期：—</div>
-          <div class="cycle-line" id="cycleDateCycle">—</div>
-          <div class="duty-line" id="cycleDateDuty">—</div>
-        </div>
+        <h2>循環日覆寫</h2>
+        <p class="hint" style="margin-bottom:10px;">今日循環日、日期、事項見<strong>頂部</strong>（跟 <strong>2026–2027 校曆表</strong>）。改期請點頂部橫幅。此處只處理本機／管理員覆寫。</p>
 
         <label class="field-label" for="cycleSelect">本機手動覆寫（可選）</label>
         <select id="cycleSelect">
@@ -1680,24 +1653,13 @@
   var lessonList = document.getElementById('lessonList');
   var dayTitle = document.getElementById('dayTitle');
   var dayLessonCount = document.getElementById('dayLessonCount');
-  var todayCycleLabel = document.getElementById('todayCycleLabel');
   var gotoTodayBtn = document.getElementById('gotoTodayBtn');
-  var cycleDateDuty = document.getElementById('cycleDateDuty');
+  var gotoTodayBar = document.getElementById('gotoTodayBar');
   var dutyBanner = document.getElementById('dutyBanner');
   var dutyBannerMain = document.getElementById('dutyBannerMain');
-  var dutyDateInput = document.getElementById('dutyDateInput');
-  var dutyDateTodayBtn = document.getElementById('dutyDateTodayBtn');
-  var dutyDateResult = document.getElementById('dutyDateResult');
-  var dutyDateLabel = document.getElementById('dutyDateLabel');
-  var dutyDateDuty = document.getElementById('dutyDateDuty');
   var dutyUpcomingList = document.getElementById('dutyUpcomingList');
   var dutyRoleHint = document.getElementById('dutyRoleHint');
 
-  var cycleDateInput = document.getElementById('cycleDateInput');
-  var cycleDateTodayBtn = document.getElementById('cycleDateTodayBtn');
-  var cycleDateResult = document.getElementById('cycleDateResult');
-  var cycleDateLabelEl = document.getElementById('cycleDateLabel');
-  var cycleDateCycle = document.getElementById('cycleDateCycle');
   var overviewContent = document.getElementById('overviewContent');
   var overviewEmpty = document.getElementById('overviewEmpty');
   var searchInput = document.getElementById('searchInput');
@@ -1707,7 +1669,6 @@
   var saveCycleBtn = document.getElementById('saveCycleBtn');
   var clearCycleBtn = document.getElementById('clearCycleBtn');
   var cycleSavedHint = document.getElementById('cycleSavedHint');
-  var cycleAutoInfo = document.getElementById('cycleAutoInfo');
   var calBannerWrap = document.getElementById('calBannerWrap');
   var calBanner = document.getElementById('calBanner');
   var calBannerMain = document.getElementById('calBannerMain');
@@ -1941,8 +1902,6 @@
 
   function syncDateInputs(ymd) {
     if (!ymd) return;
-    if (cycleDateInput && cycleDateInput.value !== ymd) cycleDateInput.value = ymd;
-    if (dutyDateInput && dutyDateInput.value !== ymd) dutyDateInput.value = ymd;
     if (headerDateInput && headerDateInput.value !== ymd) headerDateInput.value = ymd;
   }
 
@@ -2046,16 +2005,6 @@
 
   function refreshDutyPanel(ymd) {
     ymd = ymd || state.browseDate || todayYmdHK();
-    if (dutyDateInput && dutyDateInput.value !== ymd) dutyDateInput.value = ymd;
-    if (dutyDateLabel) {
-      var nice = formatYmdZh(ymd);
-      var wd = weekdayLabelHK(ymd);
-      dutyDateLabel.textContent = '選取日期：' + nice + (wd ? '（' + wd + '）' : '') + ' · ' + ymd;
-    }
-    paintDutyLine(dutyDateDuty, ymd);
-    if (dutyDateResult) {
-      dutyDateResult.classList.toggle('off', !dutyFor(ymd));
-    }
     renderDutyUpcoming(ymd);
     if (dutyRoleHint && DUTY && DUTY.meta && DUTY.meta.roles) {
       var r = DUTY.meta.roles;
@@ -2065,29 +2014,7 @@
   }
 
   function updateDateResultUI(info) {
-    var nice = formatYmdZh(info.ymd);
-    var wd = weekdayLabelHK(info.ymd);
-    var dateText = '選取日期：' + nice + (wd ? '（' + wd + '）' : '') + ' · ' + info.ymd;
-    var cycleText = '';
-    var off = info.status !== 'school';
-    if (info.status === 'school') {
-      var sched = scheduleForDay(info.day);
-      cycleText = info.label + (sched && sched.label ? ' · ' + sched.label : '');
-    } else {
-      cycleText = info.label;
-    }
-    var dayEvs = eventsFor(info.ymd);
-    if (dayEvs.length) {
-      cycleText += ' · 當日事項：' + dayEvs.join('、');
-    }
-    function paint(box, dateEl, cycleEl) {
-      if (!box || !dateEl || !cycleEl) return;
-      dateEl.textContent = dateText;
-      cycleEl.textContent = cycleText;
-      box.classList.toggle('off', off);
-    }
-    paint(cycleDateResult, cycleDateLabelEl, cycleDateCycle);
-    paintDutyLine(cycleDateDuty, info.ymd);
+    // Header is the single source of truth for date / cycle / events / duty.
     refreshCalBanner(info.ymd);
     refreshDutyBanner(info.ymd);
     refreshDutyPanel(info.ymd);
@@ -2383,28 +2310,11 @@
   function refreshCycleUI() {
     var r = resolveTodayCycle();
     var ymd = r.ymd;
-    if (r.day != null) {
-      todayCycleLabel.textContent = '循環日 ' + r.day;
-      gotoTodayBtn.hidden = false;
-    } else if (r.source === 'holiday' || r.source === 'missing') {
-      todayCycleLabel.textContent = '無上課／假期';
-      gotoTodayBtn.hidden = true;
-    } else {
-      todayCycleLabel.textContent = '未設定';
-      gotoTodayBtn.hidden = true;
-    }
     // Keep top banner in sync with selected browse date (defaults to today)
     refreshCalBanner(state.browseDate || ymd);
-    if (cycleAutoInfo) {
-      if (r.day != null) {
-        cycleAutoInfo.textContent = '今日（' + ymd + '）：循環日 Day ' + r.day + ' · 來源：' + r.label;
-      } else {
-        cycleAutoInfo.textContent = '今日（' + ymd + '）：無正規循環日課 · 來源：' + r.label;
-      }
-    }
     // Reflect manual override select only
     var manual = getLocalManualOverride();
-    cycleSelect.value = manual ? String(manual) : '';
+    if (cycleSelect) cycleSelect.value = manual ? String(manual) : '';
     var admin = getLocalAdminOverride();
     if (adminOverrideDay) adminOverrideDay.value = admin ? String(admin) : '';
 
@@ -2412,6 +2322,10 @@
       var d = parseInt(chip.dataset.day, 10);
       chip.classList.toggle('has-today-mark', r.day === d);
     });
+    // Show "jump to today" only when viewing a different cycle day chip
+    var showJump = r.day != null && state.day !== r.day;
+    if (gotoTodayBar) gotoTodayBar.hidden = !showJump;
+    if (gotoTodayBtn) gotoTodayBtn.hidden = !showJump;
   }
 
   function buildDayChips() {
@@ -2493,23 +2407,20 @@
     var busy = 0;
 
     var sched = scheduleForDay(d);
-    dayTitle.textContent = '循環日 Day ' + d;
-    var bellLabelEl = document.getElementById('dayBellLabel');
-    if (!bellLabelEl) {
-      bellLabelEl = document.createElement('div');
-      bellLabelEl.id = 'dayBellLabel';
-      bellLabelEl.className = 'day-bell-label';
-      // Place below the whole .day-title row (not inside it)
-      var titleRow = dayTitle.parentNode;
-      if (titleRow && titleRow.parentNode) {
-        titleRow.parentNode.insertBefore(bellLabelEl, titleRow.nextSibling);
-      } else {
-        dayTitle.parentNode.insertBefore(bellLabelEl, dayTitle.nextSibling);
-      }
-    }
-    bellLabelEl.textContent = sched && sched.label ? ('鐘聲：' + sched.label) : '';
+    // Day title is unique to this tab (which Day's lessons)
+    dayTitle.textContent = 'Day ' + d + (sched && sched.label ? ' · ' + sched.label : '');
+    var oldBell = document.getElementById('dayBellLabel');
+    if (oldBell) oldBell.remove();
     Array.prototype.forEach.call(dayChips.querySelectorAll('.day-chip'), function (chip) {
       chip.classList.toggle('active', parseInt(chip.dataset.day, 10) === d);
+    });
+    var rJump = resolveTodayCycle();
+    var showJump = rJump.day != null && d !== rJump.day;
+    if (gotoTodayBar) gotoTodayBar.hidden = !showJump;
+    if (gotoTodayBtn) gotoTodayBtn.hidden = !showJump;
+    Array.prototype.forEach.call(dayChips.querySelectorAll('.day-chip'), function (chip) {
+      var dd = parseInt(chip.dataset.day, 10);
+      chip.classList.toggle('has-today-mark', rJump.day === dd);
     });
 
     // Live highlight only when browsing today AND showing today's cycle day
@@ -2907,21 +2818,14 @@
     if (!coverDateHint) return;
     var ymd = state.browseDate || todayYmdHK();
     var info = lookupCalendarDate(ymd);
-    var nice = formatYmdZh(ymd);
-    var wd = weekdayLabelHK(ymd);
-    var parts = ['頂部日期：' + nice + (wd ? '（' + wd + '）' : '')];
-    if (info.status === 'school' && info.day != null) {
-      parts.push('循環日 Day ' + info.day);
-    } else {
-      parts.push(info.label || '非上課日');
-    }
     var sel = parseInt(coverDay && coverDay.value, 10);
     if (info.status === 'school' && info.day != null && sel === info.day) {
-      parts.push('已跟頂部日期');
+      coverDateHint.textContent = '已跟頂部校曆循環日';
     } else if (sel) {
-      parts.push('目前揀 Day ' + sel);
+      coverDateHint.textContent = '目前揀 Day ' + sel + '（與頂部不同；可用「用頂部日期」同步）';
+    } else {
+      coverDateHint.textContent = '請揀循環日，或用頂部日期';
     }
-    coverDateHint.textContent = parts.join(' · ');
   }
 
   function coverExportDateLabel() {
@@ -3338,13 +3242,15 @@
     applyResolvedDayToUI();
     if (state.teacher) renderDayView();
   });
-  gotoTodayBtn.addEventListener('click', function () {
-    var c = getStoredCycle();
-    if (c) {
-      state.day = c;
-      renderDayView();
-    }
-  });
+  if (gotoTodayBtn) {
+    gotoTodayBtn.addEventListener('click', function () {
+      var c = getStoredCycle();
+      if (c) {
+        state.day = c;
+        renderDayView();
+      }
+    });
+  }
 
   if (adminSaveBtn) {
     adminSaveBtn.addEventListener('click', function () {
@@ -3404,27 +3310,6 @@
       openHeaderDatePicker();
     });
   }
-  if (cycleDateInput) {
-    cycleDateInput.addEventListener('change', function () {
-      if (cycleDateInput.value) onDatePicked(cycleDateInput.value);
-    });
-  }
-  if (cycleDateTodayBtn) {
-    cycleDateTodayBtn.addEventListener('click', function () {
-      onDatePicked(todayYmdHK());
-    });
-  }
-  if (dutyDateInput) {
-    dutyDateInput.addEventListener('change', function () {
-      if (dutyDateInput.value) onDatePicked(dutyDateInput.value);
-    });
-  }
-  if (dutyDateTodayBtn) {
-    dutyDateTodayBtn.addEventListener('click', function () {
-      onDatePicked(todayYmdHK());
-    });
-  }
-
 
 
   // --- 校曆檢視 (month / week) ---
@@ -3602,24 +3487,11 @@
   function updateCalDetail(ymd) {
     if (!calDetail) return;
     ymd = ymd || state.browseDate || todayYmdHK();
-    var info = lookupCalendarDate(ymd);
     var nice = formatYmdZh(ymd);
     var wd = weekdayLabelHK(ymd);
-    var html = '<strong>' + esc(nice) + (wd ? '（' + esc(wd) + '）' : '') + '</strong>';
-    if (info.status === 'school' && info.day != null) {
-      var sched = scheduleForDay(info.day);
-      html += ' · ' + esc(cycleCircleLabel(info.day)) + ' Day ' + info.day;
-      if (sched && sched.label) html += ' · ' + esc(sched.label);
-    } else {
-      html += ' · ' + esc(info.label);
-    }
-    var evs = eventsFor(ymd);
-    if (evs.length) {
-      html += '<div class="cd-detail-events">事項：' + esc(evs.join('、')) + '</div>';
-    }
-    var d = dutyDisplay(ymd);
-    html += '<div class="cd-detail-duty">' + esc(d.hasDuty ? d.text : '是日無當值記錄') + '</div>';
-    calDetail.innerHTML = html;
+    calDetail.innerHTML =
+      '已選 <strong>' + esc(nice) + (wd ? '（' + esc(wd) + '）' : '') +
+      '</strong> · 詳情見頂部（循環日、事項、當值）。';
   }
 
   function renderSchoolCalMonth() {
@@ -3723,8 +3595,6 @@
   }
 
   // --- 即時空堂 (live free teachers) ---
-  var nowfreeTime = document.getElementById('nowfreeTime');
-  var nowfreeDay = document.getElementById('nowfreeDay');
   var nowfreeSlot = document.getElementById('nowfreeSlot');
   var nowfreeBanner = document.getElementById('nowfreeBanner');
   var nowfreeResultsCard = document.getElementById('nowfreeResultsCard');
@@ -3822,9 +3692,8 @@
   }
 
   function renderNowFree() {
-    if (!nowfreeTime) return;
+    if (!nowfreeSlot) return;
     var parts = nowHKTParts();
-    nowfreeTime.textContent = parts.hm + (parts.second != null ? '' : '');
     var r = resolveTodayCycle();
     var day = r.day;
 
@@ -3834,9 +3703,6 @@
 
     // Holiday / no school day
     if (day == null) {
-      nowfreeDay.textContent = (r.source === 'holiday' || r.source === 'missing')
-        ? '今日無正規日課'
-        : '—';
       nowfreeSlot.textContent = '—';
       nowfreeResultsCard.hidden = true;
       nowfreeEmpty.hidden = false;
@@ -3849,9 +3715,6 @@
       nowfreeEmpty.textContent = holidayMsg;
       return;
     }
-
-    nowfreeDay.textContent = 'Day ' + day +
-      (scheduleIdForDay(day) === 'bf' ? '（BF）' : '（一般）');
 
     var slot = findCurrentSlot(day);
     if (!slot) {
