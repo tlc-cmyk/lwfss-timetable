@@ -224,6 +224,51 @@
     }
     .cycle-today-bar select { width: auto; min-width: 100px; padding: 6px 8px; font-size: 0.85rem; }
 
+    .date-pick-box {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+    }
+    .date-pick-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .date-pick-row .field {
+      flex: 1 1 160px;
+      min-width: 140px;
+    }
+    .date-pick-row input[type="date"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #fff;
+    }
+    .date-result {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--primary-soft, #eef4ff);
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .date-result .date-line {
+      font-weight: 800;
+      color: var(--primary-dark, var(--primary));
+      font-size: 1rem;
+    }
+    .date-result .cycle-line { margin-top: 2px; font-weight: 700; }
+    .date-result.off {
+      background: #f4f4f4;
+      color: var(--muted);
+    }
+    .date-result.off .date-line { color: var(--muted); }
+
     .cal-banner {
       margin-top: 10px;
       padding: 8px 12px;
@@ -627,6 +672,19 @@
           <strong id="todayCycleLabel">載入中…</strong>
           <button class="btn btn-ghost btn-sm" id="gotoTodayBtn" type="button" hidden>跳至今日</button>
         </div>
+        <div class="date-pick-box">
+          <label class="field-label" for="browseDateInput">按校曆日期選循環日</label>
+          <div class="date-pick-row">
+            <div class="field">
+              <input type="date" id="browseDateInput" />
+            </div>
+            <button class="btn btn-ghost" id="browseDateTodayBtn" type="button">今日</button>
+          </div>
+          <div class="date-result" id="browseDateResult" aria-live="polite">
+            <div class="date-line" id="browseDateLabel">選取日期：—</div>
+            <div class="cycle-line" id="browseDateCycle">—</div>
+          </div>
+        </div>
       </div>
       <div class="card" id="dayLessonsCard" hidden>
         <div class="day-title">
@@ -734,6 +792,19 @@
         <h2>今日循環日（校曆）</h2>
         <p class="hint" style="margin-bottom:10px;">預設跟據 <strong>2026–2027 校曆表</strong> 自動判斷（香港時間）。通常唔使手動改。</p>
         <div id="cycleAutoInfo" style="margin-bottom:12px;font-weight:700;color:var(--primary);"></div>
+
+        <label class="field-label" for="cycleDateInput">揀校曆日期查循環日</label>
+        <div class="date-pick-row" style="margin-bottom:8px;">
+          <div class="field">
+            <input type="date" id="cycleDateInput" />
+          </div>
+          <button class="btn btn-ghost" id="cycleDateTodayBtn" type="button">今日</button>
+        </div>
+        <div class="date-result" id="cycleDateResult" aria-live="polite" style="margin-bottom:14px;">
+          <div class="date-line" id="cycleDateLabel">選取日期：—</div>
+          <div class="cycle-line" id="cycleDateCycle">—</div>
+        </div>
+
         <label class="field-label" for="cycleSelect">本機手動覆寫（可選）</label>
         <select id="cycleSelect">
           <option value="">— 跟隨校曆／全校設定 —</option>
@@ -817,7 +888,8 @@
   var state = {
     teacher: null,
     day: 1,
-    tab: 'day'
+    tab: 'day',
+    browseDate: null // YYYY-MM-DD selected in date picker (defaults to today)
   };
 
   // Elements
@@ -837,6 +909,16 @@
   var dayLessonCount = document.getElementById('dayLessonCount');
   var todayCycleLabel = document.getElementById('todayCycleLabel');
   var gotoTodayBtn = document.getElementById('gotoTodayBtn');
+  var browseDateInput = document.getElementById('browseDateInput');
+  var browseDateTodayBtn = document.getElementById('browseDateTodayBtn');
+  var browseDateResult = document.getElementById('browseDateResult');
+  var browseDateLabel = document.getElementById('browseDateLabel');
+  var browseDateCycle = document.getElementById('browseDateCycle');
+  var cycleDateInput = document.getElementById('cycleDateInput');
+  var cycleDateTodayBtn = document.getElementById('cycleDateTodayBtn');
+  var cycleDateResult = document.getElementById('cycleDateResult');
+  var cycleDateLabelEl = document.getElementById('cycleDateLabel');
+  var cycleDateCycle = document.getElementById('cycleDateCycle');
   var overviewContent = document.getElementById('overviewContent');
   var overviewEmpty = document.getElementById('overviewEmpty');
   var searchInput = document.getElementById('searchInput');
@@ -939,6 +1021,94 @@
     if (v == null) return null;
     var n = parseInt(v, 10);
     return (n >= 1 && n <= 10) ? n : null;
+  }
+
+  function formatYmdZh(ymd) {
+    if (!ymd || ymd.length < 10) return ymd || '—';
+    var parts = ymd.split('-');
+    if (parts.length !== 3) return ymd;
+    return parts[0] + '年' + parseInt(parts[1], 10) + '月' + parseInt(parts[2], 10) + '日';
+  }
+
+  function weekdayLabelHK(ymd) {
+    try {
+      var parts = ymd.split('-').map(function (x) { return parseInt(x, 10); });
+      // noon UTC+8 approx to avoid DST edge; HK has no DST
+      var d = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 4, 0, 0));
+      return new Intl.DateTimeFormat('zh-HK', { weekday: 'short', timeZone: 'Asia/Hong_Kong' }).format(d);
+    } catch (e) { return ''; }
+  }
+
+  /**
+   * Look up a calendar date. Returns { ymd, day, status, label }
+   * status: school | holiday | missing | unknown
+   */
+  function lookupCalendarDate(ymd) {
+    if (!ymd) return { ymd: '', day: null, status: 'unknown', label: '未選日期' };
+    var v = calendarCycleFor(ymd);
+    if (v === undefined) {
+      return { ymd: ymd, day: null, status: 'missing', label: '校曆無此日期' };
+    }
+    if (v == null) {
+      return { ymd: ymd, day: null, status: 'holiday', label: '無上課／假期／活動日' };
+    }
+    return { ymd: ymd, day: v, status: 'school', label: '循環日 Day ' + v };
+  }
+
+  function syncDateInputs(ymd) {
+    if (!ymd) return;
+    if (browseDateInput && browseDateInput.value !== ymd) browseDateInput.value = ymd;
+    if (cycleDateInput && cycleDateInput.value !== ymd) cycleDateInput.value = ymd;
+  }
+
+  function updateDateResultUI(info) {
+    var nice = formatYmdZh(info.ymd);
+    var wd = weekdayLabelHK(info.ymd);
+    var dateText = '選取日期：' + nice + (wd ? '（' + wd + '）' : '') + ' · ' + info.ymd;
+    var cycleText = '';
+    var off = info.status !== 'school';
+    if (info.status === 'school') {
+      var sched = scheduleForDay(info.day);
+      cycleText = info.label + (sched && sched.label ? ' · ' + sched.label : '');
+    } else {
+      cycleText = info.label;
+    }
+    function paint(box, dateEl, cycleEl) {
+      if (!box || !dateEl || !cycleEl) return;
+      dateEl.textContent = dateText;
+      cycleEl.textContent = cycleText;
+      box.classList.toggle('off', off);
+    }
+    paint(browseDateResult, browseDateLabel, browseDateCycle);
+    paint(cycleDateResult, cycleDateLabelEl, cycleDateCycle);
+  }
+
+  /** Apply a picked calendar date: update UI; if school day, jump cycle day. */
+  function applyBrowseDate(ymd, opts) {
+    opts = opts || {};
+    if (!ymd) ymd = todayYmdHK();
+    state.browseDate = ymd;
+    syncDateInputs(ymd);
+    var info = lookupCalendarDate(ymd);
+    updateDateResultUI(info);
+    if (info.status === 'school' && info.day != null) {
+      state.day = info.day;
+      if (coverDay) {
+        coverDay.value = String(info.day);
+        fillCoverPeriods();
+      }
+      if (state.teacher) renderDayView();
+      else if (typeof buildDayChips === 'function') {
+        // chips may not exist yet at first boot
+        Array.prototype.forEach.call(dayChips.querySelectorAll('.day-chip'), function (chip) {
+          chip.classList.toggle('active', parseInt(chip.dataset.day, 10) === state.day);
+        });
+      }
+    } else if (state.teacher) {
+      // keep current day chips; still refresh title area if needed
+      renderDayView();
+    }
+    return info;
   }
 
   function getLocalManualOverride() {
@@ -1762,14 +1932,40 @@
     });
   }
 
+  function onDatePicked(ymd) {
+    applyBrowseDate(ymd);
+  }
+
+  if (browseDateInput) {
+    browseDateInput.addEventListener('change', function () {
+      if (browseDateInput.value) onDatePicked(browseDateInput.value);
+    });
+  }
+  if (browseDateTodayBtn) {
+    browseDateTodayBtn.addEventListener('click', function () {
+      onDatePicked(todayYmdHK());
+    });
+  }
+  if (cycleDateInput) {
+    cycleDateInput.addEventListener('change', function () {
+      if (cycleDateInput.value) onDatePicked(cycleDateInput.value);
+    });
+  }
+  if (cycleDateTodayBtn) {
+    cycleDateTodayBtn.addEventListener('click', function () {
+      onDatePicked(todayYmdHK());
+    });
+  }
+
   function boot() {
     buildDayChips();
     applyResolvedDayToUI();
+    applyBrowseDate(todayYmdHK());
     try {
       var last = localStorage.getItem(LS_TEACHER);
       if (last && lookupTeacher(last)) {
         codeInput.value = last;
-        selectTeacher(lookupTeacher(last));
+        selectTeacher(lookupTeacher(last), { keepDay: true });
       }
     } catch (e) {}
     refreshCycleUI();
