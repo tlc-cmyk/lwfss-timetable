@@ -1441,6 +1441,90 @@
       color: #555;
     }
 
+    /* 進修通告圖片上傳／OCR */
+    .training-ocr {
+      margin-bottom: 16px;
+      padding: 12px;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius);
+      background: var(--primary-soft);
+    }
+    .training-ocr h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      color: var(--primary-dark);
+    }
+    .training-ocr .ocr-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin: 0 0 10px;
+      line-height: 1.45;
+    }
+    .training-ocr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .training-ocr-actions .btn { flex: 1 1 auto; min-width: 120px; }
+    .training-ocr-actions input[type="file"] { display: none; }
+    .training-ocr-preview {
+      display: none;
+      margin-top: 10px;
+    }
+    .training-ocr-preview.show { display: block; }
+    .training-ocr-preview img {
+      display: block;
+      max-width: 100%;
+      max-height: 220px;
+      width: auto;
+      height: auto;
+      margin: 0 auto 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      object-fit: contain;
+    }
+    .training-ocr-status {
+      font-size: 0.82rem;
+      color: var(--muted);
+      min-height: 1.3em;
+      margin-bottom: 8px;
+    }
+    .training-ocr-status.busy { color: var(--primary); font-weight: 600; }
+    .training-ocr-status.err { color: var(--danger); font-weight: 600; }
+    .training-ocr-status.ok { color: var(--accent); font-weight: 600; }
+    .training-ocr-raw {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 120px;
+      overflow: auto;
+    }
+    .training-ocr-raw.show { display: block; }
+    .training-ocr-fields {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .training-ocr-fields.show { display: block; }
+    .training-ocr-fields .field { margin-bottom: 8px; }
+    .training-ocr-fields .field-label { font-size: 0.78rem; }
+    .training-ocr-fields input,
+    .training-ocr-fields select {
+      font-size: 0.9rem;
+      padding: 8px 10px;
+    }
+    .training-ocr-fields .time-row .field { margin-bottom: 0; }
+
   </style>
 </head>
 <body>
@@ -1698,7 +1782,72 @@
     <section class="panel" id="panel-training">
       <div class="card">
         <h2>教師進修申請</h2>
-        <p class="hint" style="margin-bottom:12px;">填寫進修活動資料後可預覽／列印為 PDF，交校長審批。老師姓名可直接輸入，或用 ShortName 從時間表資料帶出。</p>
+        <p class="hint" style="margin-bottom:12px;">填寫進修活動資料後可預覽／列印為 PDF，交校長審批。老師姓名可直接輸入，或用 ShortName 從時間表資料帶出。亦可上載／拍攝通告圖片，以瀏覽器 OCR（Tesseract.js）嘗試辨識日期、時間、地點、活動名稱與類型。</p>
+
+        <div class="training-ocr" id="trainingOcrBox">
+          <h3>通告圖片／OCR 填表</h3>
+          <p class="ocr-hint">支援拍照或選擇圖片。首次使用會由 CDN 載入 Tesseract.js 及中文（繁體）語言包，或需少許時間。辨識結果可先於下方預覽修改，再套用到申請表。若 OCR 未能辨識，仍可對照圖片手動填寫。</p>
+          <div class="training-ocr-actions">
+            <button class="btn btn-ghost" id="trainingOcrCameraBtn" type="button">拍照</button>
+            <button class="btn btn-ghost" id="trainingOcrFileBtn" type="button">選擇圖片</button>
+            <button class="btn btn-ghost" id="trainingOcrClearBtn" type="button" hidden>清除圖片</button>
+            <input type="file" id="trainingOcrCameraInput" accept="image/*" capture="environment" />
+            <input type="file" id="trainingOcrFileInput" accept="image/*" />
+          </div>
+          <div class="training-ocr-preview" id="trainingOcrPreview">
+            <img id="trainingOcrImg" alt="通告預覽" />
+            <div class="training-ocr-status" id="trainingOcrStatus" aria-live="polite"></div>
+            <details class="training-ocr-raw-wrap">
+              <summary style="font-size:0.78rem;color:var(--muted);cursor:pointer;">顯示 OCR 原文</summary>
+              <pre class="training-ocr-raw" id="trainingOcrRaw"></pre>
+            </details>
+            <div class="training-ocr-fields" id="trainingOcrFields">
+              <p class="field-hint" style="margin-bottom:8px;">辨識結果預覽（可修改後再套用）：</p>
+              <div class="field">
+                <label class="field-label" for="ocrDate">進修日期</label>
+                <input type="date" id="ocrDate" />
+              </div>
+              <div class="field">
+                <label class="field-label">時間</label>
+                <div class="time-row">
+                  <div class="field">
+                    <label class="field-label" for="ocrTimeStart">開始</label>
+                    <input type="time" id="ocrTimeStart" />
+                  </div>
+                  <div class="field">
+                    <label class="field-label" for="ocrTimeEnd">結束</label>
+                    <input type="time" id="ocrTimeEnd" />
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field-label" for="ocrVenue">地點</label>
+                <input type="text" id="ocrVenue" placeholder="地點" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="ocrActivity">活動名稱</label>
+                <input type="text" id="ocrActivity" placeholder="活動名稱" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="ocrType">進修類型</label>
+                <select id="ocrType">
+                  <option value="">— 請選擇 —</option>
+                  <option value="學科知識">學科知識</option>
+                  <option value="教學法">教學法</option>
+                  <option value="資訊科技">資訊科技</option>
+                  <option value="學生支援">學生支援</option>
+                  <option value="行政／領導">行政／領導</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div class="training-actions" style="margin-top:8px;">
+                <button class="btn" id="trainingOcrApplyBtn" type="button">套用到申請表</button>
+                <button class="btn btn-ghost" id="trainingOcrRetryBtn" type="button">重新辨識</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <form class="training-form" id="trainingForm" autocomplete="on" novalidate>
           <div class="name-row">
             <div class="field field-code">
@@ -3457,6 +3606,26 @@
   var trainingFillMeBtn = document.getElementById('trainingFillMeBtn');
   var trainingPrintBtn = document.getElementById('trainingPrintBtn');
   var trainingClosePreviewBtn = document.getElementById('trainingClosePreviewBtn');
+  var trainingOcrCameraBtn = document.getElementById('trainingOcrCameraBtn');
+  var trainingOcrFileBtn = document.getElementById('trainingOcrFileBtn');
+  var trainingOcrClearBtn = document.getElementById('trainingOcrClearBtn');
+  var trainingOcrCameraInput = document.getElementById('trainingOcrCameraInput');
+  var trainingOcrFileInput = document.getElementById('trainingOcrFileInput');
+  var trainingOcrPreview = document.getElementById('trainingOcrPreview');
+  var trainingOcrImg = document.getElementById('trainingOcrImg');
+  var trainingOcrStatus = document.getElementById('trainingOcrStatus');
+  var trainingOcrRaw = document.getElementById('trainingOcrRaw');
+  var trainingOcrFields = document.getElementById('trainingOcrFields');
+  var trainingOcrApplyBtn = document.getElementById('trainingOcrApplyBtn');
+  var trainingOcrRetryBtn = document.getElementById('trainingOcrRetryBtn');
+  var ocrDate = document.getElementById('ocrDate');
+  var ocrTimeStart = document.getElementById('ocrTimeStart');
+  var ocrTimeEnd = document.getElementById('ocrTimeEnd');
+  var ocrVenue = document.getElementById('ocrVenue');
+  var ocrActivity = document.getElementById('ocrActivity');
+  var ocrType = document.getElementById('ocrType');
+  var trainingOcrState = { objectUrl: null, file: null, lastText: '', busy: false };
+  var tesseractLoadPromise = null;
 
   function formatYmdHk(ymd) {
     if (!ymd || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return ymd || '—';
@@ -3606,6 +3775,374 @@
     }
   }
 
+  var TRAINING_TYPE_OPTIONS = ['學科知識', '教學法', '資訊科技', '學生支援', '行政／領導', '其他'];
+
+  function setTrainingOcrStatus(msg, kind) {
+    if (!trainingOcrStatus) return;
+    trainingOcrStatus.textContent = msg || '';
+    trainingOcrStatus.classList.remove('busy', 'err', 'ok');
+    if (kind) trainingOcrStatus.classList.add(kind);
+  }
+
+  function clearTrainingOcrUi(keepStatus) {
+    if (trainingOcrState.objectUrl) {
+      try { URL.revokeObjectURL(trainingOcrState.objectUrl); } catch (e) {}
+      trainingOcrState.objectUrl = null;
+    }
+    trainingOcrState.file = null;
+    trainingOcrState.lastText = '';
+    if (trainingOcrImg) {
+      trainingOcrImg.removeAttribute('src');
+      trainingOcrImg.alt = '通告預覽';
+    }
+    if (trainingOcrPreview) trainingOcrPreview.classList.remove('show');
+    if (trainingOcrFields) trainingOcrFields.classList.remove('show');
+    if (trainingOcrRaw) {
+      trainingOcrRaw.textContent = '';
+      trainingOcrRaw.classList.remove('show');
+    }
+    if (trainingOcrClearBtn) trainingOcrClearBtn.hidden = true;
+    if (trainingOcrCameraInput) trainingOcrCameraInput.value = '';
+    if (trainingOcrFileInput) trainingOcrFileInput.value = '';
+    [ocrDate, ocrTimeStart, ocrTimeEnd, ocrVenue, ocrActivity].forEach(function (el) {
+      if (el) el.value = '';
+    });
+    if (ocrType) ocrType.value = '';
+    if (!keepStatus) setTrainingOcrStatus('', null);
+  }
+
+  function pad2(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  function normalizeHm(h, m) {
+    h = parseInt(h, 10);
+    m = m == null || m === '' ? 0 : parseInt(m, 10);
+    if (isNaN(h) || h < 0 || h > 23) return '';
+    if (isNaN(m) || m < 0 || m > 59) m = 0;
+    return pad2(h) + ':' + pad2(m);
+  }
+
+  function toYmd(y, mo, d) {
+    y = parseInt(y, 10);
+    mo = parseInt(mo, 10);
+    d = parseInt(d, 10);
+    if (isNaN(y) || isNaN(mo) || isNaN(d)) return '';
+    if (y < 100) y += 2000;
+    if (y < 1990 || y > 2100 || mo < 1 || mo > 12 || d < 1 || d > 31) return '';
+    return y + '-' + pad2(mo) + '-' + pad2(d);
+  }
+
+  function guessTypeFromText(text) {
+    if (!text) return '';
+    var t = text.replace(/\s+/g, '');
+    var rules = [
+      [/資訊科技|資訊及通訊|STEM|AI|人工智能|電子學習|IT\b|ICT/i, '資訊科技'],
+      [/教學法|課堂教學|評估|課程設計|協作學習|教學策略/, '教學法'],
+      [/學生支援|特殊教育|SEN|輔導|生涯規劃|訓育|升學/, '學生支援'],
+      [/行政|領導|管理|中層|校長|學校發展/, '行政／領導'],
+      [/學科|本科|知識更新|課程詮釋|科目/, '學科知識']
+    ];
+    for (var i = 0; i < rules.length; i++) {
+      if (rules[i][0].test(text) || rules[i][0].test(t)) return rules[i][1];
+    }
+    for (var j = 0; j < TRAINING_TYPE_OPTIONS.length; j++) {
+      if (text.indexOf(TRAINING_TYPE_OPTIONS[j]) !== -1) return TRAINING_TYPE_OPTIONS[j];
+    }
+    return '';
+  }
+
+  function parseTrainingFromText(raw) {
+    var out = { date: '', timeStart: '', timeEnd: '', venue: '', activity: '', type: '' };
+    if (!raw) return out;
+    var text = String(raw).replace(/\r/g, '\n');
+    var flat = text.replace(/[ \t]+/g, ' ');
+
+    // Dates: 2026年10月11日 / 11/10/2026 / 2026-10-11 / 11-10-2026
+    var m;
+    m = flat.match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+    if (m) out.date = toYmd(m[1], m[2], m[3]);
+    if (!out.date) {
+      m = flat.match(/(20\d{2})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+      if (m) out.date = toYmd(m[1], m[2], m[3]);
+    }
+    if (!out.date) {
+      m = flat.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](20\d{2})/);
+      if (m) {
+        var a = parseInt(m[1], 10), b = parseInt(m[2], 10);
+        // Prefer DMY (HK); if first > 12 treat as DMY; if second > 12 treat as MDY
+        if (a > 12) out.date = toYmd(m[3], b, a);
+        else if (b > 12) out.date = toYmd(m[3], a, b);
+        else out.date = toYmd(m[3], b, a); // default DMY
+      }
+    }
+    if (!out.date) {
+      m = flat.match(/(?:日期|Date)\s*[:：]?\s*(20\d{2})[年\/\-.]?\s*(\d{1,2})[月\/\-.]?\s*(\d{1,2})/);
+      if (m) out.date = toYmd(m[1], m[2], m[3]);
+    }
+
+    // Times: 09:00-12:00 / 9時至12時 / 上午9時30分至下午12時 / 14:00 – 17:00
+    function applyAmPm(h, ap) {
+      h = parseInt(h, 10);
+      if (ap) {
+        var low = ap.toLowerCase();
+        if (/下午|pm|p\.m/i.test(low) && h < 12) h += 12;
+        if (/上午|am|a\.m/i.test(low) && h === 12) h = 0;
+      }
+      return h;
+    }
+    m = flat.match(/(上午|下午|AM|PM|A\.M\.|P\.M\.)?\s*(\d{1,2})\s*[:：時]\s*(\d{0,2})\s*分?\s*(?:至|–|-|—|~|～)\s*(上午|下午|AM|PM|A\.M\.|P\.M\.)?\s*(\d{1,2})\s*[:：時]\s*(\d{0,2})\s*分?/i);
+    if (m) {
+      out.timeStart = normalizeHm(applyAmPm(m[2], m[1] || m[4]), m[3]);
+      out.timeEnd = normalizeHm(applyAmPm(m[5], m[4] || m[1]), m[6]);
+    }
+    if (!out.timeStart) {
+      m = flat.match(/(?:時間|Time)\s*[:：]?\s*(\d{1,2})[:：](\d{2})\s*(?:至|–|-|—)\s*(\d{1,2})[:：](\d{2})/i);
+      if (m) {
+        out.timeStart = normalizeHm(m[1], m[2]);
+        out.timeEnd = normalizeHm(m[3], m[4]);
+      }
+    }
+    if (!out.timeStart) {
+      m = flat.match(/(\d{1,2})[:：](\d{2})\s*(?:至|–|-|—|~)\s*(\d{1,2})[:：](\d{2})/);
+      if (m) {
+        out.timeStart = normalizeHm(m[1], m[2]);
+        out.timeEnd = normalizeHm(m[3], m[4]);
+      }
+    }
+
+    function labeledValue(labels) {
+      for (var i = 0; i < labels.length; i++) {
+        var re = new RegExp('(?:' + labels[i] + ')\\s*[:：]\\s*([^\\n]{2,80})', 'i');
+        var mm = text.match(re);
+        if (mm) {
+          return mm[1].replace(/\s+/g, ' ').trim().replace(/[|｜].*$/, '').trim();
+        }
+      }
+      return '';
+    }
+
+    out.venue = labeledValue(['地點', '舉辦地點', '舉行地點', 'Venue', 'Location', '場所']);
+    if (out.venue) {
+      out.venue = out.venue.replace(/(?:時間|日期|對象|費用).*$/, '').trim();
+    }
+
+    out.activity = labeledValue(['活動名稱', '課程名稱', '講座名稱', '工作坊名稱', '主題', 'Title', 'Course Title', 'Programme', 'Program']);
+    if (!out.activity) {
+      // First substantial Chinese/English line that isn't a label-only line
+      var lines = text.split(/\n+/).map(function (l) { return l.trim(); }).filter(Boolean);
+      for (var li = 0; li < lines.length; li++) {
+        var line = lines[li];
+        if (line.length < 4 || line.length > 80) continue;
+        if (/^(日期|時間|地點|Venue|Date|Time|對象|費用|備註)/i.test(line)) continue;
+        if (/^世界龍岡|教師進修|教育局通告/.test(line)) continue;
+        if (/[\u4e00-\u9fffA-Za-z]{4,}/.test(line)) {
+          out.activity = line.replace(/^[\d\.、\-\s]+/, '').trim();
+          break;
+        }
+      }
+    }
+
+    out.type = guessTypeFromText(text);
+    if (!out.type) {
+      var typed = labeledValue(['進修類型', '類型', '類別', '範疇', 'Category']);
+      if (typed) out.type = guessTypeFromText(typed) || (TRAINING_TYPE_OPTIONS.indexOf(typed) !== -1 ? typed : '');
+    }
+    return out;
+  }
+
+  function parseTrainingFromFilename(name) {
+    var out = { date: '', timeStart: '', timeEnd: '', venue: '', activity: '', type: '' };
+    if (!name) return out;
+    var base = name.replace(/\.[^.]+$/, '');
+    // Strip common upload noise
+    base = base.replace(/^(IMG_|DSC_|Photo_|image[_-]?)/i, '');
+    var parts = base.split(/[_\-–—]+/).map(function (p) { return p.trim(); }).filter(Boolean);
+    var joined = parts.join(' ');
+
+    var m = base.match(/(20\d{2})(\d{2})(\d{2})/);
+    if (m) out.date = toYmd(m[1], m[2], m[3]);
+    if (!out.date) {
+      m = base.match(/(20\d{2})[.\-](\d{1,2})[.\-](\d{1,2})/);
+      if (m) out.date = toYmd(m[1], m[2], m[3]);
+    }
+
+    m = base.match(/(\d{1,2})[:：](\d{2})\s*(?:至|–|-|—)?\s*(\d{1,2})[:：](\d{2})/);
+    if (m) {
+      out.timeStart = normalizeHm(m[1], m[2]);
+      out.timeEnd = normalizeHm(m[3], m[4]);
+    }
+
+    out.type = guessTypeFromText(joined);
+    // Heuristic: longest Chinese/English token as activity; known venue words
+    var venueHints = ['教育局', '網上', '線上', 'Zoom', '学校', '學校', 'EDB', 'HQ', '九龍', '香港', '新界'];
+    parts.forEach(function (p) {
+      if (!out.venue) {
+        for (var i = 0; i < venueHints.length; i++) {
+          if (p.indexOf(venueHints[i]) !== -1) { out.venue = p; break; }
+        }
+      }
+    });
+    var best = '';
+    parts.forEach(function (p) {
+      if (/^\d+$/.test(p)) return;
+      if (out.type && p === out.type) return;
+      if (out.venue && p === out.venue) return;
+      if (/^20\d{6}$/.test(p)) return;
+      if (p.length > best.length && /[\u4e00-\u9fffA-Za-z]/.test(p)) best = p;
+    });
+    out.activity = best;
+    return out;
+  }
+
+  function mergeParsed(a, b) {
+    var out = {};
+    ['date', 'timeStart', 'timeEnd', 'venue', 'activity', 'type'].forEach(function (k) {
+      out[k] = (a && a[k]) || (b && b[k]) || '';
+    });
+    return out;
+  }
+
+  function fillOcrPreviewFields(parsed) {
+    if (!parsed) return;
+    if (ocrDate && parsed.date) ocrDate.value = parsed.date;
+    if (ocrTimeStart && parsed.timeStart) ocrTimeStart.value = parsed.timeStart;
+    if (ocrTimeEnd && parsed.timeEnd) ocrTimeEnd.value = parsed.timeEnd;
+    if (ocrVenue && parsed.venue) ocrVenue.value = parsed.venue;
+    if (ocrActivity && parsed.activity) ocrActivity.value = parsed.activity;
+    if (ocrType && parsed.type && TRAINING_TYPE_OPTIONS.indexOf(parsed.type) !== -1) {
+      ocrType.value = parsed.type;
+    }
+    if (trainingOcrFields) trainingOcrFields.classList.add('show');
+  }
+
+  function applyOcrPreviewToForm() {
+    if (ocrDate && ocrDate.value && trainingDate) trainingDate.value = ocrDate.value;
+    if (ocrTimeStart && ocrTimeStart.value && trainingTimeStart) trainingTimeStart.value = ocrTimeStart.value;
+    if (ocrTimeEnd && ocrTimeEnd.value && trainingTimeEnd) trainingTimeEnd.value = ocrTimeEnd.value;
+    if (ocrVenue && ocrVenue.value.trim() && trainingVenue) trainingVenue.value = ocrVenue.value.trim();
+    if (ocrActivity && ocrActivity.value.trim() && trainingActivity) trainingActivity.value = ocrActivity.value.trim();
+    if (ocrType && ocrType.value && trainingType) trainingType.value = ocrType.value;
+    if (trainingError) trainingError.classList.remove('show');
+    setTrainingOcrStatus('已套用到申請表，請核對後可預覽／匯出 PDF。', 'ok');
+    if (trainingDate) trainingDate.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function loadTesseractFromCdn() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+    if (tesseractLoadPromise) return tesseractLoadPromise;
+    tesseractLoadPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+      s.async = true;
+      s.onload = function () {
+        if (window.Tesseract) resolve(window.Tesseract);
+        else reject(new Error('Tesseract 載入後不可用'));
+      };
+      s.onerror = function () {
+        tesseractLoadPromise = null;
+        reject(new Error('無法載入 Tesseract.js CDN'));
+      };
+      document.head.appendChild(s);
+    });
+    return tesseractLoadPromise;
+  }
+
+  function runTrainingOcr(file) {
+    if (!file || trainingOcrState.busy) return;
+    trainingOcrState.busy = true;
+    trainingOcrState.file = file;
+
+    var fileParsed = parseTrainingFromFilename(file.name || '');
+    fillOcrPreviewFields(fileParsed);
+
+    setTrainingOcrStatus('正在載入 OCR 引擎（首次需下載語言包）…', 'busy');
+    if (trainingOcrApplyBtn) trainingOcrApplyBtn.disabled = true;
+    if (trainingOcrRetryBtn) trainingOcrRetryBtn.disabled = true;
+
+    loadTesseractFromCdn()
+      .then(function (Tesseract) {
+        setTrainingOcrStatus('正在辨識文字（繁中＋英文）…', 'busy');
+        return Tesseract.recognize(file, 'chi_tra+eng', {
+          logger: function (m) {
+            if (!m || !trainingOcrStatus) return;
+            if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+              setTrainingOcrStatus('正在辨識文字… ' + Math.round(m.progress * 100) + '%', 'busy');
+            } else if (m.status === 'loading language traineddata') {
+              setTrainingOcrStatus('正在下載中文（繁體）語言包…', 'busy');
+            } else if (m.status === 'initializing tesseract' || m.status === 'loading tesseract core') {
+              setTrainingOcrStatus('正在初始化 OCR…', 'busy');
+            }
+          }
+        });
+      })
+      .then(function (result) {
+        var text = (result && result.data && result.data.text) || '';
+        trainingOcrState.lastText = text;
+        if (trainingOcrRaw) {
+          trainingOcrRaw.textContent = text.trim() || '（無辨識文字）';
+          trainingOcrRaw.classList.add('show');
+        }
+        var ocrParsed = parseTrainingFromText(text);
+        var merged = mergeParsed(ocrParsed, fileParsed);
+        fillOcrPreviewFields(merged);
+        var filled = ['date', 'timeStart', 'timeEnd', 'venue', 'activity', 'type'].filter(function (k) {
+          return !!(merged[k]);
+        }).length;
+        if (filled > 0) {
+          setTrainingOcrStatus('辨識完成，已填入 ' + filled + ' 個欄位預覽，請核對後按「套用到申請表」。', 'ok');
+        } else {
+          setTrainingOcrStatus('辨識完成，但未能自動對應欄位。請對照圖片手動填寫下方預覽或申請表。', 'err');
+        }
+      })
+      .catch(function (err) {
+        console.warn('Training OCR failed', err);
+        fillOcrPreviewFields(fileParsed);
+        var hasFileHint = !!(fileParsed.date || fileParsed.activity || fileParsed.venue || fileParsed.type);
+        setTrainingOcrStatus(
+          'OCR 未能完成（' + ((err && err.message) || '網絡或瀏覽器限制') + '）。' +
+          (hasFileHint ? '已嘗試從檔名推斷欄位，請核對後套用或手動填寫。' : '請對照圖片手動填寫。'),
+          'err'
+        );
+        if (trainingOcrFields) trainingOcrFields.classList.add('show');
+      })
+      .then(function () {
+        trainingOcrState.busy = false;
+        if (trainingOcrApplyBtn) trainingOcrApplyBtn.disabled = false;
+        if (trainingOcrRetryBtn) trainingOcrRetryBtn.disabled = false;
+      });
+  }
+
+  function handleTrainingOcrFile(file) {
+    if (!file) return;
+    if (!/^image\//i.test(file.type) && !/\.(jpe?g|png|gif|webp|bmp|heic)$/i.test(file.name || '')) {
+      setTrainingOcrStatus('請選擇圖片檔（JPG／PNG／WebP 等）。', 'err');
+      return;
+    }
+    if (trainingOcrState.objectUrl) {
+      try { URL.revokeObjectURL(trainingOcrState.objectUrl); } catch (e) {}
+    }
+    var url = URL.createObjectURL(file);
+    trainingOcrState.objectUrl = url;
+    trainingOcrState.file = file;
+    if (trainingOcrImg) {
+      trainingOcrImg.src = url;
+      trainingOcrImg.alt = file.name || '通告預覽';
+    }
+    if (trainingOcrPreview) trainingOcrPreview.classList.add('show');
+    if (trainingOcrClearBtn) trainingOcrClearBtn.hidden = false;
+    if (trainingOcrRaw) {
+      trainingOcrRaw.textContent = '';
+      trainingOcrRaw.classList.remove('show');
+    }
+    // Reset preview fields before new parse
+    [ocrDate, ocrTimeStart, ocrTimeEnd, ocrVenue, ocrActivity].forEach(function (el) {
+      if (el) el.value = '';
+    });
+    if (ocrType) ocrType.value = '';
+    runTrainingOcr(file);
+  }
+
   function resetTrainingForm() {
     var form = document.getElementById('trainingForm');
     if (form) form.reset();
@@ -3617,6 +4154,7 @@
       trainingPrintRoot.innerHTML = '';
       trainingPrintRoot.setAttribute('aria-hidden', 'true');
     }
+    clearTrainingOcrUi(false);
   }
 
   if (trainingCode) {
@@ -3669,6 +4207,37 @@
     });
   }
 
+  if (trainingOcrCameraBtn && trainingOcrCameraInput) {
+    trainingOcrCameraBtn.addEventListener('click', function () {
+      trainingOcrCameraInput.click();
+    });
+    trainingOcrCameraInput.addEventListener('change', function () {
+      var f = trainingOcrCameraInput.files && trainingOcrCameraInput.files[0];
+      if (f) handleTrainingOcrFile(f);
+    });
+  }
+  if (trainingOcrFileBtn && trainingOcrFileInput) {
+    trainingOcrFileBtn.addEventListener('click', function () {
+      trainingOcrFileInput.click();
+    });
+    trainingOcrFileInput.addEventListener('change', function () {
+      var f = trainingOcrFileInput.files && trainingOcrFileInput.files[0];
+      if (f) handleTrainingOcrFile(f);
+    });
+  }
+  if (trainingOcrClearBtn) {
+    trainingOcrClearBtn.addEventListener('click', function () {
+      clearTrainingOcrUi(false);
+    });
+  }
+  if (trainingOcrApplyBtn) {
+    trainingOcrApplyBtn.addEventListener('click', applyOcrPreviewToForm);
+  }
+  if (trainingOcrRetryBtn) {
+    trainingOcrRetryBtn.addEventListener('click', function () {
+      if (trainingOcrState.file) runTrainingOcr(trainingOcrState.file);
+    });
+  }
 
   // Events
   lookupBtn.addEventListener('click', doLookup);
