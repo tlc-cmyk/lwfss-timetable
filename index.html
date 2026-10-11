@@ -145,7 +145,7 @@
     .row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
     .row > * { flex: 1 1 auto; min-width: 0; }
 
-    input[type="text"], select {
+    input[type="text"], input[type="date"], input[type="time"], select, textarea {
       width: 100%;
       padding: 11px 12px;
       border: 1.5px solid var(--border);
@@ -155,11 +155,13 @@
       color: var(--text);
       outline: none;
       transition: border-color .15s;
+      font-family: inherit;
     }
-    input[type="text"]:focus, select:focus {
+    input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px var(--focus-ring);
     }
+    textarea { min-height: 72px; resize: vertical; }
     button.btn {
       border: none;
       border-radius: 10px;
@@ -1301,6 +1303,144 @@
       .wrap { padding: 16px 20px; }
       .day-chips { grid-template-columns: repeat(10, 1fr); }
     }
+
+    /* 教師進修申請 */
+    .training-form .field { margin-bottom: 12px; }
+    .training-form .field-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .training-form .time-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .training-form .time-row .field {
+      flex: 1 1 120px;
+      margin-bottom: 0;
+    }
+    .training-form .name-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .training-form .name-row .field-grow { flex: 1 1 160px; min-width: 140px; }
+    .training-form .name-row .field-code { flex: 0 1 120px; min-width: 100px; }
+    .training-resolved {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 600;
+      min-height: 1.2em;
+    }
+    .training-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .training-actions .btn { flex: 1 1 auto; min-width: 140px; }
+    .training-error {
+      display: none;
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    .training-error.show { display: block; }
+
+    /* Print / PDF preview overlay */
+    .training-print-root {
+      display: none;
+    }
+    @media print {
+      body * { visibility: hidden !important; }
+      .training-print-root, .training-print-root * { visibility: visible !important; }
+      .training-print-root {
+        display: block !important;
+        position: absolute;
+        left: 0; top: 0;
+        width: 100%;
+        padding: 12mm 14mm;
+        background: #fff;
+        color: #000;
+        font-size: 11pt;
+        line-height: 1.5;
+      }
+      .app-header, .wrap, .app-footer, .tabs { display: none !important; }
+      @page { margin: 12mm; size: A4; }
+    }
+    .training-print-sheet {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .training-print-sheet .tp-school {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      margin-bottom: 4px;
+    }
+    .training-print-sheet .tp-title {
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #1a4d8c;
+    }
+    .training-print-sheet .tp-meta {
+      text-align: right;
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .training-print-sheet table.tp-fields {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .training-print-sheet table.tp-fields th,
+    .training-print-sheet table.tp-fields td {
+      border: 1px solid #333;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .training-print-sheet table.tp-fields th {
+      width: 28%;
+      background: #f0f4f8;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .training-print-sheet .tp-sign {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px 32px;
+    }
+    .training-print-sheet .tp-sign-block {
+      border-top: 1px solid #333;
+      padding-top: 8px;
+      min-height: 72px;
+    }
+    .training-print-sheet .tp-sign-label {
+      font-weight: 700;
+      margin-bottom: 28px;
+    }
+    .training-print-sheet .tp-sign-line {
+      font-size: 0.85rem;
+      color: #444;
+    }
+    .training-print-sheet .tp-note {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: #555;
+    }
+
   </style>
 </head>
 <body>
@@ -1554,13 +1694,92 @@
       </div>
     </section>
 
-    <!-- 教師進修申請 (placeholder) -->
+    <!-- 教師進修申請 -->
     <section class="panel" id="panel-training">
       <div class="card">
         <h2>教師進修申請</h2>
-        <div class="empty" style="margin:0;">Coming soon</div>
+        <p class="hint" style="margin-bottom:12px;">填寫進修活動資料後可預覽／列印為 PDF，交校長審批。老師姓名可直接輸入，或用 ShortName 從時間表資料帶出。</p>
+        <form class="training-form" id="trainingForm" autocomplete="on" novalidate>
+          <div class="name-row">
+            <div class="field field-code">
+              <label class="field-label" for="trainingCode">ShortName（可選）</label>
+              <input type="text" id="trainingCode" list="teacherList" placeholder="例如 TLC" autocomplete="off" autocapitalize="characters" />
+            </div>
+            <div class="field field-grow">
+              <label class="field-label" for="trainingName">老師姓名 <span aria-hidden="true">*</span></label>
+              <input type="text" id="trainingName" placeholder="中文或英文姓名" required />
+            </div>
+          </div>
+          <div class="training-resolved" id="trainingResolved" aria-live="polite"></div>
+
+          <div class="field">
+            <label class="field-label" for="trainingDate">進修日期 <span aria-hidden="true">*</span></label>
+            <input type="date" id="trainingDate" required />
+          </div>
+
+          <div class="field">
+            <label class="field-label">時間 <span aria-hidden="true">*</span></label>
+            <div class="time-row">
+              <div class="field">
+                <label class="field-label" for="trainingTimeStart">開始</label>
+                <input type="time" id="trainingTimeStart" required />
+              </div>
+              <div class="field">
+                <label class="field-label" for="trainingTimeEnd">結束</label>
+                <input type="time" id="trainingTimeEnd" required />
+              </div>
+            </div>
+            <p class="field-hint">亦可於下方備註補充全日／時段說明。</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="trainingVenue">地點 <span aria-hidden="true">*</span></label>
+            <input type="text" id="trainingVenue" placeholder="例如 學校／教育局／網上" required />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="trainingActivity">活動名稱 <span aria-hidden="true">*</span></label>
+            <input type="text" id="trainingActivity" placeholder="進修活動全名" required />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="trainingType">進修類型 <span aria-hidden="true">*</span></label>
+            <select id="trainingType" required>
+              <option value="">— 請選擇 —</option>
+              <option value="學科知識">學科知識</option>
+              <option value="教學法">教學法</option>
+              <option value="資訊科技">資訊科技</option>
+              <option value="學生支援">學生支援</option>
+              <option value="行政／領導">行政／領導</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="trainingNotes">備註（可選）</label>
+            <textarea id="trainingNotes" placeholder="例如代課安排、全日活動說明…"></textarea>
+          </div>
+
+          <div class="training-error" id="trainingError" role="alert">請填妥必填欄位後再預覽。</div>
+          <div class="training-actions">
+            <button class="btn" id="trainingPreviewBtn" type="button">預覽／匯出 PDF</button>
+            <button class="btn btn-ghost" id="trainingResetBtn" type="button">清空</button>
+            <button class="btn btn-ghost" id="trainingFillMeBtn" type="button">用已選教師填入</button>
+          </div>
+        </form>
+      </div>
+      <div class="card" id="trainingPreviewCard" hidden>
+        <h2>預覽（列印／另存 PDF）</h2>
+        <p class="hint" style="margin-bottom:10px;">確認內容後按「列印／另存 PDF」。瀏覽器列印對話框可選「另存為 PDF」。</p>
+        <div class="training-actions" style="margin-top:0;margin-bottom:12px;">
+          <button class="btn" id="trainingPrintBtn" type="button">列印／另存 PDF</button>
+          <button class="btn btn-ghost" id="trainingClosePreviewBtn" type="button">關閉預覽</button>
+        </div>
+        <div id="trainingPreviewMount"></div>
       </div>
     </section>
+
+    <div class="training-print-root" id="trainingPrintRoot" aria-hidden="true"></div>
 
     <!-- Cycle day setting -->
     <section class="panel" id="panel-cycle">
@@ -2656,6 +2875,9 @@
           typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
     }
     if (name === 'cal' && typeof renderSchoolCal === 'function') renderSchoolCal();
+    if (name === 'training' && typeof syncTrainingFromTeacher === 'function') {
+      syncTrainingFromTeacher({ onlyIfEmpty: true });
+    }
   }
 
   function esc(s) {
@@ -3213,6 +3435,240 @@
       refreshCoverDateHint();
     }
   }
+
+
+  // —— 教師進修申請 ——
+  var trainingCode = document.getElementById('trainingCode');
+  var trainingName = document.getElementById('trainingName');
+  var trainingDate = document.getElementById('trainingDate');
+  var trainingTimeStart = document.getElementById('trainingTimeStart');
+  var trainingTimeEnd = document.getElementById('trainingTimeEnd');
+  var trainingVenue = document.getElementById('trainingVenue');
+  var trainingActivity = document.getElementById('trainingActivity');
+  var trainingType = document.getElementById('trainingType');
+  var trainingNotes = document.getElementById('trainingNotes');
+  var trainingResolved = document.getElementById('trainingResolved');
+  var trainingError = document.getElementById('trainingError');
+  var trainingPreviewCard = document.getElementById('trainingPreviewCard');
+  var trainingPreviewMount = document.getElementById('trainingPreviewMount');
+  var trainingPrintRoot = document.getElementById('trainingPrintRoot');
+  var trainingPreviewBtn = document.getElementById('trainingPreviewBtn');
+  var trainingResetBtn = document.getElementById('trainingResetBtn');
+  var trainingFillMeBtn = document.getElementById('trainingFillMeBtn');
+  var trainingPrintBtn = document.getElementById('trainingPrintBtn');
+  var trainingClosePreviewBtn = document.getElementById('trainingClosePreviewBtn');
+
+  function formatYmdHk(ymd) {
+    if (!ymd || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return ymd || '—';
+    var p = ymd.split('-');
+    return p[0] + '年' + parseInt(p[1], 10) + '月' + parseInt(p[2], 10) + '日';
+  }
+
+  function formatTimeHm(t) {
+    if (!t) return '—';
+    return t;
+  }
+
+  function syncTrainingFromTeacher(opts) {
+    opts = opts || {};
+    if (!state.teacher) return;
+    var t = state.teacher;
+    if (opts.onlyIfEmpty) {
+      var nameEmpty = !(trainingName && trainingName.value.trim());
+      var codeEmpty = !(trainingCode && trainingCode.value.trim());
+      if (!nameEmpty && !codeEmpty) return;
+    }
+    if (trainingCode) trainingCode.value = t.code || '';
+    if (trainingName) {
+      trainingName.value = t.chi || t.eng || t.code || '';
+    }
+    if (trainingResolved) {
+      trainingResolved.textContent = t.code
+        ? ('已對應：' + t.code + ' · ' + [t.chi, t.eng].filter(Boolean).join(' / '))
+        : '';
+    }
+  }
+
+  function applyTrainingCodeLookup() {
+    if (!trainingCode) return;
+    var code = (trainingCode.value || '').trim().toUpperCase();
+    if (!code) {
+      if (trainingResolved) trainingResolved.textContent = '';
+      return;
+    }
+    var t = lookupTeacher(code);
+    if (!t) {
+      if (trainingResolved) trainingResolved.textContent = '找不到 ShortName「' + code + '」，請直接填寫老師姓名。';
+      return;
+    }
+    trainingCode.value = t.code;
+    if (trainingName) trainingName.value = t.chi || t.eng || t.code;
+    if (trainingResolved) {
+      trainingResolved.textContent = '已對應：' + t.code + ' · ' + [t.chi, t.eng].filter(Boolean).join(' / ');
+    }
+  }
+
+  function readTrainingForm() {
+    return {
+      code: (trainingCode && trainingCode.value || '').trim().toUpperCase(),
+      name: (trainingName && trainingName.value || '').trim(),
+      date: trainingDate && trainingDate.value || '',
+      timeStart: trainingTimeStart && trainingTimeStart.value || '',
+      timeEnd: trainingTimeEnd && trainingTimeEnd.value || '',
+      venue: (trainingVenue && trainingVenue.value || '').trim(),
+      activity: (trainingActivity && trainingActivity.value || '').trim(),
+      type: trainingType && trainingType.value || '',
+      notes: (trainingNotes && trainingNotes.value || '').trim()
+    };
+  }
+
+  function validateTrainingForm(data) {
+    if (!data.name) return '請填寫老師姓名。';
+    if (!data.date) return '請選擇進修日期。';
+    if (!data.timeStart || !data.timeEnd) return '請填寫開始與結束時間。';
+    if (!data.venue) return '請填寫地點。';
+    if (!data.activity) return '請填寫活動名稱。';
+    if (!data.type) return '請選擇進修類型。';
+    return '';
+  }
+
+  function buildTrainingPrintHtml(data) {
+    var timeRange = formatTimeHm(data.timeStart) + ' – ' + formatTimeHm(data.timeEnd);
+    var nameLine = esc(data.name);
+    if (data.code) nameLine += '（' + esc(data.code) + '）';
+    var notesRow = '';
+    if (data.notes) {
+      notesRow = '<tr><th>備註</th><td>' + esc(data.notes).replace(/\n/g, '<br />') + '</td></tr>';
+    }
+    var printedAt = '';
+    try {
+      var parts = nowHKTParts();
+      printedAt = parts.year + '-' +
+        String(parts.month).padStart(2, '0') + '-' +
+        String(parts.day).padStart(2, '0') + ' ' +
+        String(parts.hour).padStart(2, '0') + ':' +
+        String(parts.minute).padStart(2, '0') + '（香港時間）';
+    } catch (e) {
+      printedAt = new Date().toLocaleString('zh-HK');
+    }
+    return (
+      '<div class="training-print-sheet">' +
+        '<div class="tp-school">世界龍岡學校劉皇發中學</div>' +
+        '<div class="tp-title">教師進修申請表</div>' +
+        '<div class="tp-meta">列印／匯出：' + esc(printedAt) + '</div>' +
+        '<table class="tp-fields">' +
+          '<tr><th>老師姓名</th><td>' + nameLine + '</td></tr>' +
+          '<tr><th>進修日期</th><td>' + esc(formatYmdHk(data.date)) + '</td></tr>' +
+          '<tr><th>時間</th><td>' + esc(timeRange) + '</td></tr>' +
+          '<tr><th>地點</th><td>' + esc(data.venue) + '</td></tr>' +
+          '<tr><th>活動名稱</th><td>' + esc(data.activity) + '</td></tr>' +
+          '<tr><th>進修類型</th><td>' + esc(data.type) + '</td></tr>' +
+          notesRow +
+        '</table>' +
+        '<div class="tp-sign">' +
+          '<div class="tp-sign-block">' +
+            '<div class="tp-sign-label">申請人簽署</div>' +
+            '<div class="tp-sign-line">簽署：________________</div>' +
+            '<div class="tp-sign-line" style="margin-top:8px;">日期：________________</div>' +
+          '</div>' +
+          '<div class="tp-sign-block">' +
+            '<div class="tp-sign-label">校長審批</div>' +
+            '<div class="tp-sign-line">□ 批准　□ 不批准</div>' +
+            '<div class="tp-sign-line" style="margin-top:8px;">簽署：________________</div>' +
+            '<div class="tp-sign-line" style="margin-top:8px;">日期：________________</div>' +
+          '</div>' +
+        '</div>' +
+        '<p class="tp-note">本表由教師時間表系統產生，供列印或另存為 PDF 後交校長審批。</p>' +
+      '</div>'
+    );
+  }
+
+  function showTrainingPreview() {
+    var data = readTrainingForm();
+    var err = validateTrainingForm(data);
+    if (trainingError) {
+      if (err) {
+        trainingError.textContent = err;
+        trainingError.classList.add('show');
+        return;
+      }
+      trainingError.classList.remove('show');
+    }
+    var html = buildTrainingPrintHtml(data);
+    if (trainingPreviewMount) trainingPreviewMount.innerHTML = html;
+    if (trainingPrintRoot) {
+      trainingPrintRoot.innerHTML = html;
+      trainingPrintRoot.setAttribute('aria-hidden', 'false');
+    }
+    if (trainingPreviewCard) {
+      trainingPreviewCard.hidden = false;
+      trainingPreviewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function resetTrainingForm() {
+    var form = document.getElementById('trainingForm');
+    if (form) form.reset();
+    if (trainingResolved) trainingResolved.textContent = '';
+    if (trainingError) trainingError.classList.remove('show');
+    if (trainingPreviewCard) trainingPreviewCard.hidden = true;
+    if (trainingPreviewMount) trainingPreviewMount.innerHTML = '';
+    if (trainingPrintRoot) {
+      trainingPrintRoot.innerHTML = '';
+      trainingPrintRoot.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  if (trainingCode) {
+    trainingCode.addEventListener('change', applyTrainingCodeLookup);
+    trainingCode.addEventListener('blur', applyTrainingCodeLookup);
+    trainingCode.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyTrainingCodeLookup();
+      }
+    });
+  }
+  if (trainingPreviewBtn) trainingPreviewBtn.addEventListener('click', showTrainingPreview);
+  if (trainingResetBtn) trainingResetBtn.addEventListener('click', resetTrainingForm);
+  if (trainingFillMeBtn) {
+    trainingFillMeBtn.addEventListener('click', function () {
+      if (!state.teacher) {
+        if (trainingError) {
+          trainingError.textContent = '請先在頂部輸入教師代碼查詢，或直接填 ShortName／姓名。';
+          trainingError.classList.add('show');
+        }
+        return;
+      }
+      if (trainingError) trainingError.classList.remove('show');
+      syncTrainingFromTeacher({ onlyIfEmpty: false });
+    });
+  }
+  if (trainingPrintBtn) {
+    trainingPrintBtn.addEventListener('click', function () {
+      var data = readTrainingForm();
+      var err = validateTrainingForm(data);
+      if (err) {
+        if (trainingError) {
+          trainingError.textContent = err;
+          trainingError.classList.add('show');
+        }
+        return;
+      }
+      var html = buildTrainingPrintHtml(data);
+      if (trainingPrintRoot) {
+        trainingPrintRoot.innerHTML = html;
+        trainingPrintRoot.setAttribute('aria-hidden', 'false');
+      }
+      window.print();
+    });
+  }
+  if (trainingClosePreviewBtn) {
+    trainingClosePreviewBtn.addEventListener('click', function () {
+      if (trainingPreviewCard) trainingPreviewCard.hidden = true;
+    });
+  }
+
 
   // Events
   lookupBtn.addEventListener('click', doLookup);
