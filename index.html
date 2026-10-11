@@ -3971,21 +3971,28 @@
       if (isDateTimeHeavy(t)) return -1;
       if (isMetaOrHeaderLine(t)) return -1;
       if (/^(地點|形式|Venue|Location|地址|Address|場所)\b/i.test(t)) return -1;
-      // Body / prose paragraphs — not titles
-      if (/^(是次|本次|本研討|透過本|我們亦|我們會|旨在|協助老師|採用|誠邀|敬請)/.test(t)) return -1;
+      // Body / prose paragraphs — not titles (flyer intros often lack 是次／本次)
+      if (/^(是次|本次|本研討|透過|探討|我們|旨在|協助|採用|誠邀|敬請|研討會將|分享如何|以及培養|人本教學|有效融合|教師將)/.test(t)) return -1;
       if (/報名連結|持續專業發展時數|https?:\/\//i.test(t)) return -1;
-      // Prefer title-like wording; penalize pure venue / address lines
-      var score = t.length;
-      if (/講座|工作坊|課程|研討|培訓|研習|工作會議|專業發展|Seminar|Workshop|Course|Programme|Program|Forum|Conference/i.test(t)) score += 25;
+      // Sentence punctuation / comma-heavy lines are body copy, not 主題／活動名稱
+      if (/[。．！？]/.test(t)) return -1;
+      var commaCount = (t.match(/[，,、]/g) || []).length;
+      if (commaCount >= 2 && t.length > 36) return -1;
+      if (commaCount >= 1 && t.length > 64) return -1;
+      // Prefer compact title-like length; do not let raw length dominate
+      var score = Math.min(t.length, 48);
+      if (t.length >= 6 && t.length <= 48) score += 40;
+      else if (t.length > 60) score -= (t.length - 60) * 2;
+      if (/講座|工作坊|課程|研討|培訓|研習|工作會議|專業發展|Seminar|Workshop|Course|Programme|Program|Forum|Conference/i.test(t)) {
+        // Short titled events keep the boost; long "研討會將…" prose already rejected above
+        if (t.length <= 64) score += 25;
+      }
       if (/[「『"].+[」』"]/.test(t) || /A\s*Taste\s+of/i.test(t)) score += 20;
+      if (/[—–-]/.test(t) && t.length <= 64) score += 12;
       if (/題目|主題|名稱/.test(t)) score += 8;
       if (looksLikeVenue(t) && !/講座|工作坊|課程|研討|培訓|Seminar|Workshop|Course/i.test(t)) score -= 40;
-      if (t.length > 100) score -= (t.length - 100);
-      // Long comma-heavy prose
-      if ((t.match(/[，,]/g) || []).length >= 2 && t.length > 40) score -= 25;
-      // Prefer denser CJK / letter content
       var letters = (t.match(/[\u4e00-\u9fffA-Za-z]/g) || []).length;
-      score += Math.min(letters, 40);
+      score += Math.min(letters, 28);
       return score;
     }
 
@@ -4126,18 +4133,31 @@
       if (isDateTimeHeavy(out.venue) || venueScore(out.venue) < 0) out.venue = '';
     }
 
-    out.activity = labeledValue(
-      ['活動名稱', '課程名稱', '講座名稱', '工作坊名稱', '進修活動', '活動題目', '課程題目', '題目', '主題', '課程', 'Title', 'Course Title', 'Programme Title', 'Program Title', 'Programme', 'Program', 'Course', 'Workshop', 'Seminar'],
-      { maxLen: 140, scoreFn: activityScore }
-    );
-    if (out.activity) {
-      out.activity = stripDateTimeNoise(out.activity)
-        .replace(/^(?:活動名稱|課程名稱|講座名稱|工作坊名稱|題目|主題|課程|Title|Programme|Program|Course)\s*[:：]?\s*/i, '')
+    // Labeled 主題／活動名稱／題目 beat weak labels (課程／Course) and long body prose
+    var activityPriorityLabels = [
+      '活動名稱', '課程名稱', '講座名稱', '工作坊名稱', '進修活動',
+      '活動題目', '課程題目', '題目', '主題', '主是', '王題',
+      'Title', 'Course Title', 'Programme Title', 'Program Title'
+    ];
+    var activityFallbackLabels = ['課程', 'Programme', 'Program', 'Course', 'Workshop', 'Seminar'];
+    function finalizeActivityCandidate(v) {
+      if (!v) return '';
+      v = stripDateTimeNoise(v)
+        .replace(/^(?:活動名稱|課程名稱|講座名稱|工作坊名稱|題目|主題|主是|王題|課程|Title|Programme|Program|Course)\s*[:：]?\s*/i, '')
         .replace(/(?:日期|時間|地點|形式|Venue|Location|地址|語言|程度).*$/i, '')
         .replace(/\bA[Il1]\b/g, 'AI')
         .replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI')
         .trim();
-      if (activityScore(out.activity) < 0) out.activity = '';
+      if (!v || activityScore(v) < 0) return '';
+      return v;
+    }
+    out.activity = finalizeActivityCandidate(
+      labeledValue(activityPriorityLabels, { maxLen: 140, scoreFn: activityScore })
+    );
+    if (!out.activity) {
+      out.activity = finalizeActivityCandidate(
+        labeledValue(activityFallbackLabels, { maxLen: 140, scoreFn: activityScore })
+      );
     }
 
     // Heuristic: prefer high-scoring title-like lines (earlier lines win ties)
@@ -4153,11 +4173,11 @@
         // Skip pure label+datetime lines
         var candidate = stripDateTimeNoise(line.replace(/^[\d\.、．\-\s]+/, '').trim());
         // Drop leading field labels if OCR glued them
-        candidate = candidate.replace(/^(?:活動名稱|課程名稱|題目|主題|課程)\s*[:：]?\s*/i, '').trim();
+        candidate = candidate.replace(/^(?:活動名稱|課程名稱|題目|主題|主是|王題|課程)\s*[:：]?\s*/i, '').trim();
         candidate = candidate.replace(/\bA[Il1]\b/g, 'AI').replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI');
         var sc = activityScore(candidate);
-        // Slight preference for lines appearing before 日期／時間／地點 block
-        if (li < 12) sc += 6;
+        // Slight preference for early compact titles (body intros already score < 0)
+        if (li < 12 && candidate.length <= 48) sc += 6;
         if (sc > bestActScore) {
           bestActScore = sc;
           bestAct = candidate;
@@ -4280,10 +4300,42 @@
     return a.length >= b.length ? a : b;
   }
 
+  function looksLikeActivityProse(s) {
+    s = String(s || '').trim();
+    if (!s) return true;
+    if (/^(是次|本次|本研討|透過|探討|我們|旨在|協助|採用|誠邀|敬請|研討會將|分享如何|以及培養|人本教學|有效融合|教師將)/.test(s)) return true;
+    if (/[。．！？]/.test(s)) return true;
+    var commas = (s.match(/[，,、]/g) || []).length;
+    if (commas >= 2 && s.length > 36) return true;
+    if (s.length > 72) return true;
+    return false;
+  }
+
+  function preferBetterActivityTitle(a, b) {
+    a = (a || '').trim();
+    b = (b || '').trim();
+    if (!a) return b;
+    if (!b) return a;
+    var ap = looksLikeActivityProse(a);
+    var bp = looksLikeActivityProse(b);
+    if (ap && !bp) return b;
+    if (bp && !ap) return a;
+    // Compact titled lines beat long leftovers
+    if (a.length !== b.length) {
+      var aFit = a.length >= 6 && a.length <= 48;
+      var bFit = b.length >= 6 && b.length <= 48;
+      if (aFit && !bFit) return a;
+      if (bFit && !aFit) return b;
+    }
+    return a.length <= b.length ? a : b;
+  }
+
   function mergeParsed(a, b) {
     var out = {};
     ['date', 'timeStart', 'timeEnd', 'venue', 'activity', 'type'].forEach(function (k) {
-      if (k === 'activity' || k === 'venue') {
+      if (k === 'activity') {
+        out[k] = preferBetterActivityTitle(a && a[k], b && b[k]);
+      } else if (k === 'venue') {
         out[k] = preferLongerText(a && a[k], b && b[k]);
       } else {
         out[k] = (a && a[k]) || (b && b[k]) || '';
