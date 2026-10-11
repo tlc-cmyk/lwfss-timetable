@@ -3836,15 +3836,18 @@
   function guessTypeFromText(text) {
     if (!text) return '';
     var t = text.replace(/\s+/g, '');
+    // OCR often confuses AI ↔ Al / A1
+    var norm = text.replace(/\bA[Il1]\b/g, 'AI').replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI');
+    var normFlat = norm.replace(/\s+/g, '');
     var rules = [
-      [/資訊科技|資訊及通訊|STEM|AI|人工智能|電子學習|IT\b|ICT/i, '資訊科技'],
-      [/教學法|課堂教學|評估|課程設計|協作學習|教學策略/, '教學法'],
+      [/資訊科技|資訊及通訊|STEM|A[Il1]|人工智能|電子學習|IT\b|ICT|AlphAI|ロボ|機械人/i, '資訊科技'],
+      [/教學法|課堂教學|評估|課程設計|協作學習|教學策略|自主學習|深度思考/, '教學法'],
       [/學生支援|特殊教育|SEN|輔導|生涯規劃|訓育|升學/, '學生支援'],
       [/行政|領導|管理|中層|校長|學校發展/, '行政／領導'],
       [/學科|本科|知識更新|課程詮釋|科目/, '學科知識']
     ];
     for (var i = 0; i < rules.length; i++) {
-      if (rules[i][0].test(text) || rules[i][0].test(t)) return rules[i][1];
+      if (rules[i][0].test(text) || rules[i][0].test(t) || rules[i][0].test(norm) || rules[i][0].test(normFlat)) return rules[i][1];
     }
     for (var j = 0; j < TRAINING_TYPE_OPTIONS.length; j++) {
       if (text.indexOf(TRAINING_TYPE_OPTIONS[j]) !== -1) return TRAINING_TYPE_OPTIONS[j];
@@ -3890,16 +3893,75 @@
       // Only skip short org/header lines — not venue lines that begin with 教育局…
       if (/^(世界龍岡學校|教師進修申請|教育局通告|Education Bureau|通告|通知|Memo|Circular)\b/i.test(line)) return true;
       if (/^(教育局|EDB)\s*$/i.test(line)) return true;
-      if (/^(敬啟者|各位老師|老師們|附件|附註|注意|查詢|報名方法|截止報名)/.test(line)) return true;
-      if (/^(日期|時間|地點|Venue|Location|Date|Time|對象|費用|備註|電話|傳真|電郵|Email|Tel|Fax)\s*[:：]?\s*$/i.test(line)) return true;
+      if (/^(敬啟者|各位老師|老師們|附件|附註|注意|查詢|報名方法|截止報名|活動詳情|報名連結)/.test(line)) return true;
+      if (/^(日期|時間|地點|形式|主題|語言|程度|Venue|Location|Date|Time|對象|費用|備註|電話|傳真|電郵|Email|Tel|Fax)\s*[:：]?\s*$/i.test(line)) return true;
       return false;
     }
 
     function looksLikeVenue(s) {
       if (!s) return false;
-      if (/教育局|教師中心|專業發展中心|網上|線上|Zoom|Teams|Google\s*Meet|Webinar|學校|中學|小學|大學|學院|校舍|禮堂|會議室|演講廳|室$|樓$|座$|EDB|HQ|九龍|香港|新界|港島|觀塘|沙田|荃灣|屯門|元朗|大埔|北區|西貢|離島|灣仔|中環|尖沙咀|旺角|地址/i.test(s)) return true;
-      if (/\d+.*(?:號|樓|室|座)|Room\s*\d+|Floor\s*\d+/i.test(s)) return true;
+      if (/教育局|教師中心|專業發展中心|網上|線上|Zoom|Teams|Google\s*Meet|Webinar|學校|中學|小學|大學|學院|校舍|禮堂|會議室|演講廳|室$|樓$|座$|EDB|HQ|九龍|香港|新界|港島|觀塘|沙田|荃灣|屯門|元朗|大埔|北區|西貢|離島|灣仔|中環|尖沙咀|旺角|地址|真光|沙福道/i.test(s)) return true;
+      if (/\d+.*(?:號|樓|室|座)|Room\s*\d+|Floor\s*\d+|\d{1,4}\s*室/i.test(s)) return true;
+      // School / centre name + room number (possibly split across OCR lines)
+      if (/(?:中學|小學|書院|學院|學校|中心).{0,20}\d{1,4}\s*室/.test(s)) return true;
       return false;
+    }
+
+    function isVenueContinuation(line) {
+      if (!line) return false;
+      var t = String(line).replace(/\s+/g, ' ').trim();
+      if (!t || t.length > 48) return false;
+      if (/^(日期|時間|地點|形式|主題|語言|程度|對象|費用|備註|報名|是次|本次|我們|透過|協助|採用|誠邀)/.test(t)) return false;
+      if (/^(?:活動名稱|題目|課程|Title)/i.test(t)) return false;
+      // Room / floor / block alone on next line (common OCR wrap after 中學)
+      if (/^\d{1,4}\s*室\s*$/.test(t)) return true;
+      if (/^(?:Room|Fl\.?|Floor|Blk\.?|Block)\s*\d+/i.test(t)) return true;
+      if (/^\d{1,4}\s*(?:樓|座|室)\s*$/.test(t)) return true;
+      if (/^第?\d{1,4}\s*(?:室|樓|座)\s*$/.test(t)) return true;
+      return false;
+    }
+
+    function extendVenueWithContinuations(venue) {
+      if (!venue) return venue;
+      var needle = stripDateTimeNoise(venue).replace(/\s+/g, ' ').trim();
+      function alreadyHas(cont) {
+        cont = String(cont || '').replace(/\s+/g, ' ').trim();
+        if (!cont) return true;
+        return needle.indexOf(cont) !== -1;
+      }
+      for (var i = 0; i < lines.length; i++) {
+        var rawLine = lines[i];
+        var stripped = stripDateTimeNoise(
+          rawLine.replace(/^(?:地點|場所|地址|Venue|Location|Address|形式|舉辦形式|活動形式|Format|Mode)\s*[:：]?\s*/i, '').trim()
+        );
+        if (!stripped) continue;
+        // Match the base school/address line, not the already-joined full venue
+        var hit = (stripped === needle) ||
+          (needle.indexOf(stripped) !== -1 && stripped.length >= 8) ||
+          (stripped.indexOf(needle) !== -1 && needle.length >= 8);
+        if (!hit) continue;
+        var parts = [needle];
+        for (var j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+          if (!isVenueContinuation(lines[j])) break;
+          var cont = lines[j].replace(/\s+/g, ' ').trim();
+          if (!alreadyHas(cont)) parts.push(cont);
+        }
+        return parts.join(' ').replace(/\s+/g, ' ').trim();
+      }
+      // Fallback: scan for school line followed by room continuation even if label OCR missed 地點
+      for (var k = 0; k < lines.length - 1; k++) {
+        if (!isVenueContinuation(lines[k + 1])) continue;
+        var base = stripDateTimeNoise(
+          lines[k].replace(/^(?:地點|場所|地址|Venue|Location|Address|形式|舉辦形式|活動形式)\s*[:：]?\s*/i, '').trim()
+        );
+        var cont2 = lines[k + 1].replace(/\s+/g, ' ').trim();
+        if (base && looksLikeVenue(base) && /中學|小學|書院|學院|學校|中心|道|街|里|號/.test(base)) {
+          if (alreadyHas(cont2) && needle.indexOf(base) !== -1) return needle;
+          if (alreadyHas(cont2)) return needle;
+          return (base + ' ' + cont2).replace(/\s+/g, ' ').trim();
+        }
+      }
+      return needle;
     }
 
     function activityScore(s) {
@@ -3908,13 +3970,19 @@
       if (!t || t.length < 4) return -1;
       if (isDateTimeHeavy(t)) return -1;
       if (isMetaOrHeaderLine(t)) return -1;
-      if (/^(地點|Venue|Location|地址|Address|場所)\b/i.test(t)) return -1;
+      if (/^(地點|形式|Venue|Location|地址|Address|場所)\b/i.test(t)) return -1;
+      // Body / prose paragraphs — not titles
+      if (/^(是次|本次|本研討|透過本|我們亦|我們會|旨在|協助老師|採用|誠邀|敬請)/.test(t)) return -1;
+      if (/報名連結|持續專業發展時數|https?:\/\//i.test(t)) return -1;
       // Prefer title-like wording; penalize pure venue / address lines
       var score = t.length;
-      if (/講座|工作坊|課程|研討|培訓|研習|工作會議|專業發展|工作坊|Seminar|Workshop|Course|Programme|Program|Forum|Conference/i.test(t)) score += 25;
+      if (/講座|工作坊|課程|研討|培訓|研習|工作會議|專業發展|Seminar|Workshop|Course|Programme|Program|Forum|Conference/i.test(t)) score += 25;
+      if (/[「『"].+[」』"]/.test(t) || /A\s*Taste\s+of/i.test(t)) score += 20;
       if (/題目|主題|名稱/.test(t)) score += 8;
       if (looksLikeVenue(t) && !/講座|工作坊|課程|研討|培訓|Seminar|Workshop|Course/i.test(t)) score -= 40;
       if (t.length > 100) score -= (t.length - 100);
+      // Long comma-heavy prose
+      if ((t.match(/[，,]/g) || []).length >= 2 && t.length > 40) score -= 25;
       // Prefer denser CJK / letter content
       var letters = (t.match(/[\u4e00-\u9fffA-Za-z]/g) || []).length;
       score += Math.min(letters, 40);
@@ -3929,10 +3997,15 @@
       if (/^(活動名稱|題目|課程|主題|Title|Programme|Program)\b/i.test(t)) return -1;
       var score = 0;
       if (looksLikeVenue(t)) score += 30;
-      if (/地址|Venue|Location|地點/.test(s)) score += 10;
+      // Strong boost for explicit 地點／形式 labels and school+room patterns
+      if (/地點\s*[:：]/.test(s) || /^(?:地點)\s*[:：]/.test(s)) score += 35;
+      if (/形式\s*[:：]/.test(s) || /線上\s*\(?\s*Zoom/i.test(s)) score += 25;
+      if (/地址|Venue|Location|地點|形式/.test(s)) score += 10;
+      if (/(?:中學|小學|書院|學院|學校|中心).{0,24}\d{1,4}\s*室/.test(t) || /\d{1,4}\s*室/.test(t)) score += 25;
+      if (/(?:道|街|里|路).{0,12}\d+\s*號/.test(t)) score += 15;
       // Prefer moderate length venues over long course titles
-      if (t.length >= 4 && t.length <= 60) score += 10;
-      if (t.length > 80) score -= 20;
+      if (t.length >= 4 && t.length <= 80) score += 10;
+      if (t.length > 100) score -= 20;
       if (/講座|工作坊|課程名稱|研討會主題/i.test(t) && !looksLikeVenue(t)) score -= 30;
       score += Math.min(t.length, 40);
       return score;
@@ -3969,7 +4042,7 @@
         if (mm) {
           var v2 = cleaner(mm[1].replace(/[|｜].*$/, '').trim());
           // Skip if next line is another field label
-          if (v2 && !/^(日期|時間|地點|Venue|Location|地址|Address|對象|費用|備註|活動名稱|題目|課程|主題|Title)\s*[:：]?$/i.test(v2)) {
+          if (v2 && !/^(日期|時間|地點|形式|語言|程度|Venue|Location|地址|Address|對象|費用|備註|活動名稱|題目|課程|主題|活動詳情|Title)\s*[:：]?$/i.test(v2)) {
             var sc2 = (opts.scoreFn ? opts.scoreFn(v2) : v2.length) + 5; // slight boost: structured forms
             if (sc2 > bestScore) { best = v2; bestScore = sc2; }
           }
@@ -3979,7 +4052,7 @@
         mm = text.match(reInline);
         if (mm) {
           var v3 = cleaner(mm[1].replace(/[|｜].*$/, '').trim());
-          if (v3 && v3.length >= 2 && !/^(日期|時間|地點|Venue|Location|地址|對象|費用)/i.test(v3)) {
+          if (v3 && v3.length >= 2 && !/^(日期|時間|地點|形式|語言|程度|Venue|Location|地址|對象|費用|活動詳情)/i.test(v3)) {
             var sc3 = (opts.scoreFn ? opts.scoreFn(v3) : v3.length);
             if (sc3 > bestScore) { best = v3; bestScore = sc3; }
           }
@@ -4042,13 +4115,13 @@
     }
 
     out.venue = labeledValue(
-      ['舉辦地點', '舉行地點', '活動地點', '舉行場所', '地點', '場所', '地址', 'Venue', 'Location', 'Address', 'Place'],
-      { maxLen: 100, scoreFn: venueScore }
+      ['舉辦地點', '舉行地點', '活動地點', '舉行場所', '地點', '場所', '地址', '形式', '舉辦形式', '活動形式', 'Venue', 'Location', 'Address', 'Place', 'Format', 'Mode'],
+      { maxLen: 120, scoreFn: venueScore }
     );
     if (out.venue) {
       out.venue = stripDateTimeNoise(out.venue)
-        .replace(/^(?:地點|場所|地址|Venue|Location|Address)\s*[:：]?\s*/i, '')
-        .replace(/(?:時間|日期|對象|費用|活動名稱|題目|課程).*$/, '')
+        .replace(/^(?:地點|場所|地址|形式|舉辦形式|活動形式|Venue|Location|Address|Format|Mode)\s*[:：]?\s*/i, '')
+        .replace(/(?:時間|日期|對象|費用|活動名稱|題目|課程|語言|程度|主題).*$/, '')
         .trim();
       if (isDateTimeHeavy(out.venue) || venueScore(out.venue) < 0) out.venue = '';
     }
@@ -4060,52 +4133,78 @@
     if (out.activity) {
       out.activity = stripDateTimeNoise(out.activity)
         .replace(/^(?:活動名稱|課程名稱|講座名稱|工作坊名稱|題目|主題|課程|Title|Programme|Program|Course)\s*[:：]?\s*/i, '')
-        .replace(/(?:日期|時間|地點|Venue|Location|地址).*$/i, '')
+        .replace(/(?:日期|時間|地點|形式|Venue|Location|地址|語言|程度).*$/i, '')
+        .replace(/\bA[Il1]\b/g, 'AI')
+        .replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI')
         .trim();
       if (activityScore(out.activity) < 0) out.activity = '';
     }
 
-    // Heuristic: prefer the longest high-scoring title-like line
+    // Heuristic: prefer high-scoring title-like lines (earlier lines win ties)
     if (!out.activity) {
       var bestAct = '';
       var bestActScore = -1;
+      var bestActIdx = -1;
       for (var li = 0; li < lines.length; li++) {
         var line = lines[li];
         if (line.length < 4 || line.length > 140) continue;
         if (isMetaOrHeaderLine(line)) continue;
-        if (/^(日期|時間|地點|Venue|Location|地址|Address|對象|費用|備註|電話)/i.test(line)) continue;
+        if (/^(日期|時間|地點|形式|語言|程度|Venue|Location|地址|Address|對象|費用|備註|電話|活動詳情)/i.test(line)) continue;
         // Skip pure label+datetime lines
         var candidate = stripDateTimeNoise(line.replace(/^[\d\.、．\-\s]+/, '').trim());
         // Drop leading field labels if OCR glued them
         candidate = candidate.replace(/^(?:活動名稱|課程名稱|題目|主題|課程)\s*[:：]?\s*/i, '').trim();
+        candidate = candidate.replace(/\bA[Il1]\b/g, 'AI').replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI');
         var sc = activityScore(candidate);
+        // Slight preference for lines appearing before 日期／時間／地點 block
+        if (li < 12) sc += 6;
         if (sc > bestActScore) {
           bestActScore = sc;
           bestAct = candidate;
+          bestActIdx = li;
+        }
+      }
+      // Join a following short title fragment (OCR often wraps 「…」工作坊)
+      if (bestActScore >= 8 && bestActIdx >= 0 && bestActIdx + 1 < lines.length) {
+        var nxt = stripDateTimeNoise(lines[bestActIdx + 1]);
+        if (nxt && nxt.length >= 2 && nxt.length <= 40 &&
+            !/^(日期|時間|地點|形式|主題|語言|程度|是次|本次|我們)/.test(nxt) &&
+            /工作坊|講座|培訓|研討|簡介|比賽|課程|Workshop|Seminar/i.test(nxt) &&
+            activityScore(bestAct + nxt) >= bestActScore) {
+          bestAct = (bestAct + nxt).replace(/\s+/g, ' ').trim();
         }
       }
       if (bestActScore >= 8) out.activity = bestAct;
     }
 
-    // Heuristic venue if unlabeled
+    // Heuristic venue if unlabeled (also catches OCR-missed 地點 with school+room wrap)
     if (!out.venue) {
       var bestVen = '';
       var bestVenScore = -1;
       for (var vi = 0; vi < lines.length; vi++) {
         var vline = lines[vi];
-        if (vline.length < 2 || vline.length > 100) continue;
+        if (vline.length < 2 || vline.length > 120) continue;
         if (isMetaOrHeaderLine(vline)) continue;
         if (out.activity && stripDateTimeNoise(vline) === out.activity) continue;
-        var vc = stripDateTimeNoise(vline.replace(/^(?:地點|場所|地址|Venue|Location|Address)\s*[:：]?\s*/i, '').trim());
-        var vsc = venueScore(vc);
+        var labeledBoost = /^(?:地點|場所|地址|形式)\s*[:：]/i.test(vline) ? 35 : 0;
+        var vc = stripDateTimeNoise(vline.replace(/^(?:地點|場所|地址|形式|舉辦形式|活動形式|Venue|Location|Address)\s*[:：]?\s*/i, '').trim());
+        // Join room continuation on next line before scoring
+        if (vi + 1 < lines.length && isVenueContinuation(lines[vi + 1])) {
+          vc = (vc + ' ' + lines[vi + 1].replace(/\s+/g, ' ').trim()).replace(/\s+/g, ' ').trim();
+        }
+        var vsc = venueScore(vline) + labeledBoost;
+        // Re-score joined text
+        var vsc2 = venueScore(vc);
+        if (vsc2 > vsc) vsc = vsc2;
         if (!looksLikeVenue(vc) && vsc < 35) continue;
         if (vsc > bestVenScore) {
           bestVenScore = vsc;
           bestVen = vc;
         }
       }
-      if (bestVenScore >= 30) out.venue = bestVen;
+      if (bestVenScore >= 30) out.venue = extendVenueWithContinuations(bestVen);
     }
+    if (out.venue) out.venue = extendVenueWithContinuations(out.venue);
 
     // Avoid cross-contamination: if activity equals venue, keep the better-fitting field
     if (out.activity && out.venue && out.activity === out.venue) {
