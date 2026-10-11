@@ -3855,10 +3855,31 @@
     return '';
   }
 
+  function collapseOcrSpaces(raw) {
+    // tesseract.js (browser) often inserts spaces between CJK letters, e.g. 「主 題」→ break label match
+    var s = String(raw || '');
+    s = s.replace(/([\u4e00-\u9fff])[ \t]+(?=[\u4e00-\u9fff])/g, '$1');
+    s = s.replace(/([\u4e00-\u9fff])[ \t]+(?=[A-Za-z0-9])/g, '$1');
+    s = s.replace(/([A-Za-z0-9])[ \t]+(?=[\u4e00-\u9fff])/g, '$1');
+    return s;
+  }
+
+  function normalizeActivityTitle(s) {
+    if (!s) return '';
+    s = String(s)
+      .replace(/\bA[Il1]\b/g, 'AI')
+      .replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI')
+      // Flyer titles use em-dash; OCR often reads it as 一 / hyphen
+      .replace(/([A-Za-z\u4e00-\u9fff])[ \t]*[一–\-−][ \t]*([\u4e00-\u9fff])/g, '$1 — $2')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return s;
+  }
+
   function parseTrainingFromText(raw) {
     var out = { date: '', timeStart: '', timeEnd: '', venue: '', activity: '', type: '' };
     if (!raw) return out;
-    var text = String(raw).replace(/\r/g, '\n');
+    var text = collapseOcrSpaces(String(raw).replace(/\r/g, '\n'));
     var flat = text.replace(/[ \t]+/g, ' ');
     var lines = text.split(/\n+/).map(function (l) { return l.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
 
@@ -3972,12 +3993,14 @@
       if (isMetaOrHeaderLine(t)) return -1;
       if (/^(地點|形式|Venue|Location|地址|Address|場所)\b/i.test(t)) return -1;
       // Body / prose paragraphs — not titles (flyer intros often lack 是次／本次)
-      if (/^(是次|本次|本研討|透過|探討|我們|旨在|協助|採用|誠邀|敬請|研討會將|分享如何|以及培養|人本教學|有效融合|教師將)/.test(t)) return -1;
+      if (/^(是次|本次|本研討|透過|探討|我們|旨在|協助|採用|誠邀|敬請|研討會將|分享如何|以及培養|人本教學與|有效融合|教師將|AI設計|Al設計)/.test(t)) return -1;
       if (/報名連結|持續專業發展時數|https?:\/\//i.test(t)) return -1;
       // Sentence punctuation / comma-heavy lines are body copy, not 主題／活動名稱
       if (/[。．！？]/.test(t)) return -1;
+      if (/[,，][提升同時避免透過探討培養分享]/.test(t)) return -1;
       var commaCount = (t.match(/[，,、]/g) || []).length;
       if (commaCount >= 2 && t.length > 36) return -1;
+      if (commaCount >= 1 && t.length > 28 && !/[—–]/.test(t)) return -1;
       if (commaCount >= 1 && t.length > 64) return -1;
       // Prefer compact title-like length; do not let raw length dominate
       var score = Math.min(t.length, 48);
@@ -4140,19 +4163,23 @@
       'Title', 'Course Title', 'Programme Title', 'Program Title'
     ];
     var activityFallbackLabels = ['課程', 'Programme', 'Program', 'Course', 'Workshop', 'Seminar'];
-    function finalizeActivityCandidate(v) {
+    function finalizeActivityCandidate(v, opts) {
+      opts = opts || {};
       if (!v) return '';
       v = stripDateTimeNoise(v)
         .replace(/^(?:活動名稱|課程名稱|講座名稱|工作坊名稱|題目|主題|主是|王題|課程|Title|Programme|Program|Course)\s*[:：]?\s*/i, '')
         .replace(/(?:日期|時間|地點|形式|Venue|Location|地址|語言|程度).*$/i, '')
-        .replace(/\bA[Il1]\b/g, 'AI')
-        .replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI')
         .trim();
-      if (!v || activityScore(v) < 0) return '';
+      v = normalizeActivityTitle(v);
+      // Priority labels (主題／活動名稱) should win even if scoring is lukewarm
+      if (!v) return '';
+      if (!opts.trustLabel && activityScore(v) < 0) return '';
+      if (opts.trustLabel && (isDateTimeHeavy(v) || v.length < 4)) return '';
       return v;
     }
     out.activity = finalizeActivityCandidate(
-      labeledValue(activityPriorityLabels, { maxLen: 140, scoreFn: activityScore })
+      labeledValue(activityPriorityLabels, { maxLen: 140, scoreFn: activityScore }),
+      { trustLabel: true }
     );
     if (!out.activity) {
       out.activity = finalizeActivityCandidate(
@@ -4174,7 +4201,7 @@
         var candidate = stripDateTimeNoise(line.replace(/^[\d\.、．\-\s]+/, '').trim());
         // Drop leading field labels if OCR glued them
         candidate = candidate.replace(/^(?:活動名稱|課程名稱|題目|主題|主是|王題|課程)\s*[:：]?\s*/i, '').trim();
-        candidate = candidate.replace(/\bA[Il1]\b/g, 'AI').replace(/A[Il1](?=[\u4e00-\u9fff])/g, 'AI');
+        candidate = normalizeActivityTitle(candidate);
         var sc = activityScore(candidate);
         // Slight preference for early compact titles (body intros already score < 0)
         if (li < 12 && candidate.length <= 48) sc += 6;
@@ -4303,10 +4330,13 @@
   function looksLikeActivityProse(s) {
     s = String(s || '').trim();
     if (!s) return true;
-    if (/^(是次|本次|本研討|透過|探討|我們|旨在|協助|採用|誠邀|敬請|研討會將|分享如何|以及培養|人本教學|有效融合|教師將)/.test(s)) return true;
+    if (/^(是次|本次|本研討|透過|探討|我們|旨在|協助|採用|誠邀|敬請|研討會將|分享如何|以及培養|人本教學與|有效融合|教師將|AI設計|Al設計)/.test(s)) return true;
     if (/[。．！？]/.test(s)) return true;
+    // Mid-sentence flyer body (e.g. 「…學習活動,提升學生…」)
+    if (/[,，][提升同時避免透過探討培養分享]/.test(s)) return true;
     var commas = (s.match(/[，,、]/g) || []).length;
     if (commas >= 2 && s.length > 36) return true;
+    if (commas >= 1 && s.length > 28 && !/[—–]/.test(s)) return true;
     if (s.length > 72) return true;
     return false;
   }
