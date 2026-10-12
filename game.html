@@ -749,9 +749,9 @@
     .scene-frame .scene { display: none; }
     .scene-frame .scene.is-active { display: block; }
 
-    /* ===== Staff room scene ===== */
+    /* ===== Staff room scene (bright white / light grey) ===== */
     .scene.staffroom .wall {
-      background: #efe0cc;
+      background: #f4f5f7;
       height: 52%;
     }
     .scene.staffroom .floor {
@@ -759,50 +759,91 @@
       background:
         repeating-linear-gradient(
           90deg,
-          #c4a07a 0 32px,
-          #b89068 32px 34px
+          #e8eaee 0 32px,
+          #d8dce4 32px 34px
         );
-      border-top: 3px solid #7a5232;
+      border-top: 3px solid #9aa3b2;
     }
     .scene.staffroom .ceiling {
-      background: linear-gradient(180deg, #e0c8a8, transparent);
+      background: linear-gradient(180deg, #ffffff, transparent);
     }
     .scene.staffroom .window {
       top: 8%;
-      right: 6%;
+      right: 5%;
       width: 18%;
       height: 26%;
-      background: #a8c8e0;
+      background: #c5dff5;
+      border-color: #8a93a3;
     }
     .scene.staffroom .pigeon {
       position: absolute;
       top: 10%;
-      left: 6%;
-      width: 28%;
-      height: 30%;
+      left: 5%;
+      width: 24%;
+      height: 28%;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       grid-template-rows: 1fr 1fr 1fr;
       gap: 2px;
-      background: #8b5e3c;
-      border: 3px solid #5c3a22;
+      background: #c5cad3;
+      border: 3px solid #8a93a3;
       border-radius: 3px;
       padding: 3px;
       box-sizing: border-box;
+      z-index: 3;
     }
     .scene.staffroom .pigeon span {
-      background: #f3e6d4;
-      border: 1px solid #6b4423;
+      background: #ffffff;
+      border: 1px solid #a8b0bc;
       border-radius: 1px;
     }
+    .scene.staffroom .bookshelf {
+      position: absolute;
+      top: 10%;
+      left: 31%;
+      width: 10%;
+      height: 34%;
+      background: #dfe3ea;
+      border: 3px solid #8a93a3;
+      border-radius: 2px;
+      z-index: 3;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .scene.staffroom .bookshelf::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(#8a93a3, #8a93a3) 0 32%/100% 2px no-repeat,
+        linear-gradient(#8a93a3, #8a93a3) 0 64%/100% 2px no-repeat;
+    }
+    .scene.staffroom .bookshelf .book {
+      position: absolute;
+      width: 18%;
+      bottom: 6%;
+      border: 1px solid #5c3a22;
+      border-radius: 1px 1px 0 0;
+      box-sizing: border-box;
+    }
+    .scene.staffroom .bookshelf .book.b1 { left: 10%; height: 22%; background: #e07878; bottom: 70%; }
+    .scene.staffroom .bookshelf .book.b2 { left: 32%; height: 26%; background: #5b8def; bottom: 70%; }
+    .scene.staffroom .bookshelf .book.b3 { left: 54%; height: 20%; background: #6bb89a; bottom: 70%; }
+    .scene.staffroom .bookshelf .book.b4 { left: 76%; height: 24%; background: #f0c14b; bottom: 70%; }
+    .scene.staffroom .bookshelf .book.b5 { left: 12%; height: 24%; background: #c48ad4; bottom: 38%; }
+    .scene.staffroom .bookshelf .book.b6 { left: 36%; height: 20%; background: #e8a05a; bottom: 38%; }
+    .scene.staffroom .bookshelf .book.b7 { left: 58%; height: 26%; background: #7a9e6e; bottom: 38%; }
+    .scene.staffroom .bookshelf .book.b8 { left: 14%; height: 22%; background: #6b8cae; bottom: 6%; }
+    .scene.staffroom .bookshelf .book.b9 { left: 38%; height: 28%; background: #d46b8a; bottom: 6%; }
+    .scene.staffroom .bookshelf .book.b10 { left: 62%; height: 18%; background: #8b5e3c; bottom: 6%; }
     .scene.staffroom .coffee-bar {
       position: absolute;
       top: 38%;
-      right: 8%;
-      width: 22%;
-      height: 12%;
-      background: #a07040;
-      border: 2px solid #5c3a22;
+      right: 7%;
+      width: 20%;
+      height: 11%;
+      background: #e6e9ef;
+      border: 2px solid #8a93a3;
       border-radius: 3px;
       z-index: 4;
     }
@@ -810,18 +851,18 @@
       content: "☕";
       position: absolute;
       left: 50%;
-      top: -40%;
+      top: -42%;
       transform: translateX(-50%);
       font-size: 0.9rem;
     }
     .scene.staffroom .whiteboard {
       position: absolute;
       top: 12%;
-      left: 40%;
-      width: 30%;
+      left: 44%;
+      width: 28%;
       height: 22%;
-      background: #f7f4ee;
-      border: 4px solid #8b5e3c;
+      background: #ffffff;
+      border: 4px solid #9aa3b2;
       border-radius: 3px;
       display: flex;
       align-items: center;
@@ -829,6 +870,7 @@
       padding: 3px;
       text-align: center;
       z-index: 3;
+      box-shadow: inset 0 0 0 1px #e8eaee;
     }
     .scene.staffroom .whiteboard .board-text {
       color: #3e2a1a;
@@ -860,8 +902,8 @@
       right: 8%;
       bottom: 18%;
       height: 22%;
-      background: #b88048;
-      border: 2px solid #5c3a22;
+      background: #f0f2f5;
+      border: 2px solid #8a93a3;
       border-radius: 2px;
       z-index: 2;
     }
@@ -870,12 +912,83 @@
       bottom: 0;
       width: 12%;
       height: 38%;
-      background: #8b5e3c;
-      border: 1px solid #5c3a22;
+      background: #c5cad3;
+      border: 1px solid #8a93a3;
       z-index: 1;
     }
     .scene.staffroom .staff-desk-slot .desk-leg.l { left: 18%; }
     .scene.staffroom .staff-desk-slot .desk-leg.r { right: 18%; }
+
+    /* pixel PC / monitor on some desks */
+    .scene.staffroom .pc {
+      position: absolute;
+      left: 28%;
+      bottom: 36%;
+      width: 44%;
+      height: 42%;
+      z-index: 3;
+      pointer-events: none;
+      image-rendering: pixelated;
+    }
+    .scene.staffroom .pc .monitor {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 0;
+      height: 62%;
+      background: #3a4250;
+      border: 2px solid #2a3038;
+      border-radius: 2px;
+      box-sizing: border-box;
+    }
+    .scene.staffroom .pc .monitor::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      background: linear-gradient(160deg, #9fd0f5 0%, #6bb0e8 55%, #4a90d0 100%);
+      border-radius: 1px;
+    }
+    .scene.staffroom .pc .stand {
+      position: absolute;
+      left: 42%;
+      width: 16%;
+      top: 60%;
+      height: 18%;
+      background: #8a93a3;
+      border: 1px solid #6a7382;
+      box-sizing: border-box;
+    }
+    .scene.staffroom .pc .base {
+      position: absolute;
+      left: 22%;
+      right: 22%;
+      bottom: 8%;
+      height: 14%;
+      background: #c5cad3;
+      border: 1px solid #8a93a3;
+      border-radius: 1px;
+      box-sizing: border-box;
+    }
+    .scene.staffroom .desk-books {
+      position: absolute;
+      right: 12%;
+      bottom: 38%;
+      width: 28%;
+      height: 28%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .scene.staffroom .desk-books i {
+      position: absolute;
+      bottom: 0;
+      width: 28%;
+      border: 1px solid #5c3a22;
+      border-radius: 1px 1px 0 0;
+      box-sizing: border-box;
+    }
+    .scene.staffroom .desk-books i:nth-child(1) { left: 0; height: 90%; background: #e07878; }
+    .scene.staffroom .desk-books i:nth-child(2) { left: 32%; height: 70%; background: #5b8def; }
+    .scene.staffroom .desk-books i:nth-child(3) { left: 64%; height: 100%; background: #f0c14b; }
 
     .npc.sitting {
       position: absolute;
@@ -914,12 +1027,12 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-1.5px); }
     }
-    .scene.staffroom[data-tod="after"] .wall { background: #d8c4ac; }
-    .scene.staffroom[data-tod="after"] .window { background: #6a7a9a; }
-    .scene.staffroom[data-tod="before"] .window { background: #9ec8e8; }
+    .scene.staffroom[data-tod="after"] .wall { background: #e8eaee; }
+    .scene.staffroom[data-tod="after"] .window { background: #7a8aaa; }
+    .scene.staffroom[data-tod="before"] .window { background: #b8d8f0; }
     .scene.staffroom[data-tod="lunch"] .window { background: #f5d48a; }
-    .scene.staffroom[data-tod="recess"] .window { background: #9fd4a8; }
-    .scene.staffroom[data-tod="holiday"] .wall { background: #f5e0e8; }
+    .scene.staffroom[data-tod="recess"] .window { background: #b5e0c0; }
+    .scene.staffroom[data-tod="holiday"] .wall { background: #f7f0f4; }
 
     .staff-empty {
       position: absolute;
@@ -1116,20 +1229,21 @@
         <div class="floor"></div>
         <div class="window" id="staffWindow"></div>
         <div class="pigeon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="bookshelf" aria-hidden="true"><span class="book b1"></span><span class="book b2"></span><span class="book b3"></span><span class="book b4"></span><span class="book b5"></span><span class="book b6"></span><span class="book b7"></span><span class="book b8"></span><span class="book b9"></span><span class="book b10"></span></div>
         <div class="whiteboard"><div class="board-text" id="staffBoardText">教員室</div></div>
         <div class="coffee-bar" aria-hidden="true"></div>
         <div class="staff-desks" id="staffDesks">
-          <div class="staff-desk-slot" id="staffDesk0"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk1"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk2"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk3"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk4"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk5"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk6"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk7"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk8"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk9"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
-          <div class="staff-desk-slot" id="staffDesk10"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk0"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="pc" aria-hidden="true"><div class="monitor"></div><div class="stand"></div><div class="base"></div></div></div>
+          <div class="staff-desk-slot" id="staffDesk1"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="desk-books" aria-hidden="true"><i></i><i></i><i></i></div></div>
+          <div class="staff-desk-slot" id="staffDesk2"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="pc" aria-hidden="true"><div class="monitor"></div><div class="stand"></div><div class="base"></div></div></div>
+          <div class="staff-desk-slot" id="staffDesk3"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="desk-books" aria-hidden="true"><i></i><i></i><i></i></div></div>
+          <div class="staff-desk-slot" id="staffDesk4"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="pc" aria-hidden="true"><div class="monitor"></div><div class="stand"></div><div class="base"></div></div></div>
+          <div class="staff-desk-slot" id="staffDesk5"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="pc" aria-hidden="true"><div class="monitor"></div><div class="stand"></div><div class="base"></div></div><div class="desk-books" aria-hidden="true"><i></i><i></i><i></i></div></div>
+          <div class="staff-desk-slot" id="staffDesk6"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="desk-books" aria-hidden="true"><i></i><i></i><i></i></div></div>
+          <div class="staff-desk-slot" id="staffDesk7"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="pc" aria-hidden="true"><div class="monitor"></div><div class="stand"></div><div class="base"></div></div></div>
+          <div class="staff-desk-slot" id="staffDesk8"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="desk-books" aria-hidden="true"><i></i><i></i><i></i></div></div>
+          <div class="staff-desk-slot" id="staffDesk9"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="pc" aria-hidden="true"><div class="monitor"></div><div class="stand"></div><div class="base"></div></div></div>
+          <div class="staff-desk-slot" id="staffDesk10"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div><div class="desk-books" aria-hidden="true"><i></i><i></i><i></i></div></div>
           <div class="staff-desk-slot" id="staffDesk11"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
         </div>
         <div class="npc-layer" id="staffNpcLayer" aria-label="教員室老師"></div>
