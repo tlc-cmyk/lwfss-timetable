@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-white-v3" />
+  <meta name="game-build" content="staff-white-v3-bubbles-bubbles" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>模擬遊戲 · 準時到堂 · 劉皇發中學</title>
@@ -1120,6 +1120,44 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-1.5px); }
     }
+    /* staff-room speech bubbles */
+    .npc .npc-bubble {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 16px);
+      transform: translateX(-50%) scale(0.85);
+      background: #ffffff;
+      color: #2c3e50;
+      border: 2px solid #5b8def;
+      border-radius: 8px;
+      padding: 3px 7px;
+      font-size: 0.58rem;
+      font-weight: 800;
+      line-height: 1.25;
+      white-space: nowrap;
+      max-width: 110px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+      z-index: 30;
+      opacity: 0;
+      box-shadow: 0 2px 0 rgba(91,141,239,0.2);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .npc .npc-bubble::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -6px;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #5b8def;
+      margin-left: 0;
+    }
+    .npc .npc-bubble.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
     #sceneStaff.staffroom[data-tod="after"] .wall { background: #f0f2f5 !important; }
     #sceneStaff.staffroom[data-tod="after"] .window { background: #8a9bb8 !important; }
     #sceneStaff.staffroom[data-tod="before"] .window { background: #c8e4fa !important; }
@@ -1397,12 +1435,12 @@
     <div class="ps-cap" id="psCap">今日上限：★ 3　♥ 5（每位同學）</div>
   </div>
 
-  <script src="data.js?v=staff-white-v3"></script>
-  <script src="bells.js?v=staff-white-v3"></script>
-  <script src="calendar.js?v=staff-white-v3"></script>
-  <script src="duty.js?v=staff-white-v3"></script>
-  <script src="form-teachers.js?v=staff-white-v3"></script>
-  <script src="students.js?v=staff-white-v3"></script>
+  <script src="data.js?v=staff-white-v3-bubbles"></script>
+  <script src="bells.js?v=staff-white-v3-bubbles"></script>
+  <script src="calendar.js?v=staff-white-v3-bubbles"></script>
+  <script src="duty.js?v=staff-white-v3-bubbles"></script>
+  <script src="form-teachers.js?v=staff-white-v3-bubbles"></script>
+  <script src="students.js?v=staff-white-v3-bubbles"></script>
   <script>
 (function () {
   'use strict';
@@ -2313,13 +2351,18 @@
     npcState.started = true;
     npcState.raf = requestAnimationFrame(npcTick);
     document.addEventListener('visibilitychange', function () {
-      if (!document.hidden) npcState.lastTs = 0;
+      if (!document.hidden) {
+        npcState.lastTs = 0;
+        if (viewMode === 'staff') scheduleStaffBubble();
+      } else {
+        stopStaffBubbles();
+      }
     });
   }
 
   /* ===== Staff room (教員室) ===== */
   var viewMode = 'classroom'; // classroom | staff
-  var staffNpcState = { key: '', seated: [], walkers: [] };
+  var staffNpcState = { key: '', seated: [], walkers: [], bubbleTimer: 0, bubbleHide: 0 };
   var FORM_TEACHER_CODES = (function () {
     var set = {};
     var FT = window.FORM_TEACHERS_DATA;
@@ -2346,6 +2389,8 @@
     if (classScene) classScene.classList.toggle('is-active', viewMode === 'classroom');
     if (staffScene) staffScene.classList.toggle('is-active', viewMode === 'staff');
     if (frame) frame.classList.toggle('scene-frame--staff', viewMode === 'staff');
+    if (viewMode === 'staff') startStaffBubbles();
+    else stopStaffBubbles();
     if (tabC) {
       tabC.classList.toggle('active', viewMode === 'classroom');
       tabC.setAttribute('aria-selected', viewMode === 'classroom' ? 'true' : 'false');
@@ -2573,6 +2618,7 @@
         else if (picked.mode === 'free-period') empty.textContent = '今節冇老師空堂（或全部出晒堂）';
         else empty.textContent = '而家教員室靜靜地～';
       }
+      stopStaffBubbles();
       return;
     }
     if (empty) empty.hidden = true;
@@ -2612,9 +2658,82 @@
         phase: rng() * Math.PI * 2
       });
     });
+    if (viewMode === 'staff') startStaffBubbles();
+  }
+
+  var STAFF_PHRASES = [
+    '好忙啊',
+    '備課中',
+    '飲杯茶先',
+    '批改緊簿',
+    '等陣開會',
+    '影印去',
+    '今日當值',
+    '休息吓～',
+    '電郵好多',
+    '寫緊計劃',
+    '翻查課表',
+    '同同事傾吓'
+  ];
+
+  function allStaffNpcEls() {
+    var list = [];
+    (staffNpcState.seated || []).forEach(function (n) { if (n && n.el) list.push(n.el); });
+    (staffNpcState.walkers || []).forEach(function (n) { if (n && n.el) list.push(n.el); });
+    return list;
+  }
+
+  function clearStaffBubbles() {
+    allStaffNpcEls().forEach(function (el) {
+      var b = el.querySelector('.npc-bubble');
+      if (b) b.remove();
+    });
+  }
+
+  function showStaffBubble() {
+    if (document.hidden) return;
+    if (viewMode !== 'staff') return;
+    var els = allStaffNpcEls();
+    if (!els.length) return;
+    clearStaffBubbles();
+    var el = els[Math.floor(Math.random() * els.length)];
+    var phrase = STAFF_PHRASES[Math.floor(Math.random() * STAFF_PHRASES.length)];
+    var bubble = document.createElement('div');
+    bubble.className = 'npc-bubble';
+    bubble.textContent = phrase;
+    el.appendChild(bubble);
+    // reflow then show
+    void bubble.offsetWidth;
+    bubble.classList.add('show');
+    clearTimeout(staffNpcState.bubbleHide);
+    staffNpcState.bubbleHide = setTimeout(function () {
+      bubble.classList.remove('show');
+      setTimeout(function () { if (bubble.parentNode) bubble.remove(); }, 200);
+    }, 2200 + Math.floor(Math.random() * 800));
+  }
+
+  function scheduleStaffBubble() {
+    clearTimeout(staffNpcState.bubbleTimer);
+    if (viewMode !== 'staff') return;
+    var delay = 2800 + Math.floor(Math.random() * 4200); // ~2.8–7s
+    staffNpcState.bubbleTimer = setTimeout(function () {
+      showStaffBubble();
+      scheduleStaffBubble();
+    }, delay);
+  }
+
+  function startStaffBubbles() {
+    scheduleStaffBubble();
+  }
+
+  function stopStaffBubbles() {
+    clearTimeout(staffNpcState.bubbleTimer);
+    clearTimeout(staffNpcState.bubbleHide);
+    clearStaffBubbles();
   }
 
   function updateStaffChrome(mood, ctx, picked) {
+
     var board = document.getElementById('staffBoardText');
     var badge = document.getElementById('staffBadge');
     var scene = document.getElementById('sceneStaff');
