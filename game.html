@@ -719,6 +719,225 @@
     .scene[data-mood="class"] .board { box-shadow: 2px 3px 0 rgba(0,0,0,.15), 0 0 12px rgba(240,193,75,0.25); }
     .scene[data-mood="free"] .board { background: #5a7a68; }
 
+    /* ===== Scene tabs: 課室 | 教員室 ===== */
+    .scene-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .scene-tab {
+      appearance: none;
+      border: 3px solid var(--wood-deeper);
+      border-radius: 12px;
+      padding: 9px 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--muted);
+      box-shadow: 0 2px 0 var(--wood-deeper);
+    }
+    .scene-tab.active {
+      background: linear-gradient(180deg, #ffe9c8, #f0d0a0);
+      color: var(--wood-deeper);
+      box-shadow: 0 3px 0 var(--wood-deeper);
+    }
+    .scene-tab:active { transform: translateY(1px); }
+
+    .scene-frame .scene { display: none; }
+    .scene-frame .scene.is-active { display: block; }
+
+    /* ===== Staff room scene ===== */
+    .scene.staffroom .wall {
+      background: #efe0cc;
+      height: 52%;
+    }
+    .scene.staffroom .floor {
+      height: 52%;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #c4a07a 0 32px,
+          #b89068 32px 34px
+        );
+      border-top: 3px solid #7a5232;
+    }
+    .scene.staffroom .ceiling {
+      background: linear-gradient(180deg, #e0c8a8, transparent);
+    }
+    .scene.staffroom .window {
+      top: 8%;
+      right: 6%;
+      width: 18%;
+      height: 26%;
+      background: #a8c8e0;
+    }
+    .scene.staffroom .pigeon {
+      position: absolute;
+      top: 10%;
+      left: 6%;
+      width: 28%;
+      height: 30%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 2px;
+      background: #8b5e3c;
+      border: 3px solid #5c3a22;
+      border-radius: 3px;
+      padding: 3px;
+      box-sizing: border-box;
+    }
+    .scene.staffroom .pigeon span {
+      background: #f3e6d4;
+      border: 1px solid #6b4423;
+      border-radius: 1px;
+    }
+    .scene.staffroom .coffee-bar {
+      position: absolute;
+      top: 38%;
+      right: 8%;
+      width: 22%;
+      height: 12%;
+      background: #a07040;
+      border: 2px solid #5c3a22;
+      border-radius: 3px;
+      z-index: 4;
+    }
+    .scene.staffroom .coffee-bar::after {
+      content: "☕";
+      position: absolute;
+      left: 50%;
+      top: -40%;
+      transform: translateX(-50%);
+      font-size: 0.9rem;
+    }
+    .scene.staffroom .whiteboard {
+      position: absolute;
+      top: 12%;
+      left: 40%;
+      width: 30%;
+      height: 22%;
+      background: #f7f4ee;
+      border: 4px solid #8b5e3c;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px;
+      text-align: center;
+      z-index: 3;
+    }
+    .scene.staffroom .whiteboard .board-text {
+      color: #3e2a1a;
+      font-size: clamp(0.58rem, 2.4vw, 0.75rem);
+      font-weight: 800;
+      line-height: 1.25;
+      white-space: pre-line;
+    }
+    .scene.staffroom .staff-desks {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      bottom: 4%;
+      top: 48%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 2% 3%;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .scene.staffroom .staff-desk-slot {
+      position: relative;
+      pointer-events: none;
+    }
+    .scene.staffroom .staff-desk-slot .desk-top {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 18%;
+      height: 22%;
+      background: #b88048;
+      border: 2px solid #5c3a22;
+      border-radius: 2px;
+      z-index: 2;
+    }
+    .scene.staffroom .staff-desk-slot .desk-leg {
+      position: absolute;
+      bottom: 0;
+      width: 12%;
+      height: 38%;
+      background: #8b5e3c;
+      border: 1px solid #5c3a22;
+      z-index: 1;
+    }
+    .scene.staffroom .staff-desk-slot .desk-leg.l { left: 18%; }
+    .scene.staffroom .staff-desk-slot .desk-leg.r { right: 18%; }
+
+    .npc.sitting {
+      position: absolute;
+      left: 50%;
+      bottom: 28%;
+      width: 22px;
+      height: 30px;
+      transform: translateX(-50%);
+      pointer-events: auto;
+      z-index: 6;
+    }
+    .npc.sitting .npc-sprite {
+      height: 28px;
+    }
+    .npc.sitting .npc-body {
+      height: 11px;
+      top: 15px;
+      border-radius: 2px 2px 0 0;
+    }
+    .npc.sitting .npc-legs {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 6px;
+      background: #5c3a22;
+      border: 2px solid #3e2a1a;
+      border-radius: 0 0 2px 2px;
+      box-sizing: border-box;
+    }
+    .npc.sitting.idle-bob .npc-sprite {
+      animation: sitBob 2.2s ease-in-out infinite;
+    }
+    @keyframes sitBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-1.5px); }
+    }
+    .scene.staffroom[data-tod="after"] .wall { background: #d8c4ac; }
+    .scene.staffroom[data-tod="after"] .window { background: #6a7a9a; }
+    .scene.staffroom[data-tod="before"] .window { background: #9ec8e8; }
+    .scene.staffroom[data-tod="lunch"] .window { background: #f5d48a; }
+    .scene.staffroom[data-tod="recess"] .window { background: #9fd4a8; }
+    .scene.staffroom[data-tod="holiday"] .wall { background: #f5e0e8; }
+
+    .staff-empty {
+      position: absolute;
+      left: 50%;
+      top: 62%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,250,242,0.92);
+      border: 2px solid var(--wood-dark);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--muted);
+      z-index: 8;
+      text-align: center;
+      max-width: 80%;
+    }
+
     .actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -859,8 +1078,13 @@
       </div>
     </div>
 
-    <div class="scene-frame" aria-label="課室場景">
-      <div class="scene" id="scene" data-mood="before">
+    <div class="scene-tabs" role="tablist" aria-label="場景切換">
+      <button type="button" class="scene-tab active" id="tabClassroom" role="tab" aria-selected="true" data-view="classroom">🏫 課室</button>
+      <button type="button" class="scene-tab" id="tabStaff" role="tab" aria-selected="false" data-view="staff">☕ 教員室</button>
+    </div>
+
+    <div class="scene-frame" aria-label="學校場景">
+      <div class="scene classroom is-active" id="scene" data-mood="before">
         <div class="wall"></div>
         <div class="ceiling"></div>
         <div class="floor"></div>
@@ -885,6 +1109,34 @@
         <span class="prop moon" id="propMoon" hidden>🌙</span>
         <span class="scene-badge" id="sceneBadge">課室</span>
       </div>
+
+      <div class="scene staffroom" id="sceneStaff" data-tod="before" aria-label="教員室">
+        <div class="wall"></div>
+        <div class="ceiling"></div>
+        <div class="floor"></div>
+        <div class="window" id="staffWindow"></div>
+        <div class="pigeon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="whiteboard"><div class="board-text" id="staffBoardText">教員室</div></div>
+        <div class="coffee-bar" aria-hidden="true"></div>
+        <div class="staff-desks" id="staffDesks">
+          <div class="staff-desk-slot" id="staffDesk0"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk1"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk2"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk3"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk4"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk5"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk6"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk7"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk8"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk9"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk10"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+          <div class="staff-desk-slot" id="staffDesk11"><div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div></div>
+        </div>
+        <div class="npc-layer" id="staffNpcLayer" aria-label="教員室老師"></div>
+        <div class="staff-empty" id="staffEmpty" hidden>而家教員室靜靜地～</div>
+        <span class="prop plant" style="bottom:44%;left:36%;">🪴</span>
+        <span class="scene-badge" id="staffBadge">教員室</span>
+      </div>
     </div>
 
     <div class="actions">
@@ -895,6 +1147,7 @@
 
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
+      可切換<strong>課室／教員室</strong>：教員室會顯示今節<strong>空堂老師</strong>坐喺度。
       撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。
       頂部「準時★」係準時到堂分數，同讚賞星分開。
       喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集準時 ★（每節每日一次）。
@@ -936,6 +1189,7 @@
   <script src="bells.js"></script>
   <script src="calendar.js"></script>
   <script src="duty.js"></script>
+  <script src="form-teachers.js"></script>
   <script src="students.js"></script>
   <script>
 (function () {
@@ -1626,12 +1880,14 @@
     el.dataset.detail = spec.detail || '';
     if (spec.class) el.dataset.class = spec.class;
     if (spec.no) el.dataset.no = spec.no;
+    if (spec.sitting) el.classList.add('sitting', 'idle-bob');
     el.innerHTML =
       '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 5 : 8)) + '</div>' +
       '<div class="npc-sprite">' +
         '<div class="npc-hair" style="background:' + (spec.hair || '#3e2a1a') + '"></div>' +
         '<div class="npc-head"></div>' +
         '<div class="npc-body"></div>' +
+        (spec.sitting ? '<div class="npc-legs"></div>' : '') +
         (spec.sleep ? '<span class="npc-zzz">z</span>' : '') +
       '</div>';
     el.addEventListener('click', function (ev) {
@@ -1852,7 +2108,272 @@
     });
   }
 
+  /* ===== Staff room (教員室) ===== */
+  var viewMode = 'classroom'; // classroom | staff
+  var staffNpcState = { key: '', seated: [] };
+  var FORM_TEACHER_CODES = (function () {
+    var set = {};
+    var FT = window.FORM_TEACHERS_DATA;
+    if (!FT) return set;
+    function add(t) {
+      if (!t) return;
+      var c = (t.timetableCode || t.code || '').toUpperCase();
+      if (c) set[c] = true;
+    }
+    (FT.classes || []).forEach(function (cl) {
+      (cl.teachers || []).forEach(add);
+    });
+    (FT.nonForm || []).forEach(add);
+    return set;
+  })();
+
+  function setViewMode(mode) {
+    viewMode = mode === 'staff' ? 'staff' : 'classroom';
+    var classScene = document.getElementById('scene');
+    var staffScene = document.getElementById('sceneStaff');
+    var tabC = document.getElementById('tabClassroom');
+    var tabS = document.getElementById('tabStaff');
+    if (classScene) classScene.classList.toggle('is-active', viewMode === 'classroom');
+    if (staffScene) staffScene.classList.toggle('is-active', viewMode === 'staff');
+    if (tabC) {
+      tabC.classList.toggle('active', viewMode === 'classroom');
+      tabC.setAttribute('aria-selected', viewMode === 'classroom' ? 'true' : 'false');
+    }
+    if (tabS) {
+      tabS.classList.toggle('active', viewMode === 'staff');
+      tabS.setAttribute('aria-selected', viewMode === 'staff' ? 'true' : 'false');
+    }
+    try { localStorage.setItem('tt_game_view', viewMode); } catch (e) {}
+  }
+
+  function teacherHasLesson(t, day, period) {
+    if (!t || !t.schedule || day == null || period == null) return false;
+    var daySched = t.schedule[String(day)] || {};
+    return !!daySched[String(period)];
+  }
+
+  /** Resolve which timetable period to use for 「空堂」checks. */
+  function periodForFreeCheck(ctx) {
+    if (!ctx || ctx.holiday || !ctx.slot) return null;
+    if (ctx.slot.kind === 'period' && ctx.slot.period != null) return ctx.slot.period;
+    // during breaks / gap: use next upcoming period if any, else previous
+    if (ctx.cycle && ctx.cycle.day != null) {
+      var sched = scheduleForDay(ctx.cycle.day);
+      if (sched && sched.slots) {
+        var nowM = nowHKTParts().minutes;
+        var prev = null;
+        for (var i = 0; i < sched.slots.length; i++) {
+          var s = sched.slots[i];
+          if (s.period == null) continue;
+          var a = hmToMinutes(s.start);
+          if (a != null && a > nowM) return s.period; // next
+          prev = s.period;
+        }
+        return prev;
+      }
+    }
+    return null;
+  }
+
+  function allFreeTeachers(day, period) {
+    var free = [];
+    if (day == null || period == null) return free;
+    (DATA.teachers || []).forEach(function (t) {
+      if (!t || !t.schedule) return;
+      if (!teacherHasLesson(t, day, period)) free.push(t);
+    });
+    return free;
+  }
+
+  function prioritizeTeachers(list, ctx, rng) {
+    var playerCode = state.teacher && state.teacher.code;
+    var dutyCodes = {};
+    dutyTeachersFor(ctx.ymd).forEach(function (t) {
+      if (t && t.code) dutyCodes[String(t.code).toUpperCase()] = true;
+    });
+    var scored = list.map(function (t, idx) {
+      var code = String(t.code || '').toUpperCase();
+      var score = rng(); // stable jitter
+      if (playerCode && code === String(playerCode).toUpperCase()) score += 1000;
+      if (dutyCodes[code]) score += 500;
+      if (FORM_TEACHER_CODES[code]) score += 200;
+      return { t: t, score: score, idx: idx };
+    });
+    scored.sort(function (a, b) {
+      if (b.score !== a.score) return b.score - a.score;
+      return String(a.t.code).localeCompare(String(b.t.code));
+    });
+    return scored.map(function (x) { return x.t; });
+  }
+
+  function pickStaffTeachers(ctx, mood) {
+    var day = ctx.cycle && ctx.cycle.day;
+    var period = periodForFreeCheck(ctx);
+    var ymd = ctx.ymd || todayYmdHK();
+    var seed = hashStr('staff|' + ymd + '|' + (day || '') + '|' + (period || '') + '|' + (ctx.slot && ctx.slot.kind || '') + '|' + (ctx.slot && ctx.slot.key || ''));
+    var rng = mulberry32(seed);
+    var list = [];
+    var cap = 10;
+    var labelHint = '教員室';
+
+    if (ctx.holiday) {
+      cap = 4;
+      labelHint = '假期教員室';
+      list = prioritizeTeachers(DATA.teachers || [], ctx, rng).slice(0, cap);
+      // prefer duty + player only on holiday
+      var duty = dutyTeachersFor(ymd);
+      var prefer = [];
+      if (state.teacher) prefer.push(state.teacher);
+      duty.forEach(function (t) { prefer.push(t); });
+      list = prioritizeTeachers(prefer.length ? prefer : list, ctx, rng).slice(0, cap);
+    } else if (!ctx.slot || ctx.slot.kind === 'before') {
+      cap = 5;
+      labelHint = '上課前教員室';
+      var dutyB = dutyTeachersFor(ymd);
+      var poolB = dutyB.slice();
+      if (state.teacher) poolB.unshift(state.teacher);
+      // a few early birds: random free for P1
+      allFreeTeachers(day, 1).forEach(function (t) { poolB.push(t); });
+      list = prioritizeTeachers(poolB, ctx, rng).slice(0, cap);
+    } else if (ctx.slot.kind === 'after') {
+      cap = 5;
+      labelHint = '放學後教員室';
+      var dutyA = dutyTeachersFor(ymd);
+      var poolA = dutyA.slice();
+      if (state.teacher) poolA.unshift(state.teacher);
+      var lastP = periodsForDay(day);
+      allFreeTeachers(day, lastP).forEach(function (t) { poolA.push(t); });
+      list = prioritizeTeachers(poolA, ctx, rng).slice(0, cap);
+    } else if (ctx.slot.kind === 'break') {
+      cap = 6;
+      var bk = ctx.slot.key;
+      if (bk === 'lunch') labelHint = '午飯教員室';
+      else if (bk === 'recess' || bk === 'gap') labelHint = '小息教員室';
+      else labelHint = (ctx.slot.label || '休息') + '教員室';
+      var poolBr = allFreeTeachers(day, period);
+      if (!poolBr.length) poolBr = (DATA.teachers || []).slice();
+      list = prioritizeTeachers(poolBr, ctx, rng).slice(0, cap);
+    } else if (ctx.slot.kind === 'period') {
+      cap = 12;
+      labelHint = '第' + ctx.slot.period + '節 · 空堂教員室';
+      list = prioritizeTeachers(allFreeTeachers(day, ctx.slot.period), ctx, rng).slice(0, cap);
+    } else {
+      cap = 6;
+      list = prioritizeTeachers(allFreeTeachers(day, period), ctx, rng).slice(0, cap);
+    }
+
+    // dedupe by code
+    var seen = {};
+    var uniq = [];
+    list.forEach(function (t) {
+      var c = String(t.code || '').toUpperCase();
+      if (!c || seen[c]) return;
+      seen[c] = true;
+      uniq.push(t);
+    });
+    return { teachers: uniq, labelHint: labelHint, period: period, totalFree: (day != null && period != null) ? allFreeTeachers(day, period).length : uniq.length, seed: seed, rng: rng };
+  }
+
+  function clearStaffSeats() {
+    var layer = document.getElementById('staffNpcLayer');
+    if (layer) layer.innerHTML = '';
+    // also clear any npc appended into desk slots
+    for (var i = 0; i < 12; i++) {
+      var desk = document.getElementById('staffDesk' + i);
+      if (!desk) continue;
+      var old = desk.querySelectorAll('.npc');
+      for (var j = 0; j < old.length; j++) old[j].remove();
+    }
+    staffNpcState.seated = [];
+  }
+
+  function syncStaffNpcs(mood, ctx) {
+    var picked = pickStaffTeachers(ctx, mood);
+    var key = [
+      'staff',
+      ctx.ymd || '',
+      (ctx.slot && ctx.slot.kind) || '',
+      (ctx.slot && ctx.slot.period) || '',
+      (ctx.slot && ctx.slot.key) || '',
+      picked.teachers.map(function (t) { return t.code; }).join(',')
+    ].join('|');
+    if (key === staffNpcState.key && staffNpcState.seated.length) {
+      // still refresh board labels
+      updateStaffChrome(mood, ctx, picked);
+      return;
+    }
+    staffNpcState.key = key;
+    clearStaffSeats();
+    updateStaffChrome(mood, ctx, picked);
+
+    var empty = document.getElementById('staffEmpty');
+    if (!picked.teachers.length) {
+      if (empty) {
+        empty.hidden = false;
+        empty.textContent = ctx.holiday
+          ? '假期教員室空空地～'
+          : (ctx.slot && ctx.slot.kind === 'period'
+            ? '今節冇老師空堂（或全部出晒堂）'
+            : '而家教員室靜靜地～');
+      }
+      return;
+    }
+    if (empty) empty.hidden = true;
+
+    var rng = picked.rng || mulberry32(picked.seed || 1);
+    picked.teachers.forEach(function (t, idx) {
+      if (idx >= 12) return;
+      var desk = document.getElementById('staffDesk' + idx);
+      if (!desk) return;
+      var label = teacherDisplayName(t);
+      var spec = {
+        role: 'teacher',
+        name: label,
+        code: t.code || '',
+        chi: t.chi || '',
+        label: label,
+        detail: (t.code || '') + (t.chi ? (' · ' + t.chi) : ''),
+        hair: HAIRS[Math.floor(rng() * HAIRS.length)],
+        sitting: true,
+        wander: false,
+        nearBoard: false,
+        sleep: false,
+        bounce: false
+      };
+      var el = makeNpcEl(spec);
+      desk.appendChild(el);
+      staffNpcState.seated.push({ el: el, spec: spec, desk: idx });
+    });
+  }
+
+  function updateStaffChrome(mood, ctx, picked) {
+    var board = document.getElementById('staffBoardText');
+    var badge = document.getElementById('staffBadge');
+    var scene = document.getElementById('sceneStaff');
+    var tod = mood || 'before';
+    if (scene) scene.setAttribute('data-tod', tod);
+    var lines = [];
+    lines.push(picked.labelHint || '教員室');
+    if (picked.period != null && ctx.slot && ctx.slot.kind === 'period') {
+      lines.push('空堂 ' + picked.teachers.length + (picked.totalFree > picked.teachers.length ? ('／' + picked.totalFree) : '') + ' 位');
+    } else if (picked.teachers.length) {
+      lines.push('在座 ' + picked.teachers.length + ' 位');
+    }
+    if (board) board.textContent = lines.join('\n');
+    if (badge) {
+      if (ctx.holiday) badge.textContent = '教員室 · 假期';
+      else if (ctx.slot && ctx.slot.kind === 'period') badge.textContent = '教員室 · P' + ctx.slot.period;
+      else if (ctx.slot && ctx.slot.kind === 'break') {
+        var bk = ctx.slot.key;
+        badge.textContent = bk === 'lunch' ? '教員室 · 午飯' : (bk === 'recess' || bk === 'gap' ? '教員室 · 小息' : '教員室');
+      } else if (ctx.slot && ctx.slot.kind === 'after') badge.textContent = '教員室 · 放學後';
+      else if (!ctx.slot || ctx.slot.kind === 'before') badge.textContent = '教員室 · 上課前';
+      else badge.textContent = '教員室';
+    }
+  }
+
   function paintScene(ctx) {
+
     var scene = document.getElementById('scene');
     var board = document.getElementById('boardText');
     var badge = document.getElementById('sceneBadge');
@@ -1923,6 +2444,7 @@
     badge.textContent = badgeMsg;
     syncNpcs(mood, ctx);
     startNpcLoop();
+    syncStaffNpcs(mood, ctx);
     var ymNow = monthKeyHK(ctx.ymd);
     if (ymNow !== praiseState.monthKey) {
       loadPraiseMonth(ymNow);
@@ -2154,6 +2676,21 @@
   loadPraiseMonth(monthKeyHK());
   resolveTeacher();
   renderStarBoard();
+
+  try {
+    var savedView = localStorage.getItem('tt_game_view');
+    if (savedView === 'staff' || savedView === 'classroom') setViewMode(savedView);
+    else setViewMode('classroom');
+  } catch (eView) { setViewMode('classroom'); }
+
+  document.getElementById('tabClassroom').addEventListener('click', function () {
+    setViewMode('classroom');
+  });
+  document.getElementById('tabStaff').addEventListener('click', function () {
+    setViewMode('staff');
+    // refresh staff seating for current context
+    try { syncStaffNpcs(document.getElementById('scene').getAttribute('data-mood') || 'before', getContext()); } catch (e2) {}
+  });
 
   document.getElementById('giveStarBtn').addEventListener('click', function () { givePraise('star'); });
   document.getElementById('giveHeartBtn').addEventListener('click', function () { givePraise('heart'); });
