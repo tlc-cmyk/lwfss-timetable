@@ -162,7 +162,7 @@
       box-shadow: 0 0 0 3px var(--focus-ring);
     }
     textarea { min-height: 72px; resize: vertical; }
-    button.btn {
+    button.btn, a.btn {
       border: none;
       border-radius: 10px;
       padding: 11px 16px;
@@ -173,15 +173,25 @@
       color: #fff;
       white-space: nowrap;
       transition: background .15s, transform .1s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      text-align: center;
     }
-    button.btn:active { transform: scale(.97); }
-    button.btn:hover { background: var(--primary-dark); }
-    button.btn-ghost {
+    button.btn:active, a.btn:active { transform: scale(.97); }
+    button.btn:hover, a.btn:hover { background: var(--primary-dark); color: #fff; }
+    button.btn-ghost, a.btn-ghost {
       background: #fff;
       color: var(--primary);
       border: 1.5px solid var(--primary);
     }
-    button.btn-sm {
+    button.btn-ghost:hover, a.btn-ghost:hover {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+    button.btn-sm, a.btn-sm {
       padding: 6px 10px;
       font-size: 0.8rem;
       border-radius: 8px;
@@ -1441,7 +1451,7 @@
       color: #555;
     }
 
-    /* 進修通告圖片上傳／OCR */
+    /* 進修通告圖片：AI 助手／離線 OCR */
     .training-ocr {
       margin-bottom: 16px;
       padding: 12px;
@@ -1484,6 +1494,66 @@
       border: 1px solid var(--border);
       background: #fff;
       object-fit: contain;
+    }
+    .training-ai-panel {
+      display: none;
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .training-ai-panel.show { display: block; }
+    .training-ai-panel h4 {
+      margin: 0 0 6px;
+      font-size: 0.88rem;
+      color: var(--primary-dark);
+    }
+    .training-ai-steps {
+      margin: 0 0 10px;
+      padding-left: 1.2em;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .training-ai-steps li { margin-bottom: 4px; }
+    .training-ai-prompt {
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: var(--primary-soft);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .training-ai-prompt code {
+      font-family: inherit;
+      font-size: inherit;
+      white-space: pre-wrap;
+    }
+    .training-ai-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .training-ai-actions .btn { flex: 1 1 auto; min-width: 110px; }
+    .training-ai-note {
+      margin: 0;
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .training-ocr-offline {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+    .training-ocr-offline h4 {
+      margin: 0 0 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
     }
     .training-ocr-status {
       font-size: 0.82rem;
@@ -1782,11 +1852,11 @@
     <section class="panel" id="panel-training">
       <div class="card">
         <h2>教師進修申請</h2>
-        <p class="hint" style="margin-bottom:12px;">填寫進修活動資料後可預覽／列印為 PDF，交校長審批。老師姓名可直接輸入，或用 ShortName 從時間表資料帶出。亦可上載／拍攝通告圖片，以瀏覽器 OCR（Tesseract.js）嘗試辨識日期、時間、地點、活動名稱與類型。</p>
+        <p class="hint" style="margin-bottom:12px;">填寫進修活動資料後可預覽／列印為 PDF，交校長審批。老師姓名可直接輸入，或用 ShortName 從時間表資料帶出。亦可拍／揀通告相，交畀「學校時間表助手」用 AI 分析填表；或改用瀏覽器離線 OCR。</p>
 
         <div class="training-ocr" id="trainingOcrBox">
-          <h3>通告圖片／OCR 填表</h3>
-          <p class="ocr-hint">支援拍照或選擇圖片。首次使用會由 CDN 載入 Tesseract.js 及中文（繁體）語言包，或需少許時間。辨識結果可先於下方預覽修改，再套用到申請表。若 OCR 未能辨識，仍可對照圖片手動填寫。</p>
+          <h3>通告圖片 → AI 助手／離線辨識</h3>
+          <p class="ocr-hint">先拍照或選擇通告圖片。建議用「用 AI 分析（傳畀助手）」：將相片上載到 Grok Bot 對話「學校時間表助手」並貼上提示句。亦可電郵畀助手、下載圖片後自行上載，或喺支援嘅裝置用系統分享。離線辨識為次選，毋須網絡對話。</p>
           <div class="training-ocr-actions">
             <button class="btn btn-ghost" id="trainingOcrCameraBtn" type="button">拍照</button>
             <button class="btn btn-ghost" id="trainingOcrFileBtn" type="button">選擇圖片</button>
@@ -1796,53 +1866,80 @@
           </div>
           <div class="training-ocr-preview" id="trainingOcrPreview">
             <img id="trainingOcrImg" alt="通告預覽" />
-            <div class="training-ocr-status" id="trainingOcrStatus" aria-live="polite"></div>
-            <details class="training-ocr-raw-wrap">
-              <summary style="font-size:0.78rem;color:var(--muted);cursor:pointer;">顯示 OCR 原文</summary>
-              <pre class="training-ocr-raw" id="trainingOcrRaw"></pre>
-            </details>
-            <div class="training-ocr-fields" id="trainingOcrFields">
-              <p class="field-hint" style="margin-bottom:8px;">辨識結果預覽（可修改後再套用）：</p>
-              <div class="field">
-                <label class="field-label" for="ocrDate">進修日期</label>
-                <input type="date" id="ocrDate" />
+
+            <div class="training-ai-panel show" id="trainingAiPanel">
+              <h4>用 AI 分析（傳畀助手）</h4>
+              <ol class="training-ai-steps">
+                <li>下載呢張相，或用下方按鈕複製提示句／開啟電郵。</li>
+                <li>開啟 Grok Bot 對話<strong>「學校時間表助手」</strong>（或喺本助手聊天入面上載相片）。</li>
+                <li>上載／貼上通告相，並貼上提示句，請助手分析並填進修申請。</li>
+              </ol>
+              <div class="training-ai-prompt" id="trainingAiPromptBox">
+                <code id="trainingAiPromptText">請幫我用 AI 分析呢張進修相並填進修申請</code>
               </div>
-              <div class="field">
-                <label class="field-label">時間</label>
-                <div class="time-row">
-                  <div class="field">
-                    <label class="field-label" for="ocrTimeStart">開始</label>
-                    <input type="time" id="ocrTimeStart" />
-                  </div>
-                  <div class="field">
-                    <label class="field-label" for="ocrTimeEnd">結束</label>
-                    <input type="time" id="ocrTimeEnd" />
+              <div class="training-ai-actions">
+                <button class="btn" id="trainingAiCopyPromptBtn" type="button">複製提示句</button>
+                <button class="btn btn-ghost" id="trainingAiDownloadBtn" type="button">下載圖片</button>
+                <a class="btn btn-ghost" id="trainingAiMailtoBtn" href="#">用電郵傳畀助手</a>
+                <button class="btn btn-ghost" id="trainingAiShareBtn" type="button" hidden>分享圖片…</button>
+              </div>
+              <p class="training-ai-note" id="trainingAiShareNote">系統「分享」會開啟裝置分享選單（即時通訊／檔案 App 等），唔保證直達 Grok Bot；最穩妥係喺「學校時間表助手」對話直接上載相片。</p>
+            </div>
+
+            <div class="training-ocr-offline">
+              <h4>離線辨識（次選）</h4>
+              <p class="ocr-hint" style="margin-bottom:8px;">用瀏覽器 Tesseract.js 喺本機辨識（首次需下載語言包）。結果可預覽修改後套用到申請表。</p>
+              <div class="training-ocr-actions" style="margin-bottom:8px;">
+                <button class="btn btn-ghost" id="trainingOcrRunBtn" type="button">離線辨識</button>
+              </div>
+              <div class="training-ocr-status" id="trainingOcrStatus" aria-live="polite"></div>
+              <details class="training-ocr-raw-wrap">
+                <summary style="font-size:0.78rem;color:var(--muted);cursor:pointer;">顯示 OCR 原文</summary>
+                <pre class="training-ocr-raw" id="trainingOcrRaw"></pre>
+              </details>
+              <div class="training-ocr-fields" id="trainingOcrFields">
+                <p class="field-hint" style="margin-bottom:8px;">辨識結果預覽（可修改後再套用）：</p>
+                <div class="field">
+                  <label class="field-label" for="ocrDate">進修日期</label>
+                  <input type="date" id="ocrDate" />
+                </div>
+                <div class="field">
+                  <label class="field-label">時間</label>
+                  <div class="time-row">
+                    <div class="field">
+                      <label class="field-label" for="ocrTimeStart">開始</label>
+                      <input type="time" id="ocrTimeStart" />
+                    </div>
+                    <div class="field">
+                      <label class="field-label" for="ocrTimeEnd">結束</label>
+                      <input type="time" id="ocrTimeEnd" />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="field">
-                <label class="field-label" for="ocrVenue">地點</label>
-                <input type="text" id="ocrVenue" placeholder="地點" />
-              </div>
-              <div class="field">
-                <label class="field-label" for="ocrActivity">活動名稱</label>
-                <input type="text" id="ocrActivity" placeholder="活動名稱" />
-              </div>
-              <div class="field">
-                <label class="field-label" for="ocrType">進修類型</label>
-                <select id="ocrType">
-                  <option value="">— 請選擇 —</option>
-                  <option value="學科知識">學科知識</option>
-                  <option value="教學法">教學法</option>
-                  <option value="資訊科技">資訊科技</option>
-                  <option value="學生支援">學生支援</option>
-                  <option value="行政／領導">行政／領導</option>
-                  <option value="其他">其他</option>
-                </select>
-              </div>
-              <div class="training-actions" style="margin-top:8px;">
-                <button class="btn" id="trainingOcrApplyBtn" type="button">套用到申請表</button>
-                <button class="btn btn-ghost" id="trainingOcrRetryBtn" type="button">重新辨識</button>
+                <div class="field">
+                  <label class="field-label" for="ocrVenue">地點</label>
+                  <input type="text" id="ocrVenue" placeholder="地點" />
+                </div>
+                <div class="field">
+                  <label class="field-label" for="ocrActivity">活動名稱</label>
+                  <input type="text" id="ocrActivity" placeholder="活動名稱" />
+                </div>
+                <div class="field">
+                  <label class="field-label" for="ocrType">進修類型</label>
+                  <select id="ocrType">
+                    <option value="">— 請選擇 —</option>
+                    <option value="學科知識">學科知識</option>
+                    <option value="教學法">教學法</option>
+                    <option value="資訊科技">資訊科技</option>
+                    <option value="學生支援">學生支援</option>
+                    <option value="行政／領導">行政／領導</option>
+                    <option value="其他">其他</option>
+                  </select>
+                </div>
+                <div class="training-actions" style="margin-top:8px;">
+                  <button class="btn" id="trainingOcrApplyBtn" type="button">套用到申請表</button>
+                  <button class="btn btn-ghost" id="trainingOcrRetryBtn" type="button">重新辨識</button>
+                </div>
               </div>
             </div>
           </div>
@@ -3618,6 +3715,15 @@
   var trainingOcrFields = document.getElementById('trainingOcrFields');
   var trainingOcrApplyBtn = document.getElementById('trainingOcrApplyBtn');
   var trainingOcrRetryBtn = document.getElementById('trainingOcrRetryBtn');
+  var trainingOcrRunBtn = document.getElementById('trainingOcrRunBtn');
+  var trainingAiPanel = document.getElementById('trainingAiPanel');
+  var trainingAiCopyPromptBtn = document.getElementById('trainingAiCopyPromptBtn');
+  var trainingAiDownloadBtn = document.getElementById('trainingAiDownloadBtn');
+  var trainingAiMailtoBtn = document.getElementById('trainingAiMailtoBtn');
+  var trainingAiShareBtn = document.getElementById('trainingAiShareBtn');
+  var trainingAiPromptText = document.getElementById('trainingAiPromptText');
+  var TRAINING_AI_PROMPT = '請幫我用 AI 分析呢張進修相並填進修申請';
+  var TRAINING_AI_MAILTO = 'tlc@mail.grokbot.com';
   var ocrDate = document.getElementById('ocrDate');
   var ocrTimeStart = document.getElementById('ocrTimeStart');
   var ocrTimeEnd = document.getElementById('ocrTimeEnd');
@@ -3804,11 +3910,136 @@
     if (trainingOcrClearBtn) trainingOcrClearBtn.hidden = true;
     if (trainingOcrCameraInput) trainingOcrCameraInput.value = '';
     if (trainingOcrFileInput) trainingOcrFileInput.value = '';
+    if (trainingOcrRunBtn) trainingOcrRunBtn.disabled = false;
     [ocrDate, ocrTimeStart, ocrTimeEnd, ocrVenue, ocrActivity].forEach(function (el) {
       if (el) el.value = '';
     });
     if (ocrType) ocrType.value = '';
     if (!keepStatus) setTrainingOcrStatus('', null);
+    updateTrainingAiMailto();
+    updateTrainingAiShareAvailability();
+  }
+
+  function getTrainingAiPrompt() {
+    return (trainingAiPromptText && trainingAiPromptText.textContent.trim()) || TRAINING_AI_PROMPT;
+  }
+
+  function updateTrainingAiMailto() {
+    if (!trainingAiMailtoBtn) return;
+    var subject = '教師進修申請·請分析通告相';
+    var body =
+      getTrainingAiPrompt() +
+      '\n\n' +
+      '請分析附件／稍後上載嘅通告相片，並幫我填「教師進修申請」欄位（日期、時間、地點、活動名稱、進修類型）。\n' +
+      '（用電郵開啟時請記得附加通告相片；亦可喺 Grok Bot「學校時間表助手」對話直接上載。）';
+    trainingAiMailtoBtn.href =
+      'mailto:' + TRAINING_AI_MAILTO +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(body);
+  }
+
+  function updateTrainingAiShareAvailability() {
+    if (!trainingAiShareBtn) return;
+    var canShare = false;
+    try {
+      canShare = !!(navigator.share) && !!trainingOcrState.file;
+      if (canShare && navigator.canShare && trainingOcrState.file) {
+        try {
+          canShare = navigator.canShare({ files: [trainingOcrState.file] });
+        } catch (e) {
+          canShare = !!navigator.share;
+        }
+      }
+    } catch (e) {
+      canShare = false;
+    }
+    trainingAiShareBtn.hidden = !canShare;
+  }
+
+  function copyTrainingAiPrompt() {
+    var text = getTrainingAiPrompt();
+    function ok() {
+      setTrainingOcrStatus('已複製提示句。請喺「學校時間表助手」對話貼上，並上載呢張通告相。', 'ok');
+    }
+    function fail() {
+      setTrainingOcrStatus('未能自動複製。請手動選取上方提示句。', 'err');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok).catch(function () {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          var copied = document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (copied) ok(); else fail();
+        } catch (e) { fail(); }
+      });
+    } else {
+      try {
+        var ta2 = document.createElement('textarea');
+        ta2.value = text;
+        ta2.setAttribute('readonly', '');
+        ta2.style.position = 'fixed';
+        ta2.style.left = '-9999px';
+        document.body.appendChild(ta2);
+        ta2.select();
+        var copied2 = document.execCommand('copy');
+        document.body.removeChild(ta2);
+        if (copied2) ok(); else fail();
+      } catch (e2) { fail(); }
+    }
+  }
+
+  function downloadTrainingAiImage() {
+    if (!trainingOcrState.file || !trainingOcrState.objectUrl) {
+      setTrainingOcrStatus('未有圖片可下載。請先拍照或選擇圖片。', 'err');
+      return;
+    }
+    var a = document.createElement('a');
+    a.href = trainingOcrState.objectUrl;
+    var name = trainingOcrState.file.name || ('training-notice-' + Date.now() + '.jpg');
+    a.download = name;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTrainingOcrStatus('已開始下載圖片。請喺「學校時間表助手」對話上載，並貼上提示句。', 'ok');
+  }
+
+  function shareTrainingAiImage() {
+    if (!trainingOcrState.file || !navigator.share) {
+      setTrainingOcrStatus('此裝置／瀏覽器唔支援系統分享。請改用下載圖片或電郵，再喺「學校時間表助手」上載。', 'err');
+      return;
+    }
+    var file = trainingOcrState.file;
+    var payload = {
+      title: '教師進修通告',
+      text: getTrainingAiPrompt() + '（請一併傳送／上載通告相畀學校時間表助手）',
+      files: [file]
+    };
+    var sharePromise;
+    try {
+      if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+        sharePromise = navigator.share({ title: payload.title, text: payload.text });
+      } else {
+        sharePromise = navigator.share(payload);
+      }
+    } catch (e) {
+      sharePromise = navigator.share({ title: payload.title, text: payload.text });
+    }
+    Promise.resolve(sharePromise)
+      .then(function () {
+        setTrainingOcrStatus('已開啟系統分享。若目標唔係 Grok Bot，請改喺「學校時間表助手」對話直接上載相片。', 'ok');
+      })
+      .catch(function (err) {
+        if (err && err.name === 'AbortError') return;
+        setTrainingOcrStatus('分享未完成。請改用下載圖片或電郵，再喺「學校時間表助手」上載。', 'err');
+      });
   }
 
   function pad2(n) {
@@ -4430,6 +4661,7 @@
     setTrainingOcrStatus('正在載入 OCR 引擎（首次需下載語言包）…', 'busy');
     if (trainingOcrApplyBtn) trainingOcrApplyBtn.disabled = true;
     if (trainingOcrRetryBtn) trainingOcrRetryBtn.disabled = true;
+    if (trainingOcrRunBtn) trainingOcrRunBtn.disabled = true;
 
     loadTesseractFromCdn()
       .then(function (Tesseract) {
@@ -4481,6 +4713,7 @@
         trainingOcrState.busy = false;
         if (trainingOcrApplyBtn) trainingOcrApplyBtn.disabled = false;
         if (trainingOcrRetryBtn) trainingOcrRetryBtn.disabled = false;
+        if (trainingOcrRunBtn) trainingOcrRunBtn.disabled = false;
       });
   }
 
@@ -4496,22 +4729,29 @@
     var url = URL.createObjectURL(file);
     trainingOcrState.objectUrl = url;
     trainingOcrState.file = file;
+    trainingOcrState.lastText = '';
     if (trainingOcrImg) {
       trainingOcrImg.src = url;
       trainingOcrImg.alt = file.name || '通告預覽';
     }
     if (trainingOcrPreview) trainingOcrPreview.classList.add('show');
+    if (trainingAiPanel) trainingAiPanel.classList.add('show');
     if (trainingOcrClearBtn) trainingOcrClearBtn.hidden = false;
+    if (trainingOcrFields) trainingOcrFields.classList.remove('show');
     if (trainingOcrRaw) {
       trainingOcrRaw.textContent = '';
       trainingOcrRaw.classList.remove('show');
     }
-    // Reset preview fields before new parse
     [ocrDate, ocrTimeStart, ocrTimeEnd, ocrVenue, ocrActivity].forEach(function (el) {
       if (el) el.value = '';
     });
     if (ocrType) ocrType.value = '';
-    runTrainingOcr(file);
+    updateTrainingAiMailto();
+    updateTrainingAiShareAvailability();
+    setTrainingOcrStatus(
+      '已選取圖片。建議：複製提示句並喺「學校時間表助手」上載相片；或按「離線辨識」。',
+      'ok'
+    );
   }
 
   function resetTrainingForm() {
@@ -4609,6 +4849,26 @@
       if (trainingOcrState.file) runTrainingOcr(trainingOcrState.file);
     });
   }
+  if (trainingOcrRunBtn) {
+    trainingOcrRunBtn.addEventListener('click', function () {
+      if (!trainingOcrState.file) {
+        setTrainingOcrStatus('請先拍照或選擇圖片，再按「離線辨識」。', 'err');
+        return;
+      }
+      runTrainingOcr(trainingOcrState.file);
+    });
+  }
+  if (trainingAiCopyPromptBtn) {
+    trainingAiCopyPromptBtn.addEventListener('click', copyTrainingAiPrompt);
+  }
+  if (trainingAiDownloadBtn) {
+    trainingAiDownloadBtn.addEventListener('click', downloadTrainingAiImage);
+  }
+  if (trainingAiShareBtn) {
+    trainingAiShareBtn.addEventListener('click', shareTrainingAiImage);
+  }
+  updateTrainingAiMailto();
+  updateTrainingAiShareAvailability();
 
   // Events
   lookupBtn.addEventListener('click', doLookup);
