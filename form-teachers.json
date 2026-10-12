@@ -1,0 +1,906 @@
+{
+  "meta": {
+    "school": "世界龍岡學校劉皇發中學",
+    "title": "26/27 班主任",
+    "year": "26/27",
+    "updated": "2026-08-17",
+    "source": "班主任名單相片",
+    "timezone": "Asia/Hong_Kong",
+    "classCount": 24,
+    "formTeacherSlots": 49,
+    "nonFormCount": 7,
+    "codeAliases": {
+      "LTTJ": "LTTT",
+      "WWKF": "WWK",
+      "GG": "NET"
+    },
+    "note": "班別 S1–S6 × A–D；多數兩位班主任；S2D 三位。底部為非班主任。名單代碼 LTTJ／WWKF／GG 對應時間表 ShortName LTTT／WWK／NET。"
+  },
+  "forms": [
+    {
+      "form": "S1",
+      "streams": {
+        "A": [
+          {
+            "code": "WCY",
+            "chi": "黃俊賢",
+            "eng": "WONG CHUN YIN",
+            "inTimetable": true
+          },
+          {
+            "code": "AYWS",
+            "chi": "歐陽瑋珊",
+            "eng": "AU-YEUNG WAI SHEAN",
+            "inTimetable": true
+          }
+        ],
+        "B": [
+          {
+            "code": "HSM",
+            "chi": "許秀文",
+            "eng": "HUI SAU MAN",
+            "inTimetable": true
+          },
+          {
+            "code": "NHH",
+            "chi": "吳學軒",
+            "eng": "NG HOK HIN",
+            "inTimetable": true
+          }
+        ],
+        "C": [
+          {
+            "code": "YTH",
+            "chi": "余子海",
+            "eng": "YU TSZ HOI",
+            "inTimetable": true
+          },
+          {
+            "code": "NCKK",
+            "chi": "吳志權",
+            "eng": "NG CHI KUEN",
+            "inTimetable": true
+          }
+        ],
+        "D": [
+          {
+            "code": "LPC",
+            "chi": "呂佩姿",
+            "eng": "LUI PUI CHI",
+            "inTimetable": true
+          },
+          {
+            "code": "LTTJ",
+            "chi": "劉婷婷",
+            "eng": "LAU TING TING TEACHER",
+            "timetableCode": "LTTT",
+            "inTimetable": true
+          }
+        ]
+      }
+    },
+    {
+      "form": "S2",
+      "streams": {
+        "A": [
+          {
+            "code": "HSY",
+            "chi": "何倩儀",
+            "eng": "HO SIN YEE",
+            "inTimetable": true
+          },
+          {
+            "code": "KMW",
+            "chi": "紀文偉",
+            "eng": "KEI MAN WAI JOE",
+            "inTimetable": true
+          }
+        ],
+        "B": [
+          {
+            "code": "SYT",
+            "chi": "蘇妍彤",
+            "eng": "SO YIN TUNG",
+            "inTimetable": true
+          },
+          {
+            "code": "WPC",
+            "chi": "黃柏琮",
+            "eng": "WONG PAK CHUNG",
+            "inTimetable": true
+          }
+        ],
+        "C": [
+          {
+            "code": "YSHC",
+            "chi": "姚善珩",
+            "eng": "YIU SIN HANG",
+            "inTimetable": true
+          },
+          {
+            "code": "KKH",
+            "chi": "姜國雄",
+            "eng": "KEUNG KWOK HUNG",
+            "inTimetable": true
+          }
+        ],
+        "D": [
+          {
+            "code": "CYT",
+            "chi": "陳逸婷",
+            "eng": "CHAN YAT TING",
+            "inTimetable": true
+          },
+          {
+            "code": "WSFA",
+            "chi": "黃雪芳",
+            "eng": "WONG SUET FONG",
+            "inTimetable": true
+          },
+          {
+            "code": "WWKF",
+            "chi": "王偉琪",
+            "eng": "WONG WAI KEE",
+            "timetableCode": "WWK",
+            "inTimetable": true
+          }
+        ]
+      }
+    },
+    {
+      "form": "S3",
+      "streams": {
+        "A": [
+          {
+            "code": "PYL",
+            "chi": "潘蕊蘭",
+            "eng": "PUN YUI LAN",
+            "inTimetable": true
+          },
+          {
+            "code": "HCS",
+            "chi": "洪澤生",
+            "eng": "HUNG CHAK SANG JONSON",
+            "inTimetable": true
+          }
+        ],
+        "B": [
+          {
+            "code": "WSF",
+            "chi": "王笑芬",
+            "eng": "WONG SIU FUN",
+            "inTimetable": true
+          },
+          {
+            "code": "LTC",
+            "chi": "林梓仲",
+            "eng": "LAM TSZ CHUNG",
+            "inTimetable": true
+          }
+        ],
+        "C": [
+          {
+            "code": "LTY",
+            "chi": "梁德恩",
+            "eng": "LEUNG TAK YAM",
+            "inTimetable": true
+          },
+          {
+            "code": "CCY",
+            "chi": "陳卓賢",
+            "eng": "CHAN CHEUK YIN",
+            "inTimetable": true
+          }
+        ],
+        "D": [
+          {
+            "code": "TSC",
+            "chi": "鄧瑞貞",
+            "eng": "TANG SUI CHING CRYSTAL",
+            "inTimetable": true
+          },
+          {
+            "code": "HV",
+            "chi": "何偉生",
+            "eng": "HO VINCENT",
+            "inTimetable": true
+          }
+        ]
+      }
+    },
+    {
+      "form": "S4",
+      "streams": {
+        "A": [
+          {
+            "code": "LWY",
+            "chi": "李穎欣",
+            "eng": "LI WING YAN",
+            "inTimetable": true
+          },
+          {
+            "code": "CMWE",
+            "chi": "陳文慧(英)",
+            "eng": "CHAN MAN WAI EMILY",
+            "inTimetable": true
+          }
+        ],
+        "B": [
+          {
+            "code": "LCHJ",
+            "chi": "李卓熙",
+            "eng": "LI CHEUK HEI",
+            "inTimetable": true
+          },
+          {
+            "code": "KNS",
+            "chi": "高雅詩",
+            "eng": "KO NGA SZE REBEKAH",
+            "inTimetable": true
+          }
+        ],
+        "C": [
+          {
+            "code": "CKYT",
+            "chi": "張家如",
+            "eng": "CHEUNG KA YU TEACHER",
+            "inTimetable": true
+          },
+          {
+            "code": "NCY",
+            "chi": "吳早恩",
+            "eng": "NG CHO YAN",
+            "inTimetable": true
+          }
+        ],
+        "D": [
+          {
+            "code": "TLP",
+            "chi": "徐麗寶",
+            "eng": "TSUI LAI PO",
+            "inTimetable": true
+          },
+          {
+            "code": "WKS",
+            "chi": "黃啟成",
+            "eng": "WONG KAI SHING",
+            "inTimetable": true
+          }
+        ]
+      }
+    },
+    {
+      "form": "S5",
+      "streams": {
+        "A": [
+          {
+            "code": "HTY",
+            "chi": "何芷如",
+            "eng": "HO HELEN TSZ YU",
+            "inTimetable": true
+          },
+          {
+            "code": "LKH",
+            "chi": "梁儉恒",
+            "eng": "LEUNG KIM HANG",
+            "inTimetable": true
+          }
+        ],
+        "B": [
+          {
+            "code": "LYF",
+            "chi": "林耀輝",
+            "eng": "LAM YIU FAI",
+            "inTimetable": true
+          },
+          {
+            "code": "NYW",
+            "chi": "吳耀榮",
+            "eng": "NG YIU WING",
+            "inTimetable": true
+          }
+        ],
+        "C": [
+          {
+            "code": "CWL",
+            "chi": "陳永利",
+            "eng": "CHAN WING LI",
+            "inTimetable": true
+          },
+          {
+            "code": "SCL",
+            "chi": "蘇智亮",
+            "eng": "SO CHI LEONG",
+            "inTimetable": true
+          }
+        ],
+        "D": [
+          {
+            "code": "CKYI",
+            "chi": "周潔瑩",
+            "eng": "CHOW KIT YING",
+            "inTimetable": true
+          },
+          {
+            "code": "FWK",
+            "chi": "馮永健",
+            "eng": "FUNG WING KIN",
+            "inTimetable": true
+          }
+        ]
+      }
+    },
+    {
+      "form": "S6",
+      "streams": {
+        "A": [
+          {
+            "code": "LNA",
+            "chi": "李諾",
+            "eng": "LI NOK ARIA",
+            "inTimetable": true
+          },
+          {
+            "code": "CYK",
+            "chi": "蔡仁桂",
+            "eng": "CHOI YAN KWAI VICTOR",
+            "inTimetable": true
+          }
+        ],
+        "B": [
+          {
+            "code": "CCC",
+            "chi": "曹治聰",
+            "eng": "CHO CHI CHUNG",
+            "inTimetable": true
+          },
+          {
+            "code": "LPL",
+            "chi": "李佩蕾",
+            "eng": "LI PUI LUI",
+            "inTimetable": true
+          }
+        ],
+        "C": [
+          {
+            "code": "CKH",
+            "chi": "陳家曦",
+            "eng": "CHAN KA HAI",
+            "inTimetable": true
+          },
+          {
+            "code": "WKYT",
+            "chi": "黃嘉燕",
+            "eng": "WONG KA YIN",
+            "inTimetable": true
+          }
+        ],
+        "D": [
+          {
+            "code": "KWY",
+            "chi": "郭偉賢",
+            "eng": "KWOK WAI YIN",
+            "inTimetable": true
+          },
+          {
+            "code": "LTT",
+            "chi": "劉清翠",
+            "eng": "LOW TSING TSUI",
+            "inTimetable": true
+          }
+        ]
+      }
+    }
+  ],
+  "classes": [
+    {
+      "id": "S1A",
+      "form": "S1",
+      "stream": "A",
+      "teachers": [
+        {
+          "code": "WCY",
+          "chi": "黃俊賢",
+          "eng": "WONG CHUN YIN",
+          "inTimetable": true
+        },
+        {
+          "code": "AYWS",
+          "chi": "歐陽瑋珊",
+          "eng": "AU-YEUNG WAI SHEAN",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S1B",
+      "form": "S1",
+      "stream": "B",
+      "teachers": [
+        {
+          "code": "HSM",
+          "chi": "許秀文",
+          "eng": "HUI SAU MAN",
+          "inTimetable": true
+        },
+        {
+          "code": "NHH",
+          "chi": "吳學軒",
+          "eng": "NG HOK HIN",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S1C",
+      "form": "S1",
+      "stream": "C",
+      "teachers": [
+        {
+          "code": "YTH",
+          "chi": "余子海",
+          "eng": "YU TSZ HOI",
+          "inTimetable": true
+        },
+        {
+          "code": "NCKK",
+          "chi": "吳志權",
+          "eng": "NG CHI KUEN",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S1D",
+      "form": "S1",
+      "stream": "D",
+      "teachers": [
+        {
+          "code": "LPC",
+          "chi": "呂佩姿",
+          "eng": "LUI PUI CHI",
+          "inTimetable": true
+        },
+        {
+          "code": "LTTJ",
+          "chi": "劉婷婷",
+          "eng": "LAU TING TING TEACHER",
+          "timetableCode": "LTTT",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S2A",
+      "form": "S2",
+      "stream": "A",
+      "teachers": [
+        {
+          "code": "HSY",
+          "chi": "何倩儀",
+          "eng": "HO SIN YEE",
+          "inTimetable": true
+        },
+        {
+          "code": "KMW",
+          "chi": "紀文偉",
+          "eng": "KEI MAN WAI JOE",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S2B",
+      "form": "S2",
+      "stream": "B",
+      "teachers": [
+        {
+          "code": "SYT",
+          "chi": "蘇妍彤",
+          "eng": "SO YIN TUNG",
+          "inTimetable": true
+        },
+        {
+          "code": "WPC",
+          "chi": "黃柏琮",
+          "eng": "WONG PAK CHUNG",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S2C",
+      "form": "S2",
+      "stream": "C",
+      "teachers": [
+        {
+          "code": "YSHC",
+          "chi": "姚善珩",
+          "eng": "YIU SIN HANG",
+          "inTimetable": true
+        },
+        {
+          "code": "KKH",
+          "chi": "姜國雄",
+          "eng": "KEUNG KWOK HUNG",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S2D",
+      "form": "S2",
+      "stream": "D",
+      "teachers": [
+        {
+          "code": "CYT",
+          "chi": "陳逸婷",
+          "eng": "CHAN YAT TING",
+          "inTimetable": true
+        },
+        {
+          "code": "WSFA",
+          "chi": "黃雪芳",
+          "eng": "WONG SUET FONG",
+          "inTimetable": true
+        },
+        {
+          "code": "WWKF",
+          "chi": "王偉琪",
+          "eng": "WONG WAI KEE",
+          "timetableCode": "WWK",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S3A",
+      "form": "S3",
+      "stream": "A",
+      "teachers": [
+        {
+          "code": "PYL",
+          "chi": "潘蕊蘭",
+          "eng": "PUN YUI LAN",
+          "inTimetable": true
+        },
+        {
+          "code": "HCS",
+          "chi": "洪澤生",
+          "eng": "HUNG CHAK SANG JONSON",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S3B",
+      "form": "S3",
+      "stream": "B",
+      "teachers": [
+        {
+          "code": "WSF",
+          "chi": "王笑芬",
+          "eng": "WONG SIU FUN",
+          "inTimetable": true
+        },
+        {
+          "code": "LTC",
+          "chi": "林梓仲",
+          "eng": "LAM TSZ CHUNG",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S3C",
+      "form": "S3",
+      "stream": "C",
+      "teachers": [
+        {
+          "code": "LTY",
+          "chi": "梁德恩",
+          "eng": "LEUNG TAK YAM",
+          "inTimetable": true
+        },
+        {
+          "code": "CCY",
+          "chi": "陳卓賢",
+          "eng": "CHAN CHEUK YIN",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S3D",
+      "form": "S3",
+      "stream": "D",
+      "teachers": [
+        {
+          "code": "TSC",
+          "chi": "鄧瑞貞",
+          "eng": "TANG SUI CHING CRYSTAL",
+          "inTimetable": true
+        },
+        {
+          "code": "HV",
+          "chi": "何偉生",
+          "eng": "HO VINCENT",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S4A",
+      "form": "S4",
+      "stream": "A",
+      "teachers": [
+        {
+          "code": "LWY",
+          "chi": "李穎欣",
+          "eng": "LI WING YAN",
+          "inTimetable": true
+        },
+        {
+          "code": "CMWE",
+          "chi": "陳文慧(英)",
+          "eng": "CHAN MAN WAI EMILY",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S4B",
+      "form": "S4",
+      "stream": "B",
+      "teachers": [
+        {
+          "code": "LCHJ",
+          "chi": "李卓熙",
+          "eng": "LI CHEUK HEI",
+          "inTimetable": true
+        },
+        {
+          "code": "KNS",
+          "chi": "高雅詩",
+          "eng": "KO NGA SZE REBEKAH",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S4C",
+      "form": "S4",
+      "stream": "C",
+      "teachers": [
+        {
+          "code": "CKYT",
+          "chi": "張家如",
+          "eng": "CHEUNG KA YU TEACHER",
+          "inTimetable": true
+        },
+        {
+          "code": "NCY",
+          "chi": "吳早恩",
+          "eng": "NG CHO YAN",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S4D",
+      "form": "S4",
+      "stream": "D",
+      "teachers": [
+        {
+          "code": "TLP",
+          "chi": "徐麗寶",
+          "eng": "TSUI LAI PO",
+          "inTimetable": true
+        },
+        {
+          "code": "WKS",
+          "chi": "黃啟成",
+          "eng": "WONG KAI SHING",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S5A",
+      "form": "S5",
+      "stream": "A",
+      "teachers": [
+        {
+          "code": "HTY",
+          "chi": "何芷如",
+          "eng": "HO HELEN TSZ YU",
+          "inTimetable": true
+        },
+        {
+          "code": "LKH",
+          "chi": "梁儉恒",
+          "eng": "LEUNG KIM HANG",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S5B",
+      "form": "S5",
+      "stream": "B",
+      "teachers": [
+        {
+          "code": "LYF",
+          "chi": "林耀輝",
+          "eng": "LAM YIU FAI",
+          "inTimetable": true
+        },
+        {
+          "code": "NYW",
+          "chi": "吳耀榮",
+          "eng": "NG YIU WING",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S5C",
+      "form": "S5",
+      "stream": "C",
+      "teachers": [
+        {
+          "code": "CWL",
+          "chi": "陳永利",
+          "eng": "CHAN WING LI",
+          "inTimetable": true
+        },
+        {
+          "code": "SCL",
+          "chi": "蘇智亮",
+          "eng": "SO CHI LEONG",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S5D",
+      "form": "S5",
+      "stream": "D",
+      "teachers": [
+        {
+          "code": "CKYI",
+          "chi": "周潔瑩",
+          "eng": "CHOW KIT YING",
+          "inTimetable": true
+        },
+        {
+          "code": "FWK",
+          "chi": "馮永健",
+          "eng": "FUNG WING KIN",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S6A",
+      "form": "S6",
+      "stream": "A",
+      "teachers": [
+        {
+          "code": "LNA",
+          "chi": "李諾",
+          "eng": "LI NOK ARIA",
+          "inTimetable": true
+        },
+        {
+          "code": "CYK",
+          "chi": "蔡仁桂",
+          "eng": "CHOI YAN KWAI VICTOR",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S6B",
+      "form": "S6",
+      "stream": "B",
+      "teachers": [
+        {
+          "code": "CCC",
+          "chi": "曹治聰",
+          "eng": "CHO CHI CHUNG",
+          "inTimetable": true
+        },
+        {
+          "code": "LPL",
+          "chi": "李佩蕾",
+          "eng": "LI PUI LUI",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S6C",
+      "form": "S6",
+      "stream": "C",
+      "teachers": [
+        {
+          "code": "CKH",
+          "chi": "陳家曦",
+          "eng": "CHAN KA HAI",
+          "inTimetable": true
+        },
+        {
+          "code": "WKYT",
+          "chi": "黃嘉燕",
+          "eng": "WONG KA YIN",
+          "inTimetable": true
+        }
+      ]
+    },
+    {
+      "id": "S6D",
+      "form": "S6",
+      "stream": "D",
+      "teachers": [
+        {
+          "code": "KWY",
+          "chi": "郭偉賢",
+          "eng": "KWOK WAI YIN",
+          "inTimetable": true
+        },
+        {
+          "code": "LTT",
+          "chi": "劉清翠",
+          "eng": "LOW TSING TSUI",
+          "inTimetable": true
+        }
+      ]
+    }
+  ],
+  "nonForm": [
+    {
+      "code": "CMW",
+      "chi": "陳文慧",
+      "eng": "CHAN MAN WAI ALISON",
+      "inTimetable": true
+    },
+    {
+      "code": "LWYS",
+      "chi": "李詠儀",
+      "eng": "LI WING YEE",
+      "inTimetable": true
+    },
+    {
+      "code": "PKF",
+      "chi": "彭景暉",
+      "eng": "PANG KING FAI",
+      "inTimetable": true
+    },
+    {
+      "code": "TCF",
+      "chi": "曾志勳",
+      "eng": "TSANG CHI FUN",
+      "inTimetable": true
+    },
+    {
+      "code": "CPY",
+      "chi": "陳碧瑩",
+      "eng": "CHAN PIK YING",
+      "inTimetable": true
+    },
+    {
+      "code": "TLC",
+      "chi": "曹立翔",
+      "eng": "TSAO LAP CHEUNG",
+      "inTimetable": true
+    },
+    {
+      "code": "GG",
+      "chi": "",
+      "eng": "Geoffrey Gould",
+      "timetableCode": "NET",
+      "inTimetable": true
+    }
+  ]
+}

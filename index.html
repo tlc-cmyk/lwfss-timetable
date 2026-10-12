@@ -1117,6 +1117,128 @@
       border-color: #e8a0b0;
       color: #8b2e4a;
     }
+
+    /* 班主任 */
+    .ft-search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .ft-search-row input {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .ft-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .ft-form-block {
+      margin-bottom: 14px;
+    }
+    .ft-form-block h3 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid var(--border);
+    }
+    .ft-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 640px) {
+      .ft-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .ft-class {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 9px;
+      background: #fff;
+      min-height: 72px;
+    }
+    .ft-class.is-hit {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 168, 0.15);
+    }
+    .ft-class.is-dim {
+      opacity: 0.38;
+    }
+    .ft-class-id {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+    }
+    .ft-teacher {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid transparent;
+      background: #f4f7fb;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-bottom: 5px;
+      cursor: default;
+      font: inherit;
+      color: inherit;
+    }
+    .ft-teacher:last-child { margin-bottom: 0; }
+    .ft-teacher.has-tt {
+      cursor: pointer;
+      background: var(--lesson);
+      border-color: var(--lesson-border);
+    }
+    .ft-teacher.has-tt:hover,
+    .ft-teacher.has-tt:focus-visible {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 168, 0.18);
+    }
+    .ft-teacher.is-hit {
+      border-color: var(--primary);
+      background: #e8f1fb;
+    }
+    .ft-teacher .ft-code {
+      font-weight: 800;
+      color: var(--primary-dark);
+      font-size: 0.82rem;
+    }
+    .ft-teacher .ft-name {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 1px;
+      line-height: 1.25;
+    }
+    .ft-teacher .ft-tt-hint {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .ft-nonform {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .ft-nonform .ft-teacher {
+      width: auto;
+      min-width: 140px;
+      flex: 1 1 140px;
+      max-width: 220px;
+      margin-bottom: 0;
+    }
+    .ft-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 18px 8px;
+      font-size: 0.9rem;
+    }
+
     .tab[data-tab="nowfree"] {
       font-weight: 800;
     }
@@ -1686,6 +1808,7 @@
       <button class="tab" data-tab="cycle" type="button">循環日覆寫</button>
       <button class="tab" data-tab="cal" type="button">校曆</button>
       <button class="tab" data-tab="duty" type="button">當值</button>
+      <button class="tab" data-tab="formteachers" type="button">班主任</button>
       <button class="tab" data-tab="rooms" type="button">房間預約</button>
       <button class="tab" data-tab="training" type="button">教師進修申請</button>
     </nav>
@@ -1864,6 +1987,21 @@
         <h2 style="font-size:1rem;margin-top:4px;">即將當值</h2>
         <p class="hint" style="margin-bottom:6px;">由頂部日期起計未來當值日子（來源：2026–2027 當值表）。點一列可改頂部日期。</p>
         <div class="duty-upcoming-list" id="dutyUpcomingList"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-formteachers">
+      <div class="card">
+        <h2>班主任（26/27）</h2>
+        <p class="hint" style="margin-bottom:8px;">按班別檢視班主任。可搜班別（例如 S1A、2D）或教師代碼／姓名。點有時間表的教師可開啟課表。</p>
+        <label class="field-label" for="ftSearchInput">搜尋班別或教師</label>
+        <div class="ft-search-row">
+          <input type="text" id="ftSearchInput" placeholder="例如 S2D、TLC、曹立翔…" autocomplete="off" />
+          <button class="btn btn-ghost" id="ftSearchClearBtn" type="button">清除</button>
+        </div>
+        <div class="ft-meta" id="ftMeta"></div>
+        <div id="ftGrid"></div>
+        <div class="ft-empty" id="ftEmpty" hidden>沒有符合的班別或教師。</div>
       </div>
     </section>
 
@@ -2115,6 +2253,7 @@
   <script src="calendar.js"></script>
   <script src="bells.js"></script>
   <script src="duty.js"></script>
+  <script src="form-teachers.js"></script>
   <script>
 (function () {
   'use strict';
@@ -2169,6 +2308,11 @@
   var dutyBannerMain = document.getElementById('dutyBannerMain');
   var dutyUpcomingList = document.getElementById('dutyUpcomingList');
   var dutyRoleHint = document.getElementById('dutyRoleHint');
+  var ftSearchInput = document.getElementById('ftSearchInput');
+  var ftSearchClearBtn = document.getElementById('ftSearchClearBtn');
+  var ftMeta = document.getElementById('ftMeta');
+  var ftGrid = document.getElementById('ftGrid');
+  var ftEmpty = document.getElementById('ftEmpty');
 
   var overviewContent = document.getElementById('overviewContent');
   var overviewEmpty = document.getElementById('overviewEmpty');
@@ -2212,6 +2356,7 @@
 
   var BELLS = window.BELLS_DATA || null;
   var DUTY = window.DUTY_DATA || null;
+  var FORM_TEACHERS = window.FORM_TEACHERS_DATA || null;
 
   function scheduleIdForDay(d) {
     if (!BELLS || !BELLS.byCycleDay) return (d === 5 || d === 10) ? 'bf' : 'general';
@@ -3172,6 +3317,189 @@
     searchResults.appendChild(frag);
   }
 
+
+  function resolveFormTeacherTimetable(entry) {
+    if (!entry) return null;
+    var code = entry.timetableCode || entry.code;
+    var t = lookupTeacher(code);
+    if (t) return t;
+    if (entry.code) {
+      t = lookupTeacher(entry.code);
+      if (t) return t;
+    }
+    var chi = (entry.chi || '').trim();
+    var eng = (entry.eng || '').trim().toUpperCase();
+    if (chi || eng) {
+      for (var i = 0; i < DATA.teachers.length; i++) {
+        var cand = DATA.teachers[i];
+        if (chi && cand.chi === chi) return cand;
+        if (eng && String(cand.eng || '').toUpperCase() === eng) return cand;
+      }
+    }
+    return null;
+  }
+
+  function normalizeFtQuery(q) {
+    return String(q || '')
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '');
+  }
+
+  function teacherMatchesFt(entry, rawQ, upperQ) {
+    if (!upperQ) return true;
+    var code = String(entry.code || '').toUpperCase();
+    var tt = String(entry.timetableCode || '').toUpperCase();
+    var chi = String(entry.chi || '');
+    var eng = String(entry.eng || '').toUpperCase();
+    if (code && code.indexOf(upperQ) !== -1) return true;
+    if (tt && tt.indexOf(upperQ) !== -1) return true;
+    if (eng && eng.indexOf(upperQ) !== -1) return true;
+    if (chi && chi.indexOf(rawQ) !== -1) return true;
+    return false;
+  }
+
+  function openFormTeacher(entry) {
+    var t = resolveFormTeacherTimetable(entry);
+    if (!t) return;
+    selectTeacher(t, { keepDay: false });
+    switchTab('day');
+    renderDayView();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderFormTeacherButton(entry, highlight) {
+    var tt = resolveFormTeacherTimetable(entry);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ft-teacher' + (tt ? ' has-tt' : '') + (highlight ? ' is-hit' : '');
+    var nameLine = [entry.chi, entry.eng].filter(Boolean).join(' · ');
+    btn.innerHTML =
+      '<span class="ft-code">' + esc(entry.code) + '</span>' +
+      (nameLine ? '<span class="ft-name">' + esc(nameLine) + '</span>' : '') +
+      (tt ? '<span class="ft-tt-hint">查看時間表</span>' : '');
+    if (tt) {
+      btn.title = '開啟 ' + entry.code + ' 時間表';
+      btn.addEventListener('click', function () { openFormTeacher(entry); });
+    } else {
+      btn.title = entry.code + ' 不在時間表資料中';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+    }
+    return btn;
+  }
+
+  function renderFormTeachers() {
+    if (!ftGrid) return;
+    ftGrid.innerHTML = '';
+    if (!FORM_TEACHERS || !FORM_TEACHERS.forms) {
+      if (ftMeta) ftMeta.textContent = '未載入班主任資料（form-teachers.js）。';
+      if (ftEmpty) {
+        ftEmpty.hidden = false;
+        ftEmpty.textContent = '未載入班主任資料。';
+      }
+      return;
+    }
+
+    var rawQ = (ftSearchInput && ftSearchInput.value || '').trim();
+    var q = normalizeFtQuery(rawQ);
+    var meta = FORM_TEACHERS.meta || {};
+    var visibleClasses = 0;
+    var visibleTeachers = 0;
+
+    FORM_TEACHERS.forms.forEach(function (formObj) {
+      var form = formObj.form;
+      var streamWrap = document.createElement('div');
+      streamWrap.className = 'ft-form-block';
+      var heading = document.createElement('h3');
+      heading.textContent = form;
+      streamWrap.appendChild(heading);
+      var grid = document.createElement('div');
+      grid.className = 'ft-grid';
+      var formHasVisible = false;
+
+      ['A', 'B', 'C', 'D'].forEach(function (stream) {
+        var teachers = (formObj.streams && formObj.streams[stream]) || [];
+        var classId = form + stream;
+        var shortId = form.replace(/^S/, '') + stream;
+        var classHit = !q ||
+          classId.indexOf(q) !== -1 ||
+          shortId.indexOf(q) !== -1 ||
+          q === form ||
+          q === form.replace(/^S/, '') ||
+          ('S' + q) === form;
+
+        var teacherHitFlags = teachers.map(function (entry) {
+          return teacherMatchesFt(entry, rawQ, q);
+        });
+        var anyTeacherHit = teacherHitFlags.some(Boolean);
+        if (q && !classHit && !anyTeacherHit) return;
+
+        formHasVisible = true;
+        visibleClasses += 1;
+        var card = document.createElement('div');
+        card.className = 'ft-class' + (q && (classHit || anyTeacherHit) ? ' is-hit' : '');
+        var idEl = document.createElement('div');
+        idEl.className = 'ft-class-id';
+        idEl.textContent = classId;
+        card.appendChild(idEl);
+
+        teachers.forEach(function (entry, idx) {
+          if (q && !classHit && !teacherHitFlags[idx]) return;
+          visibleTeachers += 1;
+          card.appendChild(renderFormTeacherButton(entry, !!(q && teacherHitFlags[idx])));
+        });
+        grid.appendChild(card);
+      });
+
+      if (formHasVisible) {
+        streamWrap.appendChild(grid);
+        ftGrid.appendChild(streamWrap);
+      }
+    });
+
+    var nonForm = FORM_TEACHERS.nonForm || [];
+    var nonHits = nonForm.map(function (entry) {
+      return teacherMatchesFt(entry, rawQ, q);
+    });
+    var queryLooksLikeClass = q && /^S?[1-6][A-D]?$/.test(q);
+    var showNon = nonForm.length > 0 && (!q || nonHits.some(Boolean)) &&
+      !(queryLooksLikeClass && !nonHits.some(Boolean));
+
+    if (showNon) {
+      var nfBlock = document.createElement('div');
+      nfBlock.className = 'ft-form-block';
+      var nfH = document.createElement('h3');
+      nfH.textContent = '非班主任';
+      nfBlock.appendChild(nfH);
+      var nfWrap = document.createElement('div');
+      nfWrap.className = 'ft-nonform';
+      nonForm.forEach(function (entry, idx) {
+        if (q && !nonHits[idx]) return;
+        visibleTeachers += 1;
+        nfWrap.appendChild(renderFormTeacherButton(entry, !!(q && nonHits[idx])));
+      });
+      nfBlock.appendChild(nfWrap);
+      ftGrid.appendChild(nfBlock);
+    }
+
+    if (ftMeta) {
+      var updated = meta.updated || '';
+      var updatedLabel = updated;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(updated)) {
+        var parts = updated.split('-');
+        updatedLabel = parseInt(parts[2], 10) + '/' + parseInt(parts[1], 10) + '/' + parts[0];
+      }
+      ftMeta.textContent = q
+        ? ('搜尋「' + rawQ + '」· 顯示 ' + visibleClasses + ' 班／' + visibleTeachers + ' 人')
+        : ((meta.title || '班主任') + ' · ' + (meta.classCount || 24) + ' 班 · 更新 ' + updatedLabel);
+    }
+    if (ftEmpty) {
+      ftEmpty.hidden = ftGrid.children.length > 0;
+      ftEmpty.textContent = '沒有符合的班別或教師。';
+    }
+  }
+
   function switchTab(name) {
     state.tab = name;
     document.querySelectorAll('.tab').forEach(function (tab) {
@@ -3189,6 +3517,9 @@
     if (name === 'cal' && typeof renderSchoolCal === 'function') renderSchoolCal();
     if (name === 'training' && typeof syncTrainingFromTeacher === 'function') {
       syncTrainingFromTeacher({ onlyIfEmpty: true });
+    }
+    if (name === 'formteachers' && typeof renderFormTeachers === 'function') {
+      renderFormTeachers();
     }
   }
 
@@ -4954,6 +5285,25 @@
       switchTab(tab.dataset.tab);
     });
   });
+
+  if (ftSearchInput) {
+    ftSearchInput.addEventListener('input', function () {
+      if (state.tab === 'formteachers') renderFormTeachers();
+    });
+    ftSearchInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        ftSearchInput.value = '';
+        renderFormTeachers();
+      }
+    });
+  }
+  if (ftSearchClearBtn) {
+    ftSearchClearBtn.addEventListener('click', function () {
+      if (ftSearchInput) ftSearchInput.value = '';
+      renderFormTeachers();
+      if (ftSearchInput) ftSearchInput.focus();
+    });
+  }
 
   searchBtn.addEventListener('click', doSearch);
   searchInput.addEventListener('keydown', function (e) {

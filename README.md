@@ -16,10 +16,11 @@
    - **循環日覆寫**：本機手動覆寫／管理員覆寫（日常循環日見頂部）。
    - **校曆**：月／週瀏覽；點選日子同步頂部。格內可見循環日圈號同事項摘要；詳細日期／當值見頂部。
    - **當值**：職責說明同即將當值列表（當日當值見頂部；點一列可改頂部日期）。
+   - **班主任**：26/27 班別網格（S1–S6 × A–D）與非班主任名單；可搜班別或教師代碼／姓名；點有時間表嘅教師開啟課表。
    - **房間預約**：即將推出。
    - **教師進修申請**：填寫老師姓名（可選 ShortName 從 `data.js` 帶出）、進修日期、時間、地點、活動名稱、進修類型；可**拍照／揀通告相**後用 **「用 AI 分析（傳畀助手）」**：複製提示句、下載圖片、`mailto:` 畀助手（`tlc@mail.grokbot.com`），或（若裝置支援）系統分享；最穩妥係喺 Grok Bot「**學校時間表助手**」對話直接上載相片並貼提示句。次選 **「離線辨識」**（瀏覽器 **Tesseract.js** CDN OCR）可預覽後套用。完成後可預覽並以瀏覽器「另存為 PDF」匯出校長審批用表格。
 
-不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`，鐘聲時間內嵌於 `bells.js`。
+不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`，鐘聲時間內嵌於 `bells.js`，班主任名單內嵌於 `form-teachers.js`。
 
 
 ## 鐘聲時間（上課時間表）
@@ -115,6 +116,7 @@ python3 -m http.server 8765
 | `calendar.js` / `calendar.json` | 校曆循環日 |
 | `bells.js` / `bells.json` | 一般／BF 鐘聲時間 |
 | `duty.js` / `duty.json` | 當值表日期 → Teacher1／Teacher2 |
+| `form-teachers.js` / `form-teachers.json` | 26/27 班主任／非班主任 |
 | `cycle-config.json` | 可選全校覆寫 |
 | `README.md` | 說明 |
 
@@ -163,6 +165,18 @@ python3 scripts/build_duty.py /path/to/duty-roster.txt
 ```
 
 會覆寫 `duty.js` 與 `duty.json`。介面頂部與日期選擇會顯示「今日／當日當值」；「當值」分頁可查即將當值日子。
+
+
+## 班主任
+
+來源：26/27 班主任名單（更新日期 17/8/2026）。資料見 `form-teachers.json`／`form-teachers.js`。
+
+- 班別：S1–S6 × A–D（多數兩位班主任；**S2D** 三位）
+- 底部「非班主任」：CMW、LWYS、PKF、TCF、CPY、TLC、GG
+- 名單代碼與時間表 ShortName 差異：`LTTJ`→`LTTT`、`WWKF`→`WWK`、`GG`→`NET`（點選仍可開啟課表）
+
+「班主任」分頁提供網格檢視與搜尋；點有時間表的教師會切換至「循環日課表」。
+
 
 
 ## 校曆檢視
