@@ -298,7 +298,7 @@
     .desk .leg-l { left: 12%; }
     .desk .leg-r { right: 12%; }
 
-    /* cute pixel characters (CSS) */
+    /* cute pixel characters (CSS) — static leftovers + wandering NPCs */
     .char {
       position: absolute;
       width: 28px; height: 40px;
@@ -361,15 +361,135 @@
       50% { transform: translateY(-3px); }
     }
 
-    .teacher-spot { left: 46%; top: 38%; }
-    .s1 { left: 14%; bottom: 30%; }
-    .s2 { left: 38%; bottom: 30%; }
-    .s3 { left: 62%; bottom: 30%; }
-    .s4 { left: 20%; bottom: 10%; }
-    .s5 { left: 46%; bottom: 10%; }
-    .s6 { left: 70%; bottom: 10%; }
+    /* ===== Wandering NPC layer ===== */
+    .npc-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .npc {
+      position: absolute;
+      width: 24px;
+      height: 36px;
+      image-rendering: pixelated;
+      pointer-events: auto;
+      cursor: pointer;
+      transform: translate(-50%, 0);
+      will-change: left, bottom;
+      z-index: 7;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .npc .npc-sprite {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 22px;
+      height: 34px;
+      margin-left: -11px;
+    }
+    .npc.facing-left .npc-sprite { transform: scaleX(-1); }
+    .npc .npc-hair {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 18px; height: 7px;
+      background: #3e2a1a;
+      border: 2px solid #2a1a10;
+      border-radius: 3px 3px 0 0;
+      box-sizing: border-box;
+    }
+    .npc .npc-head {
+      position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+      width: 16px; height: 14px;
+      background: #f5d0b0;
+      border: 2px solid #5c3a22;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+    .npc .npc-head::before, .npc .npc-head::after {
+      content: "";
+      position: absolute;
+      top: 4px; width: 2px; height: 2px;
+      background: #3e2a1a;
+    }
+    .npc .npc-head::before { left: 3px; }
+    .npc .npc-head::after { right: 3px; }
+    .npc.sleep .npc-head::before, .npc.sleep .npc-head::after {
+      height: 1px; top: 5px; width: 3px;
+    }
+    .npc .npc-body {
+      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+      width: 18px; height: 14px;
+      background: #5b8def;
+      border: 2px solid #5c3a22;
+      border-radius: 2px;
+      box-sizing: border-box;
+    }
+    .npc.role-teacher .npc-body { background: #8b5e3c; }
+    .npc.role-teacher .npc-head { background: #e8c4a0; }
+    .npc.palette-o .npc-body { background: #f0a060; }
+    .npc.palette-g .npc-body { background: #6bb89a; }
+    .npc.palette-p .npc-body { background: #c48ad4; }
+    .npc.palette-b .npc-body { background: #5b8def; }
+    .npc.palette-r .npc-body { background: #e07878; }
+    .npc.palette-y .npc-body { background: #e8c45a; }
+    .npc .npc-label {
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      transform: translateX(-50%);
+      margin-bottom: 2px;
+      max-width: 72px;
+      padding: 1px 4px;
+      background: rgba(255,250,242,0.94);
+      border: 1.5px solid var(--wood-dark);
+      border-radius: 4px;
+      font-size: 0.55rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--wood-deeper);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      pointer-events: none;
+      box-shadow: 0 1px 0 rgba(0,0,0,.12);
+      z-index: 2;
+    }
+    .npc.role-teacher .npc-label {
+      background: #fff3e0;
+      border-color: #8b5e3c;
+    }
+    .npc .npc-zzz {
+      position: absolute;
+      top: -2px; right: -8px;
+      font-size: 0.55rem;
+      color: var(--muted);
+      font-weight: 800;
+      animation: floatZ 1.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .npc.wander-bounce .npc-sprite {
+      animation: npcBob 0.9s ease-in-out infinite;
+    }
+    @keyframes npcBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    .npc.facing-left.wander-bounce .npc-sprite {
+      animation: npcBobFlip 0.9s ease-in-out infinite;
+    }
+    @keyframes npcBobFlip {
+      0%, 100% { transform: scaleX(-1) translateY(0); }
+      50% { transform: scaleX(-1) translateY(-2px); }
+    }
+    .npc:active .npc-label,
+    .npc:focus .npc-label {
+      background: #ffe9c8;
+    }
 
     .prop {
+
       position: absolute;
       font-size: 1.2rem;
       z-index: 6;
@@ -566,17 +686,7 @@
           <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
           <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
         </div>
-        <div class="char teacher teacher-spot" id="charTeacher">
-          <div class="hair"></div>
-          <div class="head"></div>
-          <div class="body"></div>
-        </div>
-        <div class="char student-o s1" id="c1"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
-        <div class="char student-g s2" id="c2"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
-        <div class="char student-p s3" id="c3"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
-        <div class="char student-o s4" id="c4"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
-        <div class="char student-g s5" id="c5"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
-        <div class="char student-p s6" id="c6"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
+        <div class="npc-layer" id="npcLayer" aria-label="課室人物"></div>
         <span class="prop clock-wall" id="propClock">🕐</span>
         <span class="prop plant" id="propPlant">🪴</span>
         <span class="prop lunch" id="propLunch" hidden>🍱</span>
@@ -595,6 +705,7 @@
 
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
+      課室內有真實姓名嘅像素同學同老師慢慢行嚟行去——撳佢哋睇名牌。
       喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集 ★ 分數（每節每日一次）。
     </div>
 
@@ -611,6 +722,8 @@
   <script src="data.js"></script>
   <script src="bells.js"></script>
   <script src="calendar.js"></script>
+  <script src="duty.js"></script>
+  <script src="students.js"></script>
   <script>
 (function () {
   'use strict';
@@ -877,34 +990,389 @@
     return daySched[String(period)] || null;
   }
 
-  function setCharsVisible(ids, show) {
-    ids.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.style.display = show ? '' : 'none';
-    });
+  /* ===== NPC roster + walking ===== */
+  var STUDENTS = (window.STUDENTS_DATA && window.STUDENTS_DATA.students) || [];
+  var studentsByClass = {};
+  STUDENTS.forEach(function (s) {
+    if (!studentsByClass[s.class]) studentsByClass[s.class] = [];
+    studentsByClass[s.class].push(s);
+  });
+  var DUTY = window.DUTY_DATA || null;
+  var PALETTES = ['o', 'g', 'p', 'b', 'r', 'y'];
+  var SURNAME_DIGRAPHS = ['歐陽', '司徒', '諸葛', '上官', '夏侯', '司馬', '東方', '南宮'];
+
+  var npcState = {
+    key: '',
+    npcs: [],
+    raf: 0,
+    lastTs: 0,
+    started: false
+  };
+
+  function mulberry32(a) {
+    return function () {
+      var t = (a += 0x6D2B79F5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
   }
 
-  function setSleep(ids, sleep) {
-    ids.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      el.classList.toggle('sleep', !!sleep);
-      var z = el.querySelector('.zzz');
-      if (sleep && !z) {
-        var span = document.createElement('span');
-        span.className = 'zzz';
-        span.textContent = 'z';
-        el.appendChild(span);
-      } else if (!sleep && z) {
-        z.remove();
+  function hashStr(s) {
+    var h = 2166136261;
+    s = String(s || '');
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  function teacherDisplayName(t) {
+    if (!t) return '老師';
+    var chi = (t.chi || '').trim();
+    if (!chi) return (t.code || '') + '老師';
+    for (var i = 0; i < SURNAME_DIGRAPHS.length; i++) {
+      if (chi.indexOf(SURNAME_DIGRAPHS[i]) === 0) return SURNAME_DIGRAPHS[i] + '老師';
+    }
+    return chi.charAt(0) + '老師';
+  }
+
+  function shortLabel(text, maxLen) {
+    text = String(text || '');
+    maxLen = maxLen || 6;
+    if (text.length <= maxLen) return text;
+    return text.slice(0, maxLen) + '…';
+  }
+
+  function parseClassList(classField, classShort) {
+    var raw = String(classField || classShort || '').trim();
+    if (!raw) return [];
+    var out = [];
+    var seen = {};
+    function add(c) {
+      c = String(c || '').trim().toUpperCase();
+      if (!c || seen[c]) return;
+      // normalize S5A -> 5A
+      var m = c.match(/^S?(\d+[A-D])$/i);
+      if (m) c = m[1].toUpperCase();
+      if (!/^(\d+[A-D])$/.test(c)) return;
+      seen[c] = true;
+      out.push(c);
+    }
+    // range like 5A-D or 5A–D
+    var range = raw.match(/^S?(\d+)([A-D])\s*[-–]\s*([A-D])$/i);
+    if (range) {
+      var form = range[1];
+      var a = range[2].toUpperCase().charCodeAt(0);
+      var b = range[3].toUpperCase().charCodeAt(0);
+      if (b < a) { var tmp = a; a = b; b = tmp; }
+      for (var code = a; code <= b; code++) add(form + String.fromCharCode(code));
+      return out;
+    }
+    raw.split(/[,，、\/\s]+/).forEach(function (part) {
+      part = part.trim();
+      if (!part) return;
+      var r2 = part.match(/^S?(\d+)([A-D])\s*[-–]\s*([A-D])$/i);
+      if (r2) {
+        var f = r2[1];
+        var aa = r2[2].toUpperCase().charCodeAt(0);
+        var bb = r2[3].toUpperCase().charCodeAt(0);
+        if (bb < aa) { var t2 = aa; aa = bb; bb = t2; }
+        for (var c2 = aa; c2 <= bb; c2++) add(f + String.fromCharCode(c2));
+      } else {
+        add(part);
       }
     });
+    return out;
   }
 
-  function setBounce(ids, on) {
-    ids.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.toggle('bounce', !!on);
+  function pickFromPool(pool, n, rng) {
+    if (!pool || !pool.length || n <= 0) return [];
+    var copy = pool.slice();
+    for (var i = copy.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
+    }
+    return copy.slice(0, Math.min(n, copy.length));
+  }
+
+  function studentsForClasses(classes, n, rng) {
+    var pool = [];
+    (classes || []).forEach(function (c) {
+      var list = studentsByClass[c];
+      if (list) pool = pool.concat(list);
+    });
+    if (!pool.length) {
+      // fallback: any students
+      pool = STUDENTS.slice();
+    }
+    return pickFromPool(pool, n, rng);
+  }
+
+  function randomClasses(n, rng) {
+    var keys = Object.keys(studentsByClass);
+    if (!keys.length) return [];
+    return pickFromPool(keys, n, rng);
+  }
+
+  function freeTeachersForPeriod(day, period, excludeCode, limit, rng) {
+    var free = [];
+    (DATA.teachers || []).forEach(function (t) {
+      if (!t || !t.schedule) return;
+      if (excludeCode && t.code === excludeCode) return;
+      var daySched = t.schedule[String(day)] || {};
+      if (!daySched[String(period)]) free.push(t);
+    });
+    return pickFromPool(free, limit, rng);
+  }
+
+  function dutyTeachersFor(ymd) {
+    if (!DUTY || !DUTY.days || !ymd) return [];
+    var d = DUTY.days[ymd];
+    if (!d) return [];
+    var out = [];
+    ['teacher1', 'teacher2'].forEach(function (role) {
+      var entry = d[role];
+      if (!entry) return;
+      var code = entry.code || entry.timetableCode;
+      var t = code ? lookupTeacher(code) : null;
+      if (t) out.push(t);
+      else if (entry.chi || code) {
+        out.push({ code: code || '?', chi: entry.chi || '', eng: entry.eng || '' });
+      }
+    });
+    return out;
+  }
+
+  function makeNpcEl(spec) {
+    var el = document.createElement('div');
+    el.className = 'npc role-' + spec.role + (spec.palette ? (' palette-' + spec.palette) : '');
+    if (spec.sleep) el.classList.add('sleep');
+    if (spec.bounce) el.classList.add('wander-bounce');
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.dataset.role = spec.role;
+    el.dataset.name = spec.name || '';
+    el.dataset.detail = spec.detail || '';
+    el.innerHTML =
+      '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 5 : 8)) + '</div>' +
+      '<div class="npc-sprite">' +
+        '<div class="npc-hair" style="background:' + (spec.hair || '#3e2a1a') + '"></div>' +
+        '<div class="npc-head"></div>' +
+        '<div class="npc-body"></div>' +
+        (spec.sleep ? '<span class="npc-zzz">z</span>' : '') +
+      '</div>';
+    el.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      toast(spec.detail || spec.name);
+    });
+    el.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        toast(spec.detail || spec.name);
+      }
+    });
+    return el;
+  }
+
+  function escapeHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  var HAIRS = ['#3e2a1a', '#5c3a22', '#2a1a10', '#6b4423', '#1a1210', '#4a3020'];
+
+  function buildNpcRoster(mood, ctx) {
+    var ymd = ctx.ymd || todayYmdHK();
+    var day = ctx.cycle && ctx.cycle.day;
+    var period = ctx.slot && ctx.slot.period;
+    var lesson = ctx.lesson;
+    var seed = hashStr(ymd + '|' + mood + '|' + (lesson && (lesson.class || lesson.classShort) || '') + '|' + (state.teacher && state.teacher.code || '') + '|' + (period || ''));
+    var rng = mulberry32(seed);
+    var roster = [];
+    var player = state.teacher;
+
+    function addStudent(s, opts) {
+      opts = opts || {};
+      var label = s.chi;
+      roster.push({
+        role: 'student',
+        name: s.chi,
+        label: label,
+        detail: s.chi + ' · ' + s.class + s.no,
+        palette: PALETTES[Math.floor(rng() * PALETTES.length)],
+        hair: HAIRS[Math.floor(rng() * HAIRS.length)],
+        sleep: !!opts.sleep,
+        bounce: !!opts.bounce,
+        nearBoard: false,
+        wander: opts.wander !== false
+      });
+    }
+    function addTeacher(t, opts) {
+      opts = opts || {};
+      if (!t) return;
+      var label = teacherDisplayName(t);
+      var detail = (t.code || '') + (t.chi ? (' · ' + t.chi) : '');
+      roster.push({
+        role: 'teacher',
+        name: label,
+        label: label,
+        detail: detail,
+        palette: null,
+        hair: HAIRS[Math.floor(rng() * HAIRS.length)],
+        sleep: !!opts.sleep,
+        bounce: !!opts.bounce,
+        nearBoard: !!opts.nearBoard,
+        wander: opts.wander !== false && !opts.nearBoard
+      });
+    }
+
+    if (mood === 'class') {
+      var classes = lesson ? parseClassList(lesson.class, lesson.classShort) : [];
+      if (!classes.length) classes = randomClasses(2, rng);
+      studentsForClasses(classes, 7, rng).forEach(function (s) { addStudent(s, { bounce: false }); });
+      addTeacher(player, { nearBoard: true, wander: false });
+    } else if (mood === 'recess' || mood === 'lunch') {
+      studentsForClasses(randomClasses(4, rng), 6, rng).forEach(function (s) {
+        addStudent(s, { bounce: true, wander: true });
+      });
+      if (day != null && period != null) {
+        freeTeachersForPeriod(day, period, player && player.code, 1, rng).forEach(function (t) {
+          addTeacher(t, { wander: true, bounce: true });
+        });
+      } else if (player && rng() > 0.4) {
+        addTeacher(player, { wander: true, bounce: true });
+      }
+    } else if (mood === 'free') {
+      studentsForClasses(randomClasses(3, rng), 3, rng).forEach(function (s) {
+        addStudent(s, { bounce: true });
+      });
+      addTeacher(player, { sleep: true, nearBoard: true, wander: false });
+      if (day != null && period != null) {
+        freeTeachersForPeriod(day, period, player && player.code, 1, rng).forEach(function (t) {
+          addTeacher(t, { wander: true, bounce: true });
+        });
+      }
+    } else if (mood === 'before') {
+      studentsForClasses(randomClasses(2, rng), 2, rng).forEach(function (s) { addStudent(s); });
+      var dutyB = dutyTeachersFor(ymd);
+      if (dutyB.length) addTeacher(dutyB[0], { wander: true });
+      else addTeacher(player, { wander: true });
+    } else if (mood === 'after') {
+      studentsForClasses(randomClasses(2, rng), 2, rng).forEach(function (s) { addStudent(s); });
+      dutyTeachersFor(ymd).slice(0, 2).forEach(function (t) {
+        addTeacher(t, { wander: true });
+      });
+    } else if (mood === 'holiday') {
+      if (player) addTeacher(player, { sleep: true, nearBoard: true, wander: false });
+      if (rng() > 0.5) {
+        studentsForClasses(randomClasses(1, rng), 1, rng).forEach(function (s) {
+          addStudent(s, { sleep: true, wander: false });
+        });
+      }
+    } else {
+      studentsForClasses(randomClasses(2, rng), 2, rng).forEach(function (s) { addStudent(s); });
+      addTeacher(player, { wander: true });
+    }
+
+    return { roster: roster, rng: rng, seed: seed };
+  }
+
+  function placeNpcs(roster, rng) {
+    var layer = document.getElementById('npcLayer');
+    if (!layer) return [];
+    layer.innerHTML = '';
+    var placed = [];
+    roster.forEach(function (spec, idx) {
+      var el = makeNpcEl(spec);
+      var x, y, vx;
+      if (spec.nearBoard) {
+        x = 42 + rng() * 12; // %
+        y = 40 + rng() * 4;  // bottom %
+        vx = 0;
+      } else if (!spec.wander) {
+        x = 12 + (idx % 6) * 13 + rng() * 4;
+        y = 8 + Math.floor(idx / 3) * 12 + rng() * 3;
+        vx = 0;
+      } else {
+        x = 8 + rng() * 78;
+        y = 5 + rng() * 28;
+        vx = (0.004 + rng() * 0.008) * (rng() > 0.5 ? 1 : -1); // % per ms scale later
+      }
+      el.style.left = x + '%';
+      el.style.bottom = y + '%';
+      if (vx < 0) el.classList.add('facing-left');
+      layer.appendChild(el);
+      placed.push({
+        el: el,
+        spec: spec,
+        x: x,
+        y: y,
+        vx: vx,
+        baseY: y,
+        phase: rng() * Math.PI * 2
+      });
+    });
+    return placed;
+  }
+
+  function syncNpcs(mood, ctx) {
+    var lesson = ctx.lesson;
+    var key = [
+      mood,
+      ctx.ymd || '',
+      (ctx.slot && ctx.slot.kind) || '',
+      (ctx.slot && ctx.slot.period) || '',
+      lesson ? (lesson.class || lesson.classShort || '') : '',
+      state.teacher ? state.teacher.code : ''
+    ].join('|');
+    if (key === npcState.key && npcState.npcs.length) return;
+    npcState.key = key;
+    var built = buildNpcRoster(mood, ctx);
+    npcState.npcs = placeNpcs(built.roster, built.rng);
+    npcState.lastTs = 0;
+  }
+
+  function npcTick(ts) {
+    npcState.raf = requestAnimationFrame(npcTick);
+    if (document.hidden) {
+      npcState.lastTs = 0;
+      return;
+    }
+    if (!npcState.lastTs) {
+      npcState.lastTs = ts;
+      return;
+    }
+    var dt = Math.min(48, ts - npcState.lastTs);
+    npcState.lastTs = ts;
+    var npcs = npcState.npcs;
+    for (var i = 0; i < npcs.length; i++) {
+      var n = npcs[i];
+      if (!n.spec.wander || !n.vx) continue;
+      n.x += n.vx * dt;
+      // soft vertical drift
+      n.y = n.baseY + Math.sin((ts / 900) + n.phase) * 1.2;
+      if (n.x < 6) { n.x = 6; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
+      if (n.x > 90) { n.x = 90; n.vx = -Math.abs(n.vx); n.el.classList.add('facing-left'); }
+      if (n.y < 3) n.y = 3;
+      if (n.y > 38) n.y = 38;
+      n.el.style.left = n.x.toFixed(2) + '%';
+      n.el.style.bottom = n.y.toFixed(2) + '%';
+      // z by bottom so closer = higher
+      n.el.style.zIndex = String(7 + Math.round(n.y));
+    }
+  }
+
+  function startNpcLoop() {
+    if (npcState.started) return;
+    npcState.started = true;
+    npcState.raf = requestAnimationFrame(npcTick);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) npcState.lastTs = 0;
     });
   }
 
@@ -921,31 +1389,19 @@
     document.getElementById('propSun').hidden = false;
     document.getElementById('propMoon').hidden = true;
 
-    var allS = ['c1','c2','c3','c4','c5','c6'];
-    setSleep(allS.concat(['charTeacher']), false);
-    setBounce(allS, false);
-
     if (ctx.holiday) {
       mood = 'holiday';
       boardMsg = '今日假期\n好好休息';
       badgeMsg = '假期';
-      setCharsVisible(['charTeacher'], true);
-      setCharsVisible(allS, false);
-      setSleep(['charTeacher'], true);
       document.getElementById('propSun').hidden = false;
     } else if (!ctx.slot || ctx.slot.kind === 'before') {
       mood = 'before';
       boardMsg = '早晨！\n準備上課';
       badgeMsg = '上課前';
-      setCharsVisible(['charTeacher'], true);
-      setCharsVisible(allS.slice(0, 2), true);
-      setCharsVisible(allS.slice(2), false);
     } else if (ctx.slot.kind === 'after') {
       mood = 'after';
       boardMsg = '放學喇\n再見！';
       badgeMsg = '放學後';
-      setCharsVisible(['charTeacher'], false);
-      setCharsVisible(allS, false);
       document.getElementById('propSun').hidden = true;
       document.getElementById('propMoon').hidden = false;
     } else if (ctx.slot.kind === 'break') {
@@ -954,36 +1410,24 @@
         mood = 'recess';
         boardMsg = '小息時間\n休息一下';
         badgeMsg = '小息';
-        setCharsVisible(['charTeacher'], false);
-        setCharsVisible(allS, true);
-        setBounce(allS, true);
       } else if (key === 'lunch') {
         mood = 'lunch';
         boardMsg = '午飯時間\n慢慢食';
         badgeMsg = '午飯';
-        setCharsVisible(['charTeacher'], false);
-        setCharsVisible(allS, true);
         document.getElementById('propLunch').hidden = false;
       } else if (key === 'reading') {
         mood = 'class';
         boardMsg = '閱讀時段\n靜心閱讀';
         badgeMsg = '閱讀';
-        setCharsVisible(['charTeacher'], true);
-        setCharsVisible(allS, true);
         document.getElementById('propBook').hidden = false;
       } else if (key === 'homeroom') {
         mood = 'class';
         boardMsg = '早會／班主任';
         badgeMsg = '早會';
-        setCharsVisible(['charTeacher'], true);
-        setCharsVisible(allS, true);
       } else {
         mood = 'recess';
         boardMsg = ctx.slot.label || '休息中';
         badgeMsg = '休息';
-        setCharsVisible(['charTeacher'], true);
-        setCharsVisible(allS.slice(0, 3), true);
-        setCharsVisible(allS.slice(3), false);
       }
     } else if (ctx.slot.kind === 'period') {
       var L = ctx.lesson;
@@ -991,21 +1435,18 @@
         mood = 'class';
         boardMsg = (L.subjectShort || L.subject || '課堂') + '\n' + (L.classShort || L.class || '');
         badgeMsg = '第' + ctx.slot.period + '節 · ' + (L.room || '');
-        setCharsVisible(['charTeacher'], true);
-        setCharsVisible(allS, true);
       } else {
         mood = 'free';
         boardMsg = '空堂\n喝杯茶～';
         badgeMsg = '空堂 · P' + ctx.slot.period;
-        setCharsVisible(['charTeacher'], true);
-        setCharsVisible(allS, false);
-        setSleep(['charTeacher'], true);
       }
     }
 
     scene.setAttribute('data-mood', mood);
     board.textContent = boardMsg;
     badge.textContent = badgeMsg;
+    syncNpcs(mood, ctx);
+    startNpcLoop();
   }
 
   function claimKey(ymd, period) {

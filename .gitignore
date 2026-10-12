@@ -1,0 +1,3 @@
+# Source CSV with student emails — do not publish
+scripts/students-gmail-list.csv
+scripts/students-gmail-list.decoded.txt

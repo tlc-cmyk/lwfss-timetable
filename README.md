@@ -18,10 +18,10 @@
    - **當值**：職責說明同即將當值列表（當日當值見頂部；點一列可改頂部日期）。
    - **班主任**：26/27 班別網格（S1–S6 × A–D）與非班主任名單；可搜班別或教師代碼／姓名；點有時間表嘅教師開啟課表。
    - **房間預約**：即將推出。
-   - **模擬遊戲**（`game.html`）：溫馨像素風課室小遊戲；跟住真實香港時間、校曆循環日、一般／BF 鐘聲同教師課表轉場（上課／小息／午飯／放學／假期），顯示現正課堂同倒數，可收集「準時到堂」★ 分數。教師代碼預設讀取本機上次查詢（`localStorage`），否則 TLC。
+   - **模擬遊戲**（`game.html`）：溫馨像素風課室小遊戲；跟住真實香港時間、校曆循環日、一般／BF 鐘聲同教師課表轉場（上課／小息／午飯／放學／假期），顯示現正課堂同倒數，可收集「準時到堂」★ 分數。課室內有真實中文姓名嘅像素同學／老師緩慢走動（上課按現節班別抽樣；小息／午飯／空堂較鬆散；放學前後可出現當值老師）；撳 NPC 睇名牌。教師代碼預設讀取本機上次查詢（`localStorage`），否則 TLC。
    - **教師進修申請**：填寫老師姓名（可選 ShortName 從 `data.js` 帶出）、進修日期、時間、地點、活動名稱、進修類型；可**拍照／揀通告相**後用 **「用 AI 分析（傳畀助手）」**：複製提示句、下載圖片、`mailto:` 畀助手（`tlc@mail.grokbot.com`），或（若裝置支援）系統分享；最穩妥係喺 Grok Bot「**學校時間表助手**」對話直接上載相片並貼提示句。次選 **「離線辨識」**（瀏覽器 **Tesseract.js** CDN OCR）可預覽後套用。完成後可預覽並以瀏覽器「另存為 PDF」匯出校長審批用表格。
 
-不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`，鐘聲時間內嵌於 `bells.js`，班主任名單內嵌於 `form-teachers.js`。
+不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`，鐘聲時間內嵌於 `bells.js`，班主任名單內嵌於 `form-teachers.js`，學生名單（班別＋中文姓名）內嵌於 `students.js`。`students.js` contains Chinese names + class only (no emails); sourced from school Gmail list for the sim game。
 
 
 ## 鐘聲時間（上課時間表）
@@ -117,6 +117,8 @@ python3 -m http.server 8765
 | `calendar.js` / `calendar.json` | 校曆循環日 |
 | `bells.js` / `bells.json` | 一般／BF 鐘聲時間 |
 | `duty.js` / `duty.json` | 當值表日期 → Teacher1／Teacher2 |
+| `students.js` / `students.json` | 模擬遊戲學生名單（班別＋中文姓名；無電郵） |
+| `game.html` | 準時到堂像素課室小遊戲（含行走 NPC） |
 | `form-teachers.js` / `form-teachers.json` | 26/27 班主任／非班主任 |
 | `cycle-config.json` | 可選全校覆寫 |
 | `README.md` | 說明 |
@@ -132,12 +134,12 @@ fileId：`14UPpVtyrCCzM_uExw7hsfKxKk-5F_kzZMy00j1RYFoM`
 
 ```bash
 cd timetable-app
-python3 scripts/build_data.py /path/to/export.json
-# 或
 python3 scripts/build_data.py /path/to/timetable.csv
+# 學生名單（班別＋中文姓名；來源：學生Gmail LIST CSV）
+python3 scripts/build_students.py scripts/students-gmail-list.csv
 ```
 
-會覆寫 `data.js` 與 `data.json`。
+會覆寫 `data.js` 與 `data.json`；學生腳本會覆寫 `students.js` 與 `students.json`（不含電郵）。
 
 Sheet 格式：每行一位教師；欄位 `ShortName, EngName, ChiName`，其後為 `DxPyCl / DxPySu / DxPyTe / DxPyRm`（D1–D10、P1–P7；D5／D10 另有 P8）。
 
