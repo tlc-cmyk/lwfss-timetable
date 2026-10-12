@@ -997,6 +997,7 @@
       border-color: #c0392b !important;
       background: #fdecea !important;
       box-shadow: 0 0 0 2px rgba(192, 57, 43, .35), 0 2px 10px rgba(192, 57, 43, .18);
+      grid-template-columns: 102px 1fr auto;
     }
     .lesson.is-current .period-badge {
       background: #f5c6c2;
@@ -1010,6 +1011,32 @@
       color: #922b21;
     }
     .lesson.is-current .subj { color: #922b21; }
+    .period-countdown {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      min-width: 4.6rem;
+      max-width: 5.6rem;
+      background: #c0392b;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.78rem;
+      line-height: 1.25;
+      text-align: center;
+      letter-spacing: 0.01em;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+      border-left: 1px solid rgba(146, 43, 33, .35);
+    }
+    .period-countdown .cd-num {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin: 2px 0;
+    }
     .lesson.is-past {
       opacity: 0.55;
     }
@@ -2289,6 +2316,38 @@
     return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
   }
 
+  /** Whole minutes left until endHm (HH:MM) in HKT; ceil of remaining seconds. */
+  function minutesLeftUntilHm(endHm) {
+    var endM = hmToMinutes(endHm);
+    if (endM == null) return null;
+    var now = nowHKTParts();
+    var nowSec = now.hour * 3600 + now.minute * 60 + (now.second || 0);
+    var left = endM * 60 - nowSec;
+    if (left <= 0) return 0;
+    return Math.ceil(left / 60);
+  }
+
+  /** zh-HK countdown label, e.g.「仲有 12 分鐘」. */
+  function formatCountdownZh(mins) {
+    if (mins == null) return '';
+    if (mins <= 0) return '即將完結';
+    return '仲有 ' + mins + ' 分鐘';
+  }
+
+  function periodCountdownHtml(endHm) {
+    if (!endHm) return '';
+    var left = minutesLeftUntilHm(endHm);
+    var label = formatCountdownZh(left);
+    // Split for compact vertical badge: 仲有 / 12 / 分鐘
+    var num = (left != null && left > 0) ? String(left) : '·';
+    var top = (left != null && left > 0) ? '仲有' : label;
+    var bot = (left != null && left > 0) ? '分鐘' : '';
+    return '<div class="period-countdown" data-end="' + esc(endHm) + '" aria-live="polite" title="' + esc(label) + '">' +
+      '<span class="cd-top">' + esc(top) + '</span>' +
+      (left != null && left > 0 ? '<span class="cd-num">' + esc(num) + '</span><span class="cd-bot">' + esc(bot) + '</span>' : '') +
+      '</div>';
+  }
+
   /**
    * Given a cycle day, find which bells.js slot contains current HKT clock time.
    * Returns { kind:'period'|'break'|'before'|'after', period, key, label, slot }
@@ -2955,6 +3014,11 @@
           }
         }
       }
+      var countdownHtml = '';
+      if (extraClass.indexOf('is-current') >= 0) {
+        var curBell = periodBell(d, p);
+        if (curBell && curBell.end) countdownHtml = periodCountdownHtml(curBell.end);
+      }
       if (L) {
         busy++;
         el.className = ('lesson ' + subjClass(L.subjectShort) + extraClass).trim();
@@ -2966,7 +3030,8 @@
             (L.room
               ? '<div class="meta-row"><span class="room">' + esc(L.room) + '</span></div>'
               : '') +
-          '</div>';
+          '</div>' +
+          countdownHtml;
         if (L.subject !== L.subjectShort && L.subject) {
           el.title = L.subject;
         }
@@ -2977,7 +3042,8 @@
           '<div class="lesson-body">' +
             '<div class="subj">空堂</div>' +
             '<div class="detail-free">Free period</div>' +
-          '</div>';
+          '</div>' +
+          countdownHtml;
       }
       if (extraClass.indexOf('is-current') >= 0) {
         el.setAttribute('aria-current', 'true');
@@ -5528,8 +5594,29 @@
     renderNowFree();
   }
 
+  function tickPeriodCountdown() {
+    var el = document.querySelector('#lessonList .lesson.is-current .period-countdown');
+    if (!el) return;
+    var end = el.getAttribute('data-end');
+    if (!end) return;
+    var left = minutesLeftUntilHm(end);
+    var label = formatCountdownZh(left);
+    el.setAttribute('title', label);
+    if (left != null && left > 0) {
+      el.innerHTML =
+        '<span class="cd-top">仲有</span>' +
+        '<span class="cd-num">' + left + '</span>' +
+        '<span class="cd-bot">分鐘</span>';
+    } else {
+      el.textContent = label || '即將完結';
+      // Period just ended — refresh day-view highlight
+      if (state.teacher) renderDayView();
+    }
+  }
+
   function startLiveClock() {
     tickLiveClock();
+    tickPeriodCountdown();
     // Align to next minute boundary, then every 60s
     var parts = nowHKTParts();
     var msToNext = Math.max(1000, (60 - (parts.second || 0)) * 1000);
@@ -5537,6 +5624,8 @@
       tickLiveClock();
       setInterval(tickLiveClock, 60 * 1000);
     }, msToNext);
+    // Live minutes-left on current (red) lesson card — HKT, every 15s
+    setInterval(tickPeriodCountdown, 15 * 1000);
   }
 
   function boot() {
