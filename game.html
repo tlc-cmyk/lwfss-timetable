@@ -439,7 +439,7 @@
       bottom: 100%;
       transform: translateX(-50%);
       margin-bottom: 2px;
-      max-width: 72px;
+      max-width: 88px;
       padding: 1px 4px;
       background: rgba(255,250,242,0.94);
       border: 1.5px solid var(--wood-dark);
@@ -1722,7 +1722,6 @@
   });
   var DUTY = window.DUTY_DATA || null;
   var PALETTES = ['o', 'g', 'p', 'b', 'r', 'y'];
-  var SURNAME_DIGRAPHS = ['歐陽', '司徒', '諸葛', '上官', '夏侯', '司馬', '東方', '南宮'];
 
   var npcState = {
     key: '',
@@ -1754,11 +1753,8 @@
   function teacherDisplayName(t) {
     if (!t) return '老師';
     var chi = (t.chi || '').trim();
-    if (!chi) return (t.code || '') + '老師';
-    for (var i = 0; i < SURNAME_DIGRAPHS.length; i++) {
-      if (chi.indexOf(SURNAME_DIGRAPHS[i]) === 0) return SURNAME_DIGRAPHS[i] + '老師';
-    }
-    return chi.charAt(0) + '老師';
+    if (chi) return chi; // full Chinese name, e.g. 曹立翔
+    return t.code || '老師';
   }
 
   function shortLabel(text, maxLen) {
@@ -1882,7 +1878,7 @@
     if (spec.no) el.dataset.no = spec.no;
     if (spec.sitting) el.classList.add('sitting', 'idle-bob');
     el.innerHTML =
-      '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 5 : 8)) + '</div>' +
+      '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 8 : 8)) + '</div>' +
       '<div class="npc-sprite">' +
         '<div class="npc-hair" style="background:' + (spec.hair || '#3e2a1a') + '"></div>' +
         '<div class="npc-head"></div>' +
