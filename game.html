@@ -488,6 +488,195 @@
       background: #ffe9c8;
     }
 
+    /* floating +1 praise */
+    .float-plus {
+      position: absolute;
+      left: 50%;
+      bottom: 110%;
+      transform: translateX(-50%);
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #c0392b;
+      pointer-events: none;
+      z-index: 20;
+      animation: floatPlus 0.9s ease-out forwards;
+      text-shadow: 0 1px 0 #fff8ee;
+      white-space: nowrap;
+    }
+    .float-plus.star { color: #c9922a; }
+    .float-plus.heart { color: #d6336c; }
+    @keyframes floatPlus {
+      0% { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.8); }
+      20% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-28px) scale(1.15); }
+    }
+
+    /* praise action sheet */
+    .praise-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(62, 42, 26, 0.35);
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .praise-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .praise-sheet {
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(120%);
+      width: min(420px, calc(100vw - 24px));
+      background: var(--card);
+      border: 3px solid var(--wood-deeper);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 14px 14px 12px;
+      z-index: 61;
+      transition: transform .22s ease;
+    }
+    .praise-sheet.show { transform: translateX(-50%) translateY(0); }
+    .praise-sheet .ps-title {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--wood-deeper);
+      margin-bottom: 2px;
+    }
+    .praise-sheet .ps-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .praise-sheet .ps-stats {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--wood-dark);
+    }
+    .praise-sheet .ps-stats span {
+      background: var(--cream);
+      border: 2px solid var(--wood);
+      border-radius: 999px;
+      padding: 3px 10px;
+    }
+    .praise-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .praise-actions .btn { padding: 12px 8px; font-size: 0.9rem; }
+    .praise-actions .btn.star-btn {
+      background: linear-gradient(180deg, #ffe9a0, #f0c14b);
+    }
+    .praise-actions .btn.heart-btn {
+      background: linear-gradient(180deg, #ffd0e0, #f5a0b8);
+      color: #6b2038;
+    }
+    .praise-sheet .ps-close {
+      width: 100%;
+      margin-top: 2px;
+    }
+    .praise-sheet .ps-cap {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* monthly leaderboard */
+    .board-card {
+      background: var(--card);
+      border: 3px solid var(--wood-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .board-card h3 {
+      font-size: 0.85rem;
+      color: var(--wood-deeper);
+      margin-bottom: 4px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .board-card .board-month {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--cream-dark);
+      border: 1.5px solid var(--wood);
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+    .board-card .board-note {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .board-row {
+      display: grid;
+      grid-template-columns: 1.6em 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 0;
+      border-top: 1px dashed var(--cream-dark);
+      font-size: 0.84rem;
+    }
+    .board-row:first-of-type { border-top: none; }
+    .board-row .rank {
+      font-weight: 900;
+      color: var(--wood-dark);
+      text-align: center;
+    }
+    .board-row.top1 .rank { color: #c9922a; }
+    .board-row.top2 .rank { color: #8a8a8a; }
+    .board-row.top3 .rank { color: #b87333; }
+    .board-row .who {
+      font-weight: 800;
+      color: var(--text);
+      min-width: 0;
+    }
+    .board-row .who .cls {
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+    .board-row .score {
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: #c9922a;
+      white-space: nowrap;
+    }
+    .board-row .score .hearts {
+      color: #d6336c;
+      font-weight: 700;
+      font-size: 0.72rem;
+      margin-left: 6px;
+    }
+    .board-empty {
+      padding: 12px 4px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .currency .coin-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      opacity: 0.85;
+      margin-right: 2px;
+    }
+
     .prop {
 
       position: absolute;
@@ -649,7 +838,8 @@
       <div class="code" id="topCode">TLC</div>
       <div class="sub" id="topNames">載入中…</div>
     </div>
-    <div class="currency" title="準時到堂分數" aria-label="準時到堂分數">
+    <div class="currency" title="準時到堂分數（同讚賞星分開）" aria-label="準時到堂分數">
+      <span class="coin-label">準時</span>
       <span class="coin">★</span>
       <span id="pointsVal">0</span>
     </div>
@@ -705,8 +895,15 @@
 
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
-      課室內有真實姓名嘅像素同學同老師慢慢行嚟行去——撳佢哋睇名牌。
-      喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集 ★ 分數（每節每日一次）。
+      撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。
+      頂部「準時★」係準時到堂分數，同讚賞星分開。
+      喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集準時 ★（每節每日一次）。
+    </div>
+
+    <div class="board-card" id="starBoardCard">
+      <h3>今個月最多星 <span class="board-month" id="boardMonthLabel">—</span></h3>
+      <div class="board-note">讚賞星排行（本機儲存 · 心心都係讚賞但唔計入排名）</div>
+      <div id="starBoardList"><div class="board-empty">未有讚賞星——撳課室同學送一顆啦 ✨</div></div>
     </div>
 
     <div class="next-list">
@@ -718,6 +915,22 @@
   </main>
 
   <div class="toast" id="toast" role="status"></div>
+
+  <div class="praise-backdrop" id="praiseBackdrop" hidden></div>
+  <div class="praise-sheet" id="praiseSheet" role="dialog" aria-modal="true" aria-labelledby="psTitle" hidden>
+    <div class="ps-title" id="psTitle">同學</div>
+    <div class="ps-sub" id="psSub">—</div>
+    <div class="ps-stats">
+      <span id="psMonthStars">本月 ★ 0</span>
+      <span id="psMonthHearts">本月 ♥ 0</span>
+    </div>
+    <div class="praise-actions">
+      <button type="button" class="btn star-btn" id="giveStarBtn">★ 讚賞星</button>
+      <button type="button" class="btn heart-btn" id="giveHeartBtn">♥ 心心</button>
+    </div>
+    <button type="button" class="btn ghost ps-close" id="praiseCloseBtn">關閉</button>
+    <div class="ps-cap" id="psCap">今日上限：★ 3　♥ 5（每位同學）</div>
+  </div>
 
   <script src="data.js"></script>
   <script src="bells.js"></script>
@@ -735,6 +948,10 @@
   var LS_CYCLE_DATE = 'tt_cycle_date';
   var LS_ADMIN_OVERRIDE = 'tt_admin_override_day';
   var ONTIME_WINDOW_MIN = 5;
+  var PRAISE_STAR_CAP = 3;
+  var PRAISE_HEART_CAP = 5;
+  var LS_PRAISE_PREFIX = 'tt_game_stars_'; // + YYYY-MM
+  var LS_TEACHER_KUDOS_PREFIX = 'tt_game_teacher_kudos_'; // + YYYY-MM
 
   var DATA = window.TIMETABLE_DATA;
   var BELLS = window.BELLS_DATA;
@@ -958,6 +1175,258 @@
     toast._t = setTimeout(function () { el.classList.remove('show'); }, 2200);
   }
 
+  /* ===== Praise stars / hearts (monthly leaderboard) ===== */
+  var praiseState = {
+    monthKey: '',
+    map: {}, // studentKey -> { class, no, chi, stars, hearts, lastAt, dayYmd, dayStars, dayHearts }
+    selected: null,
+    teacherKudos: {}
+  };
+
+  function monthKeyHK(ymd) {
+    ymd = ymd || todayYmdHK();
+    return String(ymd).slice(0, 7); // YYYY-MM
+  }
+
+  function studentKey(s) {
+    if (!s) return '';
+    if (s.class && s.no) return s.class + '|' + s.no;
+    if (s.class && s.chi) return s.class + '|' + s.chi;
+    return s.chi || '';
+  }
+
+  function loadPraiseMonth(ym) {
+    ym = ym || monthKeyHK();
+    praiseState.monthKey = ym;
+    try {
+      var raw = localStorage.getItem(LS_PRAISE_PREFIX + ym);
+      praiseState.map = raw ? (JSON.parse(raw) || {}) : {};
+    } catch (e) {
+      praiseState.map = {};
+    }
+    try {
+      var tk = localStorage.getItem(LS_TEACHER_KUDOS_PREFIX + ym);
+      praiseState.teacherKudos = tk ? (JSON.parse(tk) || {}) : {};
+    } catch (e2) {
+      praiseState.teacherKudos = {};
+    }
+  }
+
+  function savePraiseMonth() {
+    try {
+      localStorage.setItem(LS_PRAISE_PREFIX + praiseState.monthKey, JSON.stringify(praiseState.map));
+    } catch (e) {}
+  }
+
+  function saveTeacherKudos() {
+    try {
+      localStorage.setItem(LS_TEACHER_KUDOS_PREFIX + praiseState.monthKey, JSON.stringify(praiseState.teacherKudos));
+    } catch (e) {}
+  }
+
+  function ensurePraiseEntry(spec) {
+    var key = studentKey(spec);
+    if (!key) return null;
+    var ymd = todayYmdHK();
+    var entry = praiseState.map[key];
+    if (!entry) {
+      entry = {
+        class: spec.class || '',
+        no: spec.no || '',
+        chi: spec.chi || spec.name || '',
+        stars: 0,
+        hearts: 0,
+        lastAt: null,
+        dayYmd: ymd,
+        dayStars: 0,
+        dayHearts: 0
+      };
+      praiseState.map[key] = entry;
+    } else {
+      if (entry.dayYmd !== ymd) {
+        entry.dayYmd = ymd;
+        entry.dayStars = 0;
+        entry.dayHearts = 0;
+      }
+      if (!entry.chi && (spec.chi || spec.name)) entry.chi = spec.chi || spec.name;
+      if (!entry.class && spec.class) entry.class = spec.class;
+      if (!entry.no && spec.no) entry.no = spec.no;
+    }
+    return entry;
+  }
+
+  function givePraise(kind) {
+    var spec = praiseState.selected;
+    if (!spec || spec.role !== 'student') return;
+    var ym = monthKeyHK();
+    if (ym !== praiseState.monthKey) loadPraiseMonth(ym);
+    var entry = ensurePraiseEntry(spec);
+    if (!entry) return;
+
+    if (kind === 'star') {
+      if (entry.dayStars >= PRAISE_STAR_CAP) {
+        toast('今日已經畀夠 ★ 啦（上限 ' + PRAISE_STAR_CAP + '）· 聽日再讚 ' + (entry.chi || ''));
+        return;
+      }
+      entry.stars += 1;
+      entry.dayStars += 1;
+      entry.lastAt = new Date().toISOString();
+      savePraiseMonth();
+      spawnFloatPlus(kind);
+      updatePraiseSheetStats(entry);
+      renderStarBoard();
+      toast('★ 讚賞星 → ' + entry.chi + '（本月 ' + entry.stars + '）');
+    } else if (kind === 'heart') {
+      if (entry.dayHearts >= PRAISE_HEART_CAP) {
+        toast('今日心心滿晒（上限 ' + PRAISE_HEART_CAP + '）· 溫柔啲啦 ♥');
+        return;
+      }
+      entry.hearts += 1;
+      entry.dayHearts += 1;
+      entry.lastAt = new Date().toISOString();
+      savePraiseMonth();
+      spawnFloatPlus(kind);
+      updatePraiseSheetStats(entry);
+      renderStarBoard();
+      toast('♥ 心心 → ' + entry.chi + '（本月 ♥' + entry.hearts + '）');
+    }
+  }
+
+  function spawnFloatPlus(kind) {
+    var sheet = document.getElementById('praiseSheet');
+    if (!sheet) return;
+    var el = document.createElement('div');
+    el.className = 'float-plus ' + (kind === 'star' ? 'star' : 'heart');
+    el.textContent = kind === 'star' ? '★ +1' : '♥ +1';
+    sheet.appendChild(el);
+    setTimeout(function () { el.remove(); }, 950);
+    // also try above selected npc
+    var npcs = npcState.npcs || [];
+    for (var i = 0; i < npcs.length; i++) {
+      var n = npcs[i];
+      if (n.spec && n.spec.role === 'student' && studentKey(n.spec) === studentKey(praiseState.selected)) {
+        var f = document.createElement('div');
+        f.className = 'float-plus ' + (kind === 'star' ? 'star' : 'heart');
+        f.textContent = kind === 'star' ? '★ +1' : '♥ +1';
+        n.el.appendChild(f);
+        setTimeout(function () { f.remove(); }, 950);
+        break;
+      }
+    }
+  }
+
+  function updatePraiseSheetStats(entry) {
+    document.getElementById('psMonthStars').textContent = '本月 ★ ' + (entry ? entry.stars : 0);
+    document.getElementById('psMonthHearts').textContent = '本月 ♥ ' + (entry ? entry.hearts : 0);
+    var leftS = Math.max(0, PRAISE_STAR_CAP - (entry ? entry.dayStars : 0));
+    var leftH = Math.max(0, PRAISE_HEART_CAP - (entry ? entry.dayHearts : 0));
+    document.getElementById('psCap').textContent =
+      '今日尚餘：★ ' + leftS + '　♥ ' + leftH + '（上限 ★' + PRAISE_STAR_CAP + '／♥' + PRAISE_HEART_CAP + '）';
+    document.getElementById('giveStarBtn').disabled = leftS <= 0;
+    document.getElementById('giveHeartBtn').disabled = leftH <= 0;
+  }
+
+  function openPraiseSheet(spec) {
+    praiseState.selected = spec;
+    var ym = monthKeyHK();
+    if (ym !== praiseState.monthKey) loadPraiseMonth(ym);
+    var entry = ensurePraiseEntry(spec);
+    document.getElementById('psTitle').textContent = spec.chi || spec.name || '同學';
+    document.getElementById('psSub').textContent =
+      (spec.class || '') + (spec.no || '') + ' · 送讚賞星或心心';
+    updatePraiseSheetStats(entry);
+    var backdrop = document.getElementById('praiseBackdrop');
+    var sheet = document.getElementById('praiseSheet');
+    backdrop.hidden = false;
+    sheet.hidden = false;
+    // force reflow for transition
+    void sheet.offsetWidth;
+    backdrop.classList.add('show');
+    sheet.classList.add('show');
+  }
+
+  function closePraiseSheet() {
+    praiseState.selected = null;
+    var backdrop = document.getElementById('praiseBackdrop');
+    var sheet = document.getElementById('praiseSheet');
+    backdrop.classList.remove('show');
+    sheet.classList.remove('show');
+    setTimeout(function () {
+      if (!sheet.classList.contains('show')) {
+        backdrop.hidden = true;
+        sheet.hidden = true;
+      }
+    }, 220);
+  }
+
+  function onNpcTap(spec, el) {
+    if (!spec) return;
+    if (spec.role === 'teacher') {
+      var ym = monthKeyHK();
+      if (ym !== praiseState.monthKey) loadPraiseMonth(ym);
+      var code = spec.code || spec.name || '?';
+      var k = praiseState.teacherKudos[code] || { count: 0, chi: spec.chi || spec.name || '', lastAt: null };
+      k.count += 1;
+      k.lastAt = new Date().toISOString();
+      if (spec.chi) k.chi = spec.chi;
+      praiseState.teacherKudos[code] = k;
+      saveTeacherKudos();
+      var phrases = [
+        '你好呀，' + (spec.label || spec.name) + '！☕',
+        (spec.label || spec.name) + '，今日辛苦喇 ✨',
+        '同 ' + (spec.label || spec.name) + ' 打個招呼～'
+      ];
+      toast(phrases[k.count % phrases.length]);
+      // tiny float on teacher
+      if (el) {
+        var f = document.createElement('div');
+        f.className = 'float-plus heart';
+        f.textContent = '👋';
+        el.appendChild(f);
+        setTimeout(function () { f.remove(); }, 950);
+      }
+      return;
+    }
+    // student
+    openPraiseSheet(spec);
+  }
+
+  function renderStarBoard() {
+    var ym = monthKeyHK();
+    if (ym !== praiseState.monthKey) loadPraiseMonth(ym);
+    document.getElementById('boardMonthLabel').textContent = ym;
+    var list = document.getElementById('starBoardList');
+    var rows = Object.keys(praiseState.map).map(function (k) {
+      return praiseState.map[k];
+    }).filter(function (e) {
+      return e && (e.stars > 0);
+    });
+    rows.sort(function (a, b) {
+      if (b.stars !== a.stars) return b.stars - a.stars;
+      if ((b.hearts || 0) !== (a.hearts || 0)) return (b.hearts || 0) - (a.hearts || 0);
+      return String(a.chi || '').localeCompare(String(b.chi || ''), 'zh-HK');
+    });
+    rows = rows.slice(0, 10);
+    if (!rows.length) {
+      list.innerHTML = '<div class="board-empty">未有讚賞星——撳課室同學送一顆啦 ✨</div>';
+      return;
+    }
+    var html = '';
+    rows.forEach(function (e, i) {
+      var rank = i + 1;
+      var cls = rank === 1 ? ' top1' : rank === 2 ? ' top2' : rank === 3 ? ' top3' : '';
+      var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : String(rank);
+      html += '<div class="board-row' + cls + '">' +
+        '<span class="rank">' + medal + '</span>' +
+        '<span class="who">' + escapeHtml(e.chi || '—') +
+          '<span class="cls">' + escapeHtml((e.class || '') + (e.no || '')) + '</span></span>' +
+        '<span class="score">★ ' + e.stars +
+          (e.hearts ? ('<span class="hearts">♥ ' + e.hearts + '</span>') : '') +
+        '</span></div>';
+    });
+    list.innerHTML = html;
+  }
+
   function lookupTeacher(code) {
     if (!code) return null;
     return teachersByCode[String(code).trim().toUpperCase()] || null;
@@ -1155,6 +1624,8 @@
     el.dataset.role = spec.role;
     el.dataset.name = spec.name || '';
     el.dataset.detail = spec.detail || '';
+    if (spec.class) el.dataset.class = spec.class;
+    if (spec.no) el.dataset.no = spec.no;
     el.innerHTML =
       '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 5 : 8)) + '</div>' +
       '<div class="npc-sprite">' +
@@ -1165,12 +1636,12 @@
       '</div>';
     el.addEventListener('click', function (ev) {
       ev.stopPropagation();
-      toast(spec.detail || spec.name);
+      onNpcTap(spec, el);
     });
     el.addEventListener('keydown', function (ev) {
       if (ev.key === 'Enter' || ev.key === ' ') {
         ev.preventDefault();
-        toast(spec.detail || spec.name);
+        onNpcTap(spec, el);
       }
     });
     return el;
@@ -1202,6 +1673,9 @@
       roster.push({
         role: 'student',
         name: s.chi,
+        chi: s.chi,
+        class: s.class,
+        no: s.no,
         label: label,
         detail: s.chi + ' · ' + s.class + s.no,
         palette: PALETTES[Math.floor(rng() * PALETTES.length)],
@@ -1220,6 +1694,8 @@
       roster.push({
         role: 'teacher',
         name: label,
+        code: t.code || '',
+        chi: t.chi || '',
         label: label,
         detail: detail,
         palette: null,
@@ -1447,6 +1923,11 @@
     badge.textContent = badgeMsg;
     syncNpcs(mood, ctx);
     startNpcLoop();
+    var ymNow = monthKeyHK(ctx.ymd);
+    if (ymNow !== praiseState.monthKey) {
+      loadPraiseMonth(ymNow);
+      renderStarBoard();
+    }
   }
 
   function claimKey(ymd, period) {
@@ -1670,7 +2151,17 @@
   }
 
   loadPoints();
+  loadPraiseMonth(monthKeyHK());
   resolveTeacher();
+  renderStarBoard();
+
+  document.getElementById('giveStarBtn').addEventListener('click', function () { givePraise('star'); });
+  document.getElementById('giveHeartBtn').addEventListener('click', function () { givePraise('heart'); });
+  document.getElementById('praiseCloseBtn').addEventListener('click', closePraiseSheet);
+  document.getElementById('praiseBackdrop').addEventListener('click', closePraiseSheet);
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') closePraiseSheet();
+  });
 
   fetch('cycle-config.json', { cache: 'no-store' })
     .then(function (res) { return res.ok ? res.json() : null; })
