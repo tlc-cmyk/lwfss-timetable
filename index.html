@@ -116,6 +116,18 @@
       border-color: var(--primary);
       color: #fff;
     }
+    a.tab {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      color: var(--muted);
+    }
+    a.tab:hover { color: var(--primary); }
+    a.tab[data-tab="game"] {
+      border-color: #c49a6c;
+      background: linear-gradient(180deg, #fff8ee, #f5e6d0);
+      color: #6b4423;
+    }
 
     .panel { display: none; }
     .panel.active { display: block; }
@@ -1811,6 +1823,7 @@
       <button class="tab" data-tab="formteachers" type="button">班主任</button>
       <button class="tab" data-tab="rooms" type="button">房間預約</button>
       <button class="tab" data-tab="training" type="button">教師進修申請</button>
+      <a class="tab" data-tab="game" href="game.html" id="gameTabLink">模擬遊戲</a>
     </nav>
 
     <!-- Day view -->
@@ -5281,7 +5294,10 @@
   });
 
   document.querySelectorAll('.tab').forEach(function (tab) {
-    tab.addEventListener('click', function () {
+    tab.addEventListener('click', function (e) {
+      // External / linked tabs (e.g. 模擬遊戲 → game.html) navigate normally
+      if (tab.tagName === 'A' && tab.getAttribute('href')) return;
+      e.preventDefault();
       switchTab(tab.dataset.tab);
     });
   });

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#8b5e3c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="準時到堂" />
+  <title>模擬遊戲 · 準時到堂 · 劉皇發中學</title>
+  <style>
+    :root {
+      --cream: #f7efe3;
+      --cream-dark: #efe2ce;
+      --wood: #c49a6c;
+      --wood-dark: #8b5e3c;
+      --wood-deeper: #6b4423;
+      --wall: #f3e6d4;
+      --floor: #d4a574;
+      --floor-line: #c09060;
+      --board: #3d6b4f;
+      --board-frame: #8b5e3c;
+      --text: #3e2a1a;
+      --muted: #7a5c45;
+      --accent: #e8a05a;
+      --gold: #f0c14b;
+      --sky: #b8d4e8;
+      --card: #fffaf2;
+      --shadow: 0 4px 0 rgba(107, 68, 35, 0.18);
+      --radius: 14px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --pixel: 2px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang HK",
+        "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(180deg, #e8d5b8 0%, var(--cream) 40%, #e6d0b0 100%);
+      color: var(--text);
+      min-height: 100dvh;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+    /* soft scanline / pixel feel */
+    body::before {
+      content: "";
+      pointer-events: none;
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(107, 68, 35, 0.02) 3px,
+        rgba(107, 68, 35, 0.02) 4px
+      );
+      z-index: 1000;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      padding-top: max(10px, env(safe-area-inset-top));
+      background: linear-gradient(180deg, #a06b42 0%, var(--wood-dark) 100%);
+      color: #fff8ee;
+      box-shadow: 0 3px 0 rgba(60, 35, 15, 0.35);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 3px solid #5c3a22;
+      display: grid; place-items: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+      image-rendering: pixelated;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.08);
+    }
+    .top-meta { flex: 1; min-width: 0; }
+    .top-meta .code {
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+    }
+    .top-meta .sub {
+      font-size: 0.72rem;
+      opacity: 0.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .currency {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,248,238,0.18);
+      border: 2px solid rgba(255,248,238,0.35);
+      border-radius: 999px;
+      padding: 4px 10px 4px 6px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.9rem;
+    }
+    .currency .coin {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffe9a0, var(--gold) 55%, #c9922a);
+      border: 2px solid #8a6410;
+      display: grid; place-items: center;
+      font-size: 0.7rem;
+      color: #6b4423;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.15);
+    }
+    .back-link {
+      color: #fff8ee;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+      border: 2px solid rgba(255,255,255,0.2);
+      white-space: nowrap;
+    }
+    .back-link:active { transform: translateY(1px); }
+
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 12px calc(20px + var(--safe-bottom));
+    }
+
+    .status-card {
+      background: var(--card);
+      border: 3px solid var(--wood-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .clock {
+      font-size: 1.55rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      color: var(--wood-deeper);
+    }
+    .day-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--cream-dark);
+      border: 2px solid var(--wood);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--wood-deeper);
+    }
+    .day-pill.bf { background: #dcefe4; border-color: #4a9b6e; color: #1e5c3a; }
+    .day-pill.holiday { background: #fce4ec; border-color: #e891b0; color: #8e0e42; }
+    .slot-label {
+      margin-top: 8px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .countdown {
+      margin-top: 4px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #c0392b;
+      font-variant-numeric: tabular-nums;
+    }
+    .countdown.relaxed { color: var(--muted); }
+    .lesson-line {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: var(--cream);
+      border-radius: 10px;
+      border: 2px dashed var(--wood);
+      font-size: 0.88rem;
+    }
+    .lesson-line strong { color: var(--wood-deeper); }
+    .lesson-line .muted { color: var(--muted); font-size: 0.8rem; }
+
+    /* ===== Pixel classroom scene ===== */
+    .scene-frame {
+      border: 4px solid var(--wood-deeper);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow), inset 0 0 0 2px #e8c9a0;
+      margin-bottom: 12px;
+      background: var(--wall);
+      position: relative;
+      aspect-ratio: 4 / 3.2;
+      image-rendering: pixelated;
+    }
+    .scene {
+      position: absolute; inset: 0;
+      transition: background 0.4s ease;
+    }
+    .scene .ceiling {
+      position: absolute; top: 0; left: 0; right: 0; height: 12%;
+      background: linear-gradient(180deg, #e8d4b8, transparent);
+      opacity: 0.7;
+    }
+    .scene .wall {
+      position: absolute; top: 0; left: 0; right: 0; height: 55%;
+      background: var(--wall);
+    }
+    .scene .floor {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 48%;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--floor) 0 28px,
+          var(--floor-line) 28px 30px
+        );
+      border-top: 3px solid var(--wood-dark);
+    }
+    .scene .window {
+      position: absolute;
+      top: 10%; right: 8%;
+      width: 22%; height: 28%;
+      background: var(--sky);
+      border: 4px solid var(--wood-dark);
+      border-radius: 4px;
+      box-shadow: inset 0 0 0 2px #fff8ee;
+    }
+    .scene .window::after {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(var(--wood-dark), var(--wood-dark)) center/2px 100% no-repeat,
+        linear-gradient(var(--wood-dark), var(--wood-dark)) center/100% 2px no-repeat;
+    }
+    .scene .board {
+      position: absolute;
+      top: 12%; left: 50%; transform: translateX(-50%);
+      width: 48%; height: 26%;
+      background: var(--board);
+      border: 5px solid var(--board-frame);
+      border-radius: 4px;
+      box-shadow: 2px 3px 0 rgba(0,0,0,.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      text-align: center;
+    }
+    .scene .board-text {
+      color: #e8f5ee;
+      font-size: clamp(0.65rem, 2.8vw, 0.85rem);
+      font-weight: 800;
+      line-height: 1.25;
+      text-shadow: 1px 1px 0 rgba(0,0,0,.25);
+      word-break: break-word;
+    }
+    .scene .desk-row {
+      position: absolute;
+      left: 8%; right: 8%;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 18%;
+    }
+    .scene .desk-row.r1 { bottom: 28%; }
+    .scene .desk-row.r2 { bottom: 8%; }
+    .desk {
+      width: 22%;
+      height: 70%;
+      position: relative;
+    }
+    .desk .top {
+      position: absolute; top: 20%; left: 0; right: 0; height: 28%;
+      background: #b88048;
+      border: 2px solid #6b4423;
+      border-radius: 3px;
+    }
+    .desk .leg-l, .desk .leg-r {
+      position: absolute; bottom: 0; width: 14%; height: 55%;
+      background: #8b5e3c;
+      border: 1px solid #5c3a22;
+    }
+    .desk .leg-l { left: 12%; }
+    .desk .leg-r { right: 12%; }
+
+    /* cute pixel characters (CSS) */
+    .char {
+      position: absolute;
+      width: 28px; height: 40px;
+      image-rendering: pixelated;
+      z-index: 5;
+      transition: transform 0.3s ease;
+    }
+    .char .head {
+      width: 18px; height: 16px;
+      margin: 0 auto;
+      background: #f5d0b0;
+      border: 2px solid #5c3a22;
+      border-radius: 4px 4px 3px 3px;
+      position: relative;
+    }
+    .char .head::before, .char .head::after {
+      content: "";
+      position: absolute;
+      top: 5px; width: 3px; height: 3px;
+      background: #3e2a1a;
+      border-radius: 1px;
+    }
+    .char .head::before { left: 3px; }
+    .char .head::after { right: 3px; }
+    .char .body {
+      width: 20px; height: 16px;
+      margin: -1px auto 0;
+      background: #5b8def;
+      border: 2px solid #5c3a22;
+      border-radius: 3px;
+    }
+    .char.teacher .body { background: #8b5e3c; }
+    .char.teacher .head { background: #e8c4a0; }
+    .char .hair {
+      position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+      width: 20px; height: 8px;
+      background: #3e2a1a;
+      border: 2px solid #2a1a10;
+      border-radius: 4px 4px 0 0;
+    }
+    .char.student-o .body { background: #f0a060; }
+    .char.student-g .body { background: #6bb89a; }
+    .char.student-p .body { background: #c48ad4; }
+    .char.sleep .head::before,
+    .char.sleep .head::after {
+      height: 2px; top: 6px; width: 4px;
+    }
+    .char .zzz {
+      position: absolute; top: -10px; right: -6px;
+      font-size: 0.65rem; color: var(--muted); font-weight: 800;
+      animation: floatZ 1.6s ease-in-out infinite;
+    }
+    @keyframes floatZ {
+      0%, 100% { transform: translateY(0); opacity: 0.6; }
+      50% { transform: translateY(-4px); opacity: 1; }
+    }
+    .char.bounce { animation: bounce 1.2s ease-in-out infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .teacher-spot { left: 46%; top: 38%; }
+    .s1 { left: 14%; bottom: 30%; }
+    .s2 { left: 38%; bottom: 30%; }
+    .s3 { left: 62%; bottom: 30%; }
+    .s4 { left: 20%; bottom: 10%; }
+    .s5 { left: 46%; bottom: 10%; }
+    .s6 { left: 70%; bottom: 10%; }
+
+    .prop {
+      position: absolute;
+      font-size: 1.2rem;
+      z-index: 6;
+      filter: drop-shadow(1px 1px 0 rgba(0,0,0,.15));
+    }
+    .prop.clock-wall { top: 8%; left: 10%; font-size: 1rem; }
+    .prop.plant { bottom: 42%; left: 4%; }
+    .prop.lunch { bottom: 36%; left: 42%; }
+    .prop.book { bottom: 36%; left: 50%; }
+    .prop.sun { top: 12%; right: 12%; font-size: 1.4rem; }
+    .prop.moon { top: 12%; right: 12%; font-size: 1.4rem; }
+    .prop.star { top: 8%; left: 40%; }
+
+    .scene-badge {
+      position: absolute;
+      top: 8px; left: 8px;
+      background: rgba(255,250,242,0.92);
+      border: 2px solid var(--wood-dark);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--wood-deeper);
+      z-index: 10;
+      box-shadow: 0 2px 0 rgba(0,0,0,.1);
+    }
+
+    /* Scene mood overrides */
+    .scene[data-mood="holiday"] .wall { background: #fce8f0; }
+    .scene[data-mood="holiday"] .floor {
+      background: repeating-linear-gradient(90deg, #e8b890 0 28px, #d4a070 28px 30px);
+    }
+    .scene[data-mood="recess"] .window { background: #9fd4a8; }
+    .scene[data-mood="lunch"] .window { background: #f5d48a; }
+    .scene[data-mood="after"] .wall { background: #d9c8b0; }
+    .scene[data-mood="after"] .window { background: #6a7a9a; }
+    .scene[data-mood="before"] .window { background: #9ec8e8; }
+    .scene[data-mood="class"] .board { box-shadow: 2px 3px 0 rgba(0,0,0,.15), 0 0 12px rgba(240,193,75,0.25); }
+    .scene[data-mood="free"] .board { background: #5a7a68; }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .btn {
+      appearance: none;
+      border: 3px solid var(--wood-deeper);
+      border-radius: 12px;
+      padding: 12px 10px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--text);
+      background: linear-gradient(180deg, #ffe9c8, #f0d0a0);
+      box-shadow: 0 3px 0 var(--wood-deeper);
+      transition: transform .1s, box-shadow .1s;
+    }
+    .btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--wood-deeper);
+    }
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      filter: grayscale(0.3);
+    }
+    .btn.primary {
+      background: linear-gradient(180deg, #f0c14b, #e09830);
+      color: #3e2a1a;
+      grid-column: 1 / -1;
+    }
+    .btn.ghost {
+      background: var(--card);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(24px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(20px);
+      background: var(--wood-deeper);
+      color: #fff8ee;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      z-index: 50;
+      border: 2px solid #e8c9a0;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hint-card {
+      background: rgba(255,250,242,0.85);
+      border: 2px solid var(--wood);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .hint-card strong { color: var(--wood-deeper); }
+
+    .next-list {
+      background: var(--card);
+      border: 3px solid var(--wood-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .next-list h3 {
+      font-size: 0.85rem;
+      color: var(--wood-deeper);
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+    .next-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 0;
+      border-top: 1px dashed var(--cream-dark);
+      font-size: 0.82rem;
+    }
+    .next-item:first-of-type { border-top: none; }
+    .next-item .p { font-weight: 800; color: var(--wood-dark); min-width: 2.2em; }
+    .next-item .free { color: var(--muted); font-style: italic; }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      padding: 4px 8px 12px;
+    }
+
+    @media (min-width: 480px) {
+      .scene-frame { aspect-ratio: 4 / 3; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back-link" href="index.html" title="返回時間表">← 課表</a>
+    <div class="avatar" id="avatarFace" aria-hidden="true">🧑‍🏫</div>
+    <div class="top-meta">
+      <div class="code" id="topCode">TLC</div>
+      <div class="sub" id="topNames">載入中…</div>
+    </div>
+    <div class="currency" title="準時到堂分數" aria-label="準時到堂分數">
+      <span class="coin">★</span>
+      <span id="pointsVal">0</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="status-card">
+      <div class="status-row">
+        <div class="clock" id="clockHm">--:--</div>
+        <span class="day-pill" id="dayPill">—</span>
+      </div>
+      <div class="slot-label" id="slotLabel">讀取香港時間…</div>
+      <div class="countdown relaxed" id="countdown">—</div>
+      <div class="lesson-line" id="lessonLine">
+        <strong>今節</strong>：—<br />
+        <span class="muted">真實校曆循環日 · 一般／BF 鐘聲</span>
+      </div>
+    </div>
+
+    <div class="scene-frame" aria-label="課室場景">
+      <div class="scene" id="scene" data-mood="before">
+        <div class="wall"></div>
+        <div class="ceiling"></div>
+        <div class="floor"></div>
+        <div class="window" id="sceneWindow"></div>
+        <div class="board"><div class="board-text" id="boardText">歡迎</div></div>
+        <div class="desk-row r1">
+          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
+          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
+          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
+        </div>
+        <div class="desk-row r2">
+          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
+          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
+          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
+        </div>
+        <div class="char teacher teacher-spot" id="charTeacher">
+          <div class="hair"></div>
+          <div class="head"></div>
+          <div class="body"></div>
+        </div>
+        <div class="char student-o s1" id="c1"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
+        <div class="char student-g s2" id="c2"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
+        <div class="char student-p s3" id="c3"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
+        <div class="char student-o s4" id="c4"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
+        <div class="char student-g s5" id="c5"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
+        <div class="char student-p s6" id="c6"><div class="hair"></div><div class="head"></div><div class="body"></div></div>
+        <span class="prop clock-wall" id="propClock">🕐</span>
+        <span class="prop plant" id="propPlant">🪴</span>
+        <span class="prop lunch" id="propLunch" hidden>🍱</span>
+        <span class="prop book" id="propBook" hidden>📖</span>
+        <span class="prop sun" id="propSun">☀️</span>
+        <span class="prop moon" id="propMoon" hidden>🌙</span>
+        <span class="scene-badge" id="sceneBadge">課室</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn primary" id="checkInBtn" disabled>★ 準時到堂簽到</button>
+      <button type="button" class="btn ghost" id="refreshBtn">重新整理狀態</button>
+      <button type="button" class="btn ghost" id="changeTeacherBtn">換教師代碼</button>
+    </div>
+
+    <div class="hint-card" id="hintCard">
+      <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
+      喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集 ★ 分數（每節每日一次）。
+    </div>
+
+    <div class="next-list">
+      <h3>今日其餘節次</h3>
+      <div id="todayList"></div>
+    </div>
+
+    <p class="footer-note">世界龍岡學校劉皇發中學 · 模擬遊戲用真實校曆／鐘聲／時間表資料 · zh-HK</p>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="data.js"></script>
+  <script src="bells.js"></script>
+  <script src="calendar.js"></script>
+  <script>
+(function () {
+  'use strict';
+
+  var LS_TEACHER = 'tt_teacher_code';
+  var LS_POINTS = 'tt_game_ontime_points';
+  var LS_CLAIMED = 'tt_game_ontime_claimed'; // JSON { "YYYY-MM-DD:P3": true }
+  var LS_CYCLE = 'tt_cycle_day';
+  var LS_CYCLE_DATE = 'tt_cycle_date';
+  var LS_ADMIN_OVERRIDE = 'tt_admin_override_day';
+  var ONTIME_WINDOW_MIN = 5;
+
+  var DATA = window.TIMETABLE_DATA;
+  var BELLS = window.BELLS_DATA;
+  var CAL = window.CALENDAR_DATA;
+  var schoolCycleConfig = null;
+
+  var teachersByCode = {};
+  (DATA.teachers || []).forEach(function (t) {
+    teachersByCode[t.code.toUpperCase()] = t;
+  });
+
+  var state = {
+    teacher: null,
+    points: 0,
+    claimed: {}
+  };
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  function todayYmdHK() {
+    try {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Hong_Kong',
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      }).format(new Date());
+    } catch (e) {
+      var t = new Date(Date.now() + 8 * 3600 * 1000);
+      return t.getUTCFullYear() + '-' + pad2(t.getUTCMonth() + 1) + '-' + pad2(t.getUTCDate());
+    }
+  }
+
+  function nowHKTParts() {
+    try {
+      var parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Hong_Kong',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false, hourCycle: 'h23'
+      }).formatToParts(new Date());
+      var map = {};
+      parts.forEach(function (p) { if (p.type !== 'literal') map[p.type] = p.value; });
+      var hh = parseInt(map.hour, 10);
+      var mm = parseInt(map.minute, 10);
+      var ss = parseInt(map.second, 10);
+      return {
+        ymd: map.year + '-' + map.month + '-' + map.day,
+        hour: hh, minute: mm, second: ss,
+        hm: pad2(hh) + ':' + pad2(mm),
+        minutes: hh * 60 + mm
+      };
+    } catch (e) {
+      var t = new Date(Date.now() + 8 * 3600 * 1000);
+      var hh = t.getUTCHours(), mm = t.getUTCMinutes(), ss = t.getUTCSeconds();
+      return {
+        ymd: t.getUTCFullYear() + '-' + pad2(t.getUTCMonth() + 1) + '-' + pad2(t.getUTCDate()),
+        hour: hh, minute: mm, second: ss,
+        hm: pad2(hh) + ':' + pad2(mm),
+        minutes: hh * 60 + mm
+      };
+    }
+  }
+
+  function hmToMinutes(hm) {
+    if (!hm || hm.indexOf(':') < 0) return null;
+    var p = hm.split(':');
+    return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+  }
+
+  function minutesLeftUntilHm(endHm) {
+    var endM = hmToMinutes(endHm);
+    if (endM == null) return null;
+    var now = nowHKTParts();
+    var left = endM * 60 - (now.hour * 3600 + now.minute * 60 + (now.second || 0));
+    if (left <= 0) return 0;
+    return Math.ceil(left / 60);
+  }
+
+  function formatCountdownZh(mins) {
+    if (mins == null) return '';
+    if (mins <= 0) return '即將完結';
+    if (mins >= 60) {
+      var h = Math.floor(mins / 60);
+      var m = mins % 60;
+      return m ? ('仲有 ' + h + ' 小時 ' + m + ' 分鐘') : ('仲有 ' + h + ' 小時');
+    }
+    return '仲有 ' + mins + ' 分鐘';
+  }
+
+  function scheduleIdForDay(d) {
+    if (!BELLS || !BELLS.byCycleDay) return (d === 5 || d === 10) ? 'bf' : 'general';
+    return BELLS.byCycleDay[String(d)] || ((d === 5 || d === 10) ? 'bf' : 'general');
+  }
+
+  function scheduleForDay(d) {
+    if (!BELLS || !BELLS.schedules) return null;
+    return BELLS.schedules[scheduleIdForDay(d)] || null;
+  }
+
+  function periodsForDay(d) {
+    return (d === 5 || d === 10) ? 8 : 7;
+  }
+
+  function periodBell(d, p) {
+    var sched = scheduleForDay(d);
+    if (!sched || !sched.periods) return null;
+    return sched.periods[String(p)] || null;
+  }
+
+  function calendarCycleFor(ymd) {
+    if (!CAL || !CAL.days) return undefined;
+    if (!Object.prototype.hasOwnProperty.call(CAL.days, ymd)) return undefined;
+    var v = CAL.days[ymd];
+    if (v == null) return null;
+    var n = parseInt(v, 10);
+    return (n >= 1 && n <= 10) ? n : null;
+  }
+
+  function getLocalManualOverride() {
+    try {
+      var d = localStorage.getItem(LS_CYCLE);
+      var dt = localStorage.getItem(LS_CYCLE_DATE);
+      if (!d) return null;
+      if (dt && dt !== todayYmdHK()) return null;
+      var n = parseInt(d, 10);
+      return (n >= 1 && n <= 10) ? n : null;
+    } catch (e) { return null; }
+  }
+
+  function getLocalAdminOverride() {
+    try {
+      var d = localStorage.getItem(LS_ADMIN_OVERRIDE);
+      if (!d) return null;
+      var n = parseInt(d, 10);
+      return (n >= 1 && n <= 10) ? n : null;
+    } catch (e) { return null; }
+  }
+
+  function resolveTodayCycle() {
+    var ymd = todayYmdHK();
+    var conf = schoolCycleConfig && schoolCycleConfig.overrideDay;
+    if (conf != null && conf !== '') {
+      var cn = parseInt(conf, 10);
+      if (cn >= 1 && cn <= 10) {
+        return { day: cn, source: 'config', ymd: ymd, label: '全校設定' };
+      }
+    }
+    var admin = getLocalAdminOverride();
+    if (admin != null) return { day: admin, source: 'admin-local', ymd: ymd, label: '本機管理員覆寫' };
+    var manual = getLocalManualOverride();
+    if (manual != null) return { day: manual, source: 'manual', ymd: ymd, label: '本機手動覆寫' };
+    var cal = calendarCycleFor(ymd);
+    if (cal === undefined) return { day: null, source: 'missing', ymd: ymd, label: '校曆無此日期' };
+    if (cal == null) return { day: null, source: 'holiday', ymd: ymd, label: '校曆' };
+    return { day: cal, source: 'calendar', ymd: ymd, label: '校曆' };
+  }
+
+  function findCurrentSlot(cycleDay) {
+    var sched = scheduleForDay(cycleDay);
+    if (!sched || !sched.slots || !sched.slots.length) return null;
+    var mins = nowHKTParts().minutes;
+    var slots = sched.slots;
+    var firstStart = hmToMinutes(slots[0].start);
+    var lastEnd = hmToMinutes(slots[slots.length - 1].end);
+    if (firstStart != null && mins < firstStart) {
+      return { kind: 'before', period: null, key: null, label: '上課前', slot: null };
+    }
+    if (lastEnd != null && mins >= lastEnd) {
+      return { kind: 'after', period: null, key: null, label: '放學後', slot: null };
+    }
+    for (var i = 0; i < slots.length; i++) {
+      var s = slots[i];
+      var a = hmToMinutes(s.start);
+      var b = hmToMinutes(s.end);
+      if (a == null || b == null) continue;
+      if (mins >= a && mins < b) {
+        if (s.period != null) {
+          return { kind: 'period', period: s.period, key: s.key, label: s.label, slot: s };
+        }
+        var label = s.label || '';
+        if (s.key === 'recess') label = '小息中';
+        else if (s.key === 'lunch') label = '午飯中';
+        else if (s.key === 'homeroom') label = '班主任／早會中';
+        else if (s.key === 'reading') label = '閱讀時段中';
+        else label = label ? (label + '中') : '休息中';
+        return { kind: 'break', period: null, key: s.key, label: label, slot: s };
+      }
+      if (i + 1 < slots.length) {
+        var nextA = hmToMinutes(slots[i + 1].start);
+        if (nextA != null && mins >= b && mins < nextA) {
+          return { kind: 'break', period: null, key: 'gap', label: '轉堂中', slot: null };
+        }
+      }
+    }
+    return null;
+  }
+
+  function loadPoints() {
+    try {
+      var n = parseInt(localStorage.getItem(LS_POINTS) || '0', 10);
+      state.points = isNaN(n) ? 0 : Math.max(0, n);
+    } catch (e) { state.points = 0; }
+    try {
+      state.claimed = JSON.parse(localStorage.getItem(LS_CLAIMED) || '{}') || {};
+    } catch (e2) { state.claimed = {}; }
+    document.getElementById('pointsVal').textContent = String(state.points);
+  }
+
+  function savePoints() {
+    try {
+      localStorage.setItem(LS_POINTS, String(state.points));
+      localStorage.setItem(LS_CLAIMED, JSON.stringify(state.claimed));
+    } catch (e) {}
+    document.getElementById('pointsVal').textContent = String(state.points);
+  }
+
+  function toast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.classList.remove('show'); }, 2200);
+  }
+
+  function lookupTeacher(code) {
+    if (!code) return null;
+    return teachersByCode[String(code).trim().toUpperCase()] || null;
+  }
+
+  function resolveTeacher() {
+    var code = null;
+    try { code = localStorage.getItem(LS_TEACHER); } catch (e) {}
+    var t = lookupTeacher(code) || lookupTeacher('TLC');
+    if (!t && DATA.teachers && DATA.teachers.length) t = DATA.teachers[0];
+    state.teacher = t;
+    if (t) {
+      try { localStorage.setItem(LS_TEACHER, t.code); } catch (e2) {}
+      document.getElementById('topCode').textContent = t.code;
+      document.getElementById('topNames').textContent =
+        [t.chi, t.eng].filter(Boolean).join(' · ') || t.code;
+      var face = '🧑‍🏫';
+      var subjHint = JSON.stringify(t.schedule || {}).toUpperCase();
+      if (subjHint.indexOf('MATH') >= 0 && subjHint.indexOf('ICT') < 0) face = '📐';
+      else if (subjHint.indexOf('ICT') >= 0) face = '💻';
+      else if (subjHint.indexOf('ENG') >= 0) face = '📘';
+      document.getElementById('avatarFace').textContent = face;
+    }
+    return t;
+  }
+
+  function lessonFor(day, period) {
+    if (!state.teacher) return null;
+    var daySched = state.teacher.schedule[String(day)] || {};
+    return daySched[String(period)] || null;
+  }
+
+  function setCharsVisible(ids, show) {
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = show ? '' : 'none';
+    });
+  }
+
+  function setSleep(ids, sleep) {
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('sleep', !!sleep);
+      var z = el.querySelector('.zzz');
+      if (sleep && !z) {
+        var span = document.createElement('span');
+        span.className = 'zzz';
+        span.textContent = 'z';
+        el.appendChild(span);
+      } else if (!sleep && z) {
+        z.remove();
+      }
+    });
+  }
+
+  function setBounce(ids, on) {
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.toggle('bounce', !!on);
+    });
+  }
+
+  function paintScene(ctx) {
+    var scene = document.getElementById('scene');
+    var board = document.getElementById('boardText');
+    var badge = document.getElementById('sceneBadge');
+    var mood = 'before';
+    var boardMsg = '歡迎返學';
+    var badgeMsg = '課室';
+
+    document.getElementById('propLunch').hidden = true;
+    document.getElementById('propBook').hidden = true;
+    document.getElementById('propSun').hidden = false;
+    document.getElementById('propMoon').hidden = true;
+
+    var allS = ['c1','c2','c3','c4','c5','c6'];
+    setSleep(allS.concat(['charTeacher']), false);
+    setBounce(allS, false);
+
+    if (ctx.holiday) {
+      mood = 'holiday';
+      boardMsg = '今日假期\n好好休息';
+      badgeMsg = '假期';
+      setCharsVisible(['charTeacher'], true);
+      setCharsVisible(allS, false);
+      setSleep(['charTeacher'], true);
+      document.getElementById('propSun').hidden = false;
+    } else if (!ctx.slot || ctx.slot.kind === 'before') {
+      mood = 'before';
+      boardMsg = '早晨！\n準備上課';
+      badgeMsg = '上課前';
+      setCharsVisible(['charTeacher'], true);
+      setCharsVisible(allS.slice(0, 2), true);
+      setCharsVisible(allS.slice(2), false);
+    } else if (ctx.slot.kind === 'after') {
+      mood = 'after';
+      boardMsg = '放學喇\n再見！';
+      badgeMsg = '放學後';
+      setCharsVisible(['charTeacher'], false);
+      setCharsVisible(allS, false);
+      document.getElementById('propSun').hidden = true;
+      document.getElementById('propMoon').hidden = false;
+    } else if (ctx.slot.kind === 'break') {
+      var key = ctx.slot.key;
+      if (key === 'recess' || key === 'gap') {
+        mood = 'recess';
+        boardMsg = '小息時間\n休息一下';
+        badgeMsg = '小息';
+        setCharsVisible(['charTeacher'], false);
+        setCharsVisible(allS, true);
+        setBounce(allS, true);
+      } else if (key === 'lunch') {
+        mood = 'lunch';
+        boardMsg = '午飯時間\n慢慢食';
+        badgeMsg = '午飯';
+        setCharsVisible(['charTeacher'], false);
+        setCharsVisible(allS, true);
+        document.getElementById('propLunch').hidden = false;
+      } else if (key === 'reading') {
+        mood = 'class';
+        boardMsg = '閱讀時段\n靜心閱讀';
+        badgeMsg = '閱讀';
+        setCharsVisible(['charTeacher'], true);
+        setCharsVisible(allS, true);
+        document.getElementById('propBook').hidden = false;
+      } else if (key === 'homeroom') {
+        mood = 'class';
+        boardMsg = '早會／班主任';
+        badgeMsg = '早會';
+        setCharsVisible(['charTeacher'], true);
+        setCharsVisible(allS, true);
+      } else {
+        mood = 'recess';
+        boardMsg = ctx.slot.label || '休息中';
+        badgeMsg = '休息';
+        setCharsVisible(['charTeacher'], true);
+        setCharsVisible(allS.slice(0, 3), true);
+        setCharsVisible(allS.slice(3), false);
+      }
+    } else if (ctx.slot.kind === 'period') {
+      var L = ctx.lesson;
+      if (L) {
+        mood = 'class';
+        boardMsg = (L.subjectShort || L.subject || '課堂') + '\n' + (L.classShort || L.class || '');
+        badgeMsg = '第' + ctx.slot.period + '節 · ' + (L.room || '');
+        setCharsVisible(['charTeacher'], true);
+        setCharsVisible(allS, true);
+      } else {
+        mood = 'free';
+        boardMsg = '空堂\n喝杯茶～';
+        badgeMsg = '空堂 · P' + ctx.slot.period;
+        setCharsVisible(['charTeacher'], true);
+        setCharsVisible(allS, false);
+        setSleep(['charTeacher'], true);
+      }
+    }
+
+    scene.setAttribute('data-mood', mood);
+    board.textContent = boardMsg;
+    badge.textContent = badgeMsg;
+  }
+
+  function claimKey(ymd, period) {
+    return ymd + ':P' + period;
+  }
+
+  function canCheckIn(ctx) {
+    if (!ctx || ctx.holiday || !ctx.slot || ctx.slot.kind !== 'period') return false;
+    if (!ctx.lesson) return false; // only when you have a real lesson
+    var slot = ctx.slot.slot;
+    if (!slot || !slot.start) return false;
+    var startM = hmToMinutes(slot.start);
+    var nowM = nowHKTParts().minutes;
+    if (startM == null) return false;
+    var elapsed = nowM - startM;
+    if (elapsed < 0 || elapsed > ONTIME_WINDOW_MIN) return false;
+    var key = claimKey(ctx.ymd, ctx.slot.period);
+    if (state.claimed[key]) return false;
+    return true;
+  }
+
+  function doCheckIn(ctx) {
+    if (!canCheckIn(ctx)) {
+      toast('而家唔可以簽到哦');
+      return;
+    }
+    var key = claimKey(ctx.ymd, ctx.slot.period);
+    state.claimed[key] = true;
+    state.points += 10;
+    savePoints();
+    toast('★ +10　準時到堂！P' + ctx.slot.period);
+    render();
+  }
+
+  function buildTodayList(day) {
+    var box = document.getElementById('todayList');
+    if (!day || !state.teacher) {
+      box.innerHTML = '<div class="next-item"><span class="free">今日無正規日課</span></div>';
+      return;
+    }
+    var maxp = periodsForDay(day);
+    var html = '';
+    var cur = findCurrentSlot(day);
+    var curP = (cur && cur.kind === 'period') ? cur.period : null;
+    for (var p = 1; p <= maxp; p++) {
+      var L = lessonFor(day, p);
+      var bell = periodBell(day, p);
+      var time = bell ? (bell.start + '–' + bell.end) : '';
+      var mark = (curP === p) ? ' ←' : '';
+      if (L) {
+        html += '<div class="next-item"><span class="p">P' + p + mark + '</span><span>' +
+          (L.subjectShort || L.subject) + ' · ' + (L.classShort || L.class) +
+          (L.room ? (' @ ' + L.room) : '') +
+          '</span><span class="muted">' + time + '</span></div>';
+      } else {
+        html += '<div class="next-item"><span class="p">P' + p + mark + '</span><span class="free">空堂</span><span class="muted">' + time + '</span></div>';
+      }
+    }
+    box.innerHTML = html || '<div class="next-item"><span class="free">—</span></div>';
+  }
+
+  function getContext() {
+    var now = nowHKTParts();
+    var r = resolveTodayCycle();
+    var holiday = (r.day == null);
+    var slot = (!holiday && r.day != null) ? findCurrentSlot(r.day) : null;
+    var lesson = null;
+    if (slot && slot.kind === 'period' && r.day != null) {
+      lesson = lessonFor(r.day, slot.period);
+    }
+    return {
+      ymd: now.ymd,
+      hm: now.hm,
+      cycle: r,
+      holiday: holiday,
+      slot: slot,
+      lesson: lesson,
+      schedId: r.day != null ? scheduleIdForDay(r.day) : null
+    };
+  }
+
+  function render() {
+    var ctx = getContext();
+    document.getElementById('clockHm').textContent = ctx.hm;
+
+    var pill = document.getElementById('dayPill');
+    pill.classList.remove('bf', 'holiday');
+    if (ctx.holiday) {
+      pill.textContent = '無上課／假期';
+      pill.classList.add('holiday');
+    } else {
+      var sid = ctx.schedId === 'bf' ? 'BF' : '一般';
+      pill.textContent = 'Day ' + ctx.cycle.day + ' · ' + sid;
+      if (ctx.schedId === 'bf') pill.classList.add('bf');
+    }
+
+    var slotLabel = document.getElementById('slotLabel');
+    var cd = document.getElementById('countdown');
+    var lessonLine = document.getElementById('lessonLine');
+
+    if (ctx.holiday) {
+      slotLabel.textContent = '今日無正規循環日課';
+      cd.textContent = '享受休息嘅一天';
+      cd.className = 'countdown relaxed';
+      lessonLine.innerHTML = '<strong>狀態</strong>：假期／活動日<br /><span class="muted">來源：' + (ctx.cycle.label || '校曆') + '</span>';
+    } else if (!ctx.slot) {
+      slotLabel.textContent = '未能判斷時段';
+      cd.textContent = '—';
+      cd.className = 'countdown relaxed';
+      lessonLine.innerHTML = '<strong>Day ' + ctx.cycle.day + '</strong>';
+    } else if (ctx.slot.kind === 'period') {
+      slotLabel.textContent = '現正：' + (ctx.slot.label || ('第' + ctx.slot.period + '節'));
+      var endHm = ctx.slot.slot && ctx.slot.slot.end;
+      var left = endHm ? minutesLeftUntilHm(endHm) : null;
+      cd.textContent = formatCountdownZh(left) + (endHm ? ('（至 ' + endHm + '）') : '');
+      cd.className = 'countdown';
+      if (ctx.lesson) {
+        lessonLine.innerHTML =
+          '<strong>' + (ctx.lesson.subjectShort || ctx.lesson.subject) + '</strong> · ' +
+          (ctx.lesson.classShort || ctx.lesson.class || '') +
+          (ctx.lesson.room ? (' · 📍 ' + ctx.lesson.room) : '') +
+          '<br /><span class="muted">' + (ctx.slot.slot.start || '') + '–' + (ctx.slot.slot.end || '') +
+          ' · ' + (state.teacher ? state.teacher.code : '') + '</span>';
+      } else {
+        lessonLine.innerHTML =
+          '<strong>空堂</strong> · 第' + ctx.slot.period + '節<br />' +
+          '<span class="muted">' + (ctx.slot.slot.start || '') + '–' + (ctx.slot.slot.end || '') + ' · 休息／備課</span>';
+      }
+    } else {
+      slotLabel.textContent = ctx.slot.label;
+      var end2 = ctx.slot.slot && ctx.slot.slot.end;
+      if (end2) {
+        cd.textContent = formatCountdownZh(minutesLeftUntilHm(end2)) + '（至 ' + end2 + '）';
+        cd.className = 'countdown';
+      } else {
+        cd.textContent = ctx.slot.kind === 'before' ? '即將開始上學日' : '今日課堂完結';
+        cd.className = 'countdown relaxed';
+      }
+      // preview next lesson if break
+      var nextInfo = '';
+      if (ctx.slot.kind === 'break' && ctx.cycle.day != null) {
+        var sched = scheduleForDay(ctx.cycle.day);
+        if (sched && sched.slots) {
+          var nowM = nowHKTParts().minutes;
+          for (var i = 0; i < sched.slots.length; i++) {
+            var s = sched.slots[i];
+            if (s.period != null && hmToMinutes(s.start) > nowM) {
+              var nL = lessonFor(ctx.cycle.day, s.period);
+              nextInfo = nL
+                ? ('下一節 P' + s.period + '：' + (nL.subjectShort || nL.subject) + ' · ' + (nL.classShort || ''))
+                : ('下一節 P' + s.period + '：空堂');
+              break;
+            }
+          }
+        }
+      }
+      lessonLine.innerHTML =
+        '<strong>' + ctx.slot.label + '</strong>' +
+        (ctx.slot.slot ? (' · ' + ctx.slot.slot.start + '–' + ctx.slot.slot.end) : '') +
+        (nextInfo ? ('<br /><span class="muted">' + nextInfo + '</span>') : '');
+    }
+
+    paintScene(ctx);
+    buildTodayList(ctx.holiday ? null : ctx.cycle.day);
+
+    var btn = document.getElementById('checkInBtn');
+    if (canCheckIn(ctx)) {
+      btn.disabled = false;
+      btn.textContent = '★ 準時到堂簽到（+10）';
+    } else if (ctx.slot && ctx.slot.kind === 'period' && ctx.lesson) {
+      var k = claimKey(ctx.ymd, ctx.slot.period);
+      if (state.claimed[k]) {
+        btn.disabled = true;
+        btn.textContent = '✓ 本節已簽到';
+      } else {
+        btn.disabled = true;
+        btn.textContent = '★ 超過準時窗口（首 ' + ONTIME_WINDOW_MIN + ' 分鐘）';
+      }
+    } else {
+      btn.disabled = true;
+      btn.textContent = '★ 準時到堂簽到';
+    }
+
+    return ctx;
+  }
+
+  document.getElementById('checkInBtn').addEventListener('click', function () {
+    doCheckIn(getContext());
+  });
+  document.getElementById('refreshBtn').addEventListener('click', function () {
+    render();
+    toast('已更新 · ' + nowHKTParts().hm + ' HKT');
+  });
+  document.getElementById('changeTeacherBtn').addEventListener('click', function () {
+    var cur = state.teacher ? state.teacher.code : 'TLC';
+    var input = window.prompt('輸入教師代碼（例如 TLC）', cur);
+    if (input == null) return;
+    var t = lookupTeacher(input);
+    if (!t) {
+      toast('找不到教師：' + input);
+      return;
+    }
+    try { localStorage.setItem(LS_TEACHER, t.code); } catch (e) {}
+    resolveTeacher();
+    render();
+    toast('已切換至 ' + t.code);
+  });
+
+  function tick() {
+    render();
+  }
+
+  function startTicks() {
+    tick();
+    var parts = nowHKTParts();
+    var msToNext = Math.max(1000, (60 - (parts.second || 0)) * 1000);
+    setTimeout(function () {
+      tick();
+      setInterval(tick, 30 * 1000);
+    }, msToNext);
+  }
+
+  loadPoints();
+  resolveTeacher();
+
+  fetch('cycle-config.json', { cache: 'no-store' })
+    .then(function (res) { return res.ok ? res.json() : null; })
+    .then(function (cfg) {
+      if (cfg && typeof cfg === 'object') schoolCycleConfig = cfg;
+    })
+    .catch(function () {})
+    .then(function () { startTicks(); });
+})();
+  </script>
+</body>
+</html>
