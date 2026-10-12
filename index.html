@@ -1254,6 +1254,165 @@
     .tab[data-tab="nowfree"] {
       font-weight: 800;
     }
+    .tab[data-tab="meet"] {
+      font-weight: 800;
+    }
+
+    /* 約開會 */
+    .meet-picks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 36px;
+      margin: 8px 0 4px;
+    }
+    .meet-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef4ff;
+      border: 2px solid var(--primary, #3b6ea5);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 4px 8px 4px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .meet-chip .code {
+      font-weight: 900;
+      color: var(--primary, #3b6ea5);
+      letter-spacing: 0.02em;
+    }
+    .meet-chip button {
+      appearance: none;
+      border: none;
+      background: rgba(0,0,0,0.08);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--muted);
+    }
+    .meet-chip button:active { transform: scale(0.95); }
+    .meet-controls {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .meet-controls .row-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: end;
+    }
+    .meet-controls .grow { flex: 1; min-width: 140px; }
+    .meet-day-block {
+      margin-top: 12px;
+      border: 2px solid var(--border, #ddd);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--card, #fff);
+    }
+    .meet-day-block.is-today {
+      border-color: var(--primary, #3b6ea5);
+      box-shadow: 0 0 0 2px rgba(59,110,165,0.15);
+    }
+    .meet-day-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #f5f7fb;
+      font-weight: 800;
+      font-size: 0.88rem;
+    }
+    .meet-day-block.is-today .meet-day-head {
+      background: #e8f0fa;
+      color: var(--primary, #3b6ea5);
+    }
+    .meet-day-body {
+      padding: 8px 10px 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .meet-slot {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #e7f6ec;
+      border: 2px solid #4a9b6e;
+      color: #1e5c3a;
+      font-weight: 800;
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .meet-slot .bell {
+      font-weight: 600;
+      font-size: 0.72rem;
+      opacity: 0.85;
+    }
+    .meet-none {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 4px 2px;
+    }
+    .meet-summary {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .meet-error {
+      color: #b42318;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-top: 6px;
+      display: none;
+    }
+    .meet-error.show { display: block; }
+    .meet-suggest {
+      position: relative;
+    }
+    .meet-suggest-box {
+      display: none;
+      position: absolute;
+      left: 0; right: 0;
+      top: calc(100% + 4px);
+      background: #fff;
+      border: 2px solid var(--border, #ccc);
+      border-radius: 10px;
+      max-height: 220px;
+      overflow: auto;
+      z-index: 20;
+      box-shadow: 0 6px 16px rgba(0,0,0,.12);
+    }
+    .meet-suggest-box.show { display: block; }
+    .meet-suggest-box button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: transparent;
+      padding: 8px 10px;
+      font: inherit;
+      cursor: pointer;
+    }
+    .meet-suggest-box button:hover,
+    .meet-suggest-box button:focus {
+      background: #eef4ff;
+    }
+    .meet-suggest-box .mcode {
+      font-weight: 900;
+      color: var(--primary, #3b6ea5);
+      margin-right: 6px;
+    }
     .nowfree-meta {
       font-size: 0.78rem;
       color: var(--muted);
@@ -1814,6 +1973,7 @@
     <nav class="tabs" id="mainTabs">
       <button class="tab active" data-tab="day" type="button">循環日課表</button>
       <button class="tab" data-tab="nowfree" type="button">即時空堂</button>
+      <button class="tab" data-tab="meet" type="button">約開會</button>
       <button class="tab" data-tab="overview" type="button">全日概覽</button>
       <button class="tab" data-tab="cover" type="button">代堂助手</button>
       <button class="tab" data-tab="search" type="button">搜尋課室／班別</button>
@@ -1869,6 +2029,54 @@
         <div class="cover-list" id="nowfreeList"></div>
       </div>
       <div class="empty" id="nowfreeEmpty" hidden></div>
+    </section>
+
+    <!-- 約開會: common free periods -->
+    <section class="panel" id="panel-meet">
+      <div class="card">
+        <h2>約開會</h2>
+        <p class="hint" style="margin-bottom:10px;">揀 <strong>1–8 位教師</strong>，計算十日循環內<strong>全部都空堂</strong>嘅節次（可選連續幾節）。方便約開會／備課。</p>
+        <div class="cover-step">① 揀教師（最多 8 位）</div>
+        <div class="meet-picks" id="meetPicks" aria-live="polite"></div>
+        <p class="hint" id="meetPickHint">尚未選擇教師</p>
+        <div class="meet-controls">
+          <div class="meet-suggest">
+            <label class="field-label" for="meetTeacherInput">加入教師（ShortName／中文名）</label>
+            <div class="row-inline">
+              <div class="grow" style="position:relative;">
+                <input type="text" id="meetTeacherInput" list="teacherList" placeholder="例如 TLC 或 曹…" autocomplete="off" autocapitalize="characters" />
+                <div class="meet-suggest-box" id="meetSuggestBox" role="listbox"></div>
+              </div>
+              <button class="btn" id="meetAddBtn" type="button">加入</button>
+            </div>
+          </div>
+          <div>
+            <div class="cover-step">② 連續空堂</div>
+            <label class="field-label" for="meetConsec">需要連續幾節</label>
+            <select id="meetConsec">
+              <option value="1" selected>1 節</option>
+              <option value="2">2 節連續</option>
+              <option value="3">3 節連續</option>
+            </select>
+          </div>
+          <div class="row-inline">
+            <button class="btn" id="meetComputeBtn" type="button">計算共同空堂</button>
+            <button class="btn btn-ghost" id="meetClearBtn" type="button">清空選擇</button>
+          </div>
+          <div class="meet-error" id="meetError"></div>
+        </div>
+      </div>
+
+      <div class="card" id="meetResultsCard" hidden>
+        <div class="cover-summary-bar">
+          <h2 style="margin:0;">共同空堂結果</h2>
+          <span class="badge-count" id="meetCount"></span>
+        </div>
+        <p class="meet-summary" id="meetSummary"></p>
+        <p class="hint" id="meetTodayHint" style="margin-bottom:8px;"></p>
+        <div id="meetResults"></div>
+      </div>
+      <div class="empty" id="meetEmpty" hidden>未有結果。請加入教師後按「計算共同空堂」。</div>
     </section>
 
     <!-- Overview -->
@@ -3522,6 +3730,7 @@
       p.classList.toggle('active', p.id === 'panel-' + name);
     });
     if (name === 'nowfree') renderNowFree();
+    if (name === 'meet' && typeof renderMeetPanel === 'function') renderMeetPanel();
     if (name === 'cover') {
       if (typeof applyCoverGate === 'function') applyCoverGate();
       if (typeof isCoverUnlocked === 'function' && isCoverUnlocked() &&
@@ -5302,6 +5511,8 @@
     });
   });
 
+  if (typeof wireMeetPanel === 'function') wireMeetPanel();
+
   if (ftSearchInput) {
     ftSearchInput.addEventListener('input', function () {
       if (state.tab === 'formteachers') renderFormTeachers();
@@ -5749,7 +5960,310 @@
     return free;
   }
 
+  /* ===== 約開會：共同空堂 ===== */
+  var meetSelected = []; // teacher objects, max 8
+  var MEET_MAX = 8;
+
+  function meetIsFree(t, day, period) {
+    if (!t || !t.schedule) return false;
+    var daySched = t.schedule[String(day)] || {};
+    return !daySched[String(period)];
+  }
+
+  function meetAllFree(teachers, day, period) {
+    for (var i = 0; i < teachers.length; i++) {
+      if (!meetIsFree(teachers[i], day, period)) return false;
+    }
+    return teachers.length > 0;
+  }
+
+  function meetFindSlots(teachers, consec) {
+    var out = [];
+    if (!teachers.length) return out;
+    consec = Math.max(1, Math.min(3, consec || 1));
+    for (var d = 1; d <= 10; d++) {
+      var maxP = periodsForDay(d);
+      for (var p = 1; p <= maxP - consec + 1; p++) {
+        var ok = true;
+        for (var k = 0; k < consec; k++) {
+          if (!meetAllFree(teachers, d, p + k)) { ok = false; break; }
+        }
+        if (ok) out.push({ day: d, start: p, end: p + consec - 1, consec: consec });
+      }
+    }
+    return out;
+  }
+
+  function meetLookupTeacher(q) {
+    q = String(q || '').trim();
+    if (!q) return null;
+    var up = q.toUpperCase();
+    if (teachersByCode[up]) return teachersByCode[up];
+    var found = null;
+    DATA.teachers.forEach(function (t) {
+      if (found) return;
+      if ((t.code || '').toUpperCase() === up) found = t;
+      else if ((t.chi || '') === q) found = t;
+      else if ((t.eng || '').toUpperCase() === up) found = t;
+      else if ((t.chi || '').indexOf(q) >= 0) found = t;
+      else if (((t.eng || '') + t.code).toUpperCase().indexOf(up) >= 0) found = t;
+    });
+    return found;
+  }
+
+  function meetAddTeacher(codeOrName) {
+    var err = document.getElementById('meetError');
+    err.classList.remove('show');
+    err.textContent = '';
+    var t = meetLookupTeacher(codeOrName);
+    if (!t) {
+      err.textContent = '找不到教師：' + codeOrName;
+      err.classList.add('show');
+      return false;
+    }
+    if (meetSelected.some(function (x) { return x.code === t.code; })) {
+      err.textContent = t.code + ' 已在名單中';
+      err.classList.add('show');
+      return false;
+    }
+    if (meetSelected.length >= MEET_MAX) {
+      err.textContent = '最多揀 ' + MEET_MAX + ' 位教師';
+      err.classList.add('show');
+      return false;
+    }
+    meetSelected.push(t);
+    renderMeetPicks();
+    return true;
+  }
+
+  function meetRemoveTeacher(code) {
+    meetSelected = meetSelected.filter(function (t) { return t.code !== code; });
+    renderMeetPicks();
+  }
+
+  function renderMeetPicks() {
+    var box = document.getElementById('meetPicks');
+    var hint = document.getElementById('meetPickHint');
+    if (!box) return;
+    box.innerHTML = '';
+    meetSelected.forEach(function (t) {
+      var chip = document.createElement('span');
+      chip.className = 'meet-chip';
+      chip.innerHTML = '<span class="code">' + esc(t.code) + '</span>' +
+        esc(t.chi || t.eng || '') +
+        '<button type="button" aria-label="移除 ' + esc(t.code) + '" data-code="' + esc(t.code) + '">×</button>';
+      box.appendChild(chip);
+    });
+    if (hint) {
+      hint.textContent = meetSelected.length
+        ? ('已選 ' + meetSelected.length + '／' + MEET_MAX + ' 位')
+        : '尚未選擇教師';
+    }
+  }
+
+  function updateMeetSuggest() {
+    var input = document.getElementById('meetTeacherInput');
+    var box = document.getElementById('meetSuggestBox');
+    if (!input || !box) return;
+    var q = (input.value || '').trim().toUpperCase();
+    if (!q) {
+      box.classList.remove('show');
+      box.innerHTML = '';
+      return;
+    }
+    var selectedCodes = {};
+    meetSelected.forEach(function (t) { selectedCodes[t.code] = true; });
+    var matches = [];
+    DATA.teachers.forEach(function (t) {
+      if (selectedCodes[t.code]) return;
+      var hay = ((t.code || '') + ' ' + (t.chi || '') + ' ' + (t.eng || '')).toUpperCase();
+      if (hay.indexOf(q) >= 0 || (t.code || '').toUpperCase().indexOf(q) === 0) {
+        matches.push(t);
+      }
+    });
+    matches = matches.slice(0, 10);
+    if (!matches.length) {
+      box.classList.remove('show');
+      box.innerHTML = '';
+      return;
+    }
+    box.innerHTML = matches.map(function (t) {
+      return '<button type="button" role="option" data-code="' + esc(t.code) + '">' +
+        '<span class="mcode">' + esc(t.code) + '</span>' + esc(t.chi || t.eng || '') +
+        '</button>';
+    }).join('');
+    box.classList.add('show');
+  }
+
+  function renderMeetResults() {
+    var card = document.getElementById('meetResultsCard');
+    var empty = document.getElementById('meetEmpty');
+    var results = document.getElementById('meetResults');
+    var summary = document.getElementById('meetSummary');
+    var countEl = document.getElementById('meetCount');
+    var todayHint = document.getElementById('meetTodayHint');
+    var err = document.getElementById('meetError');
+    err.classList.remove('show');
+
+    if (!meetSelected.length) {
+      err.textContent = '請先加入至少 1 位教師';
+      err.classList.add('show');
+      card.hidden = true;
+      empty.hidden = false;
+      empty.textContent = '請加入教師後按「計算共同空堂」。';
+      return;
+    }
+
+    var consec = parseInt(document.getElementById('meetConsec').value, 10) || 1;
+    var slots = meetFindSlots(meetSelected, consec);
+    var names = meetSelected.map(function (t) {
+      return t.code + (t.chi ? ('（' + t.chi + '）') : '');
+    }).join('、');
+
+    // today's cycle day from header state if available
+    var todayDay = null;
+    try {
+      if (typeof resolveTodayCycle === 'function') {
+        var r = resolveTodayCycle();
+        if (r && r.day != null) todayDay = r.day;
+      } else if (state && state.headerCycleDay != null) {
+        todayDay = state.headerCycleDay;
+      }
+    } catch (e) {}
+    // fallback: look at banner / common patterns
+    if (todayDay == null && state && state.cycleDay != null) todayDay = state.cycleDay;
+
+    card.hidden = false;
+    empty.hidden = true;
+    countEl.textContent = slots.length + ' 個時段';
+    summary.textContent = names + ' · 連續 ' + consec + ' 節 · 共 ' + slots.length + ' 個共同空堂時段';
+    if (todayHint) {
+      todayHint.textContent = todayDay
+        ? ('頂部校曆今日循環日：Day ' + todayDay + '（下方已標示）')
+        : '頂部未有今日循環日（假期或未設定）——以下顯示完整十日。';
+    }
+
+    // group by day
+    var byDay = {};
+    for (var d = 1; d <= 10; d++) byDay[d] = [];
+    slots.forEach(function (s) { byDay[s.day].push(s); });
+
+    var html = '';
+    // show today first if present
+    var order = [];
+    for (var i = 1; i <= 10; i++) order.push(i);
+    if (todayDay >= 1 && todayDay <= 10) {
+      order = [todayDay].concat(order.filter(function (x) { return x !== todayDay; }));
+    }
+
+    order.forEach(function (d) {
+      var list = byDay[d];
+      var isToday = todayDay === d;
+      html += '<div class="meet-day-block' + (isToday ? ' is-today' : '') + '">';
+      html += '<div class="meet-day-head"><span>Day ' + d +
+        (isToday ? ' · 今日' : '') +
+        (d === 5 || d === 10 ? ' · BF' : '') +
+        '</span><span>' + (list.length ? (list.length + ' 個') : '無') + '</span></div>';
+      html += '<div class="meet-day-body">';
+      if (!list.length) {
+        html += '<div class="meet-none">冇共同空堂</div>';
+      } else {
+        list.forEach(function (s) {
+          var label = s.consec === 1
+            ? ('P' + s.start)
+            : ('P' + s.start + '–P' + s.end);
+          var bell = periodBell(d, s.start);
+          var time = '';
+          if (bell && bell.start) {
+            var endBell = periodBell(d, s.end);
+            time = bell.start + '–' + ((endBell && endBell.end) || bell.end || '');
+          }
+          html += '<span class="meet-slot">' + label +
+            (time ? (' <span class="bell">' + time + '</span>') : '') +
+            '</span>';
+        });
+      }
+      html += '</div></div>';
+    });
+    results.innerHTML = html;
+  }
+
+  function renderMeetPanel() {
+    renderMeetPicks();
+    var card = document.getElementById('meetResultsCard');
+    var empty = document.getElementById('meetEmpty');
+    if (card && !card.hidden) {
+      // keep previous results visible; refresh today highlight
+      renderMeetResults();
+    } else if (empty) {
+      empty.hidden = false;
+      empty.textContent = '加入教師後按「計算共同空堂」。';
+    }
+  }
+
+  function wireMeetPanel() {
+    var addBtn = document.getElementById('meetAddBtn');
+    var input = document.getElementById('meetTeacherInput');
+    var suggest = document.getElementById('meetSuggestBox');
+    var computeBtn = document.getElementById('meetComputeBtn');
+    var clearBtn = document.getElementById('meetClearBtn');
+    var picks = document.getElementById('meetPicks');
+    if (!addBtn || !input) return;
+
+    addBtn.addEventListener('click', function () {
+      if (meetAddTeacher(input.value)) {
+        input.value = '';
+        suggest.classList.remove('show');
+        input.focus();
+      }
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (meetAddTeacher(input.value)) {
+          input.value = '';
+          suggest.classList.remove('show');
+        }
+      } else if (e.key === 'Escape') {
+        suggest.classList.remove('show');
+      }
+    });
+    input.addEventListener('input', updateMeetSuggest);
+    input.addEventListener('focus', updateMeetSuggest);
+    suggest.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-code]');
+      if (!btn) return;
+      if (meetAddTeacher(btn.getAttribute('data-code'))) {
+        input.value = '';
+        suggest.classList.remove('show');
+        input.focus();
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (!suggest.contains(e.target) && e.target !== input) suggest.classList.remove('show');
+    });
+    picks.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-code]');
+      if (!btn) return;
+      meetRemoveTeacher(btn.getAttribute('data-code'));
+    });
+    computeBtn.addEventListener('click', renderMeetResults);
+    clearBtn.addEventListener('click', function () {
+      meetSelected = [];
+      renderMeetPicks();
+      document.getElementById('meetResultsCard').hidden = true;
+      var empty = document.getElementById('meetEmpty');
+      empty.hidden = false;
+      empty.textContent = '已清空。請重新加入教師。';
+      document.getElementById('meetError').classList.remove('show');
+    });
+    document.getElementById('meetConsec').addEventListener('change', function () {
+      if (!document.getElementById('meetResultsCard').hidden) renderMeetResults();
+    });
+  }
+
   function renderNowFreeTeacherList(free, day) {
+
     nowfreeList.innerHTML = '';
     if (!free.length) {
       nowfreeList.innerHTML = '<div class="empty" style="padding:16px 0;">呢節冇空堂老師。</div>';
