@@ -1147,7 +1147,7 @@
 
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
-      可切換<strong>課室／教員室</strong>：教員室會顯示今節<strong>空堂老師</strong>坐喺度。
+      可切換<strong>課室／教員室</strong>：上課前／小息／午膳見<strong>今日當值</strong>；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐＋行）。
       撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。
       頂部「準時★」係準時到堂分數，同讚賞星分開。
       喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集準時 ★（每節每日一次）。
@@ -2081,22 +2081,23 @@
     }
     var dt = Math.min(48, ts - npcState.lastTs);
     npcState.lastTs = ts;
-    var npcs = npcState.npcs;
-    for (var i = 0; i < npcs.length; i++) {
-      var n = npcs[i];
-      if (!n.spec.wander || !n.vx) continue;
-      n.x += n.vx * dt;
-      // soft vertical drift
-      n.y = n.baseY + Math.sin((ts / 900) + n.phase) * 1.2;
-      if (n.x < 6) { n.x = 6; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
-      if (n.x > 90) { n.x = 90; n.vx = -Math.abs(n.vx); n.el.classList.add('facing-left'); }
-      if (n.y < 3) n.y = 3;
-      if (n.y > 38) n.y = 38;
-      n.el.style.left = n.x.toFixed(2) + '%';
-      n.el.style.bottom = n.y.toFixed(2) + '%';
-      // z by bottom so closer = higher
-      n.el.style.zIndex = String(7 + Math.round(n.y));
+    function stepWalkers(list, yMax) {
+      for (var i = 0; i < list.length; i++) {
+        var n = list[i];
+        if (!n.spec || !n.spec.wander || !n.vx) continue;
+        n.x += n.vx * dt;
+        n.y = n.baseY + Math.sin((ts / 900) + n.phase) * 1.2;
+        if (n.x < 6) { n.x = 6; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
+        if (n.x > 90) { n.x = 90; n.vx = -Math.abs(n.vx); n.el.classList.add('facing-left'); }
+        if (n.y < 3) n.y = 3;
+        if (n.y > yMax) n.y = yMax;
+        n.el.style.left = n.x.toFixed(2) + '%';
+        n.el.style.bottom = n.y.toFixed(2) + '%';
+        n.el.style.zIndex = String(7 + Math.round(n.y));
+      }
     }
+    stepWalkers(npcState.npcs, 38);
+    if (typeof staffNpcState !== 'undefined' && staffNpcState.walkers) stepWalkers(staffNpcState.walkers, 42);
   }
 
   function startNpcLoop() {
@@ -2110,7 +2111,7 @@
 
   /* ===== Staff room (教員室) ===== */
   var viewMode = 'classroom'; // classroom | staff
-  var staffNpcState = { key: '', seated: [] };
+  var staffNpcState = { key: '', seated: [], walkers: [] };
   var FORM_TEACHER_CODES = (function () {
     var set = {};
     var FT = window.FORM_TEACHERS_DATA;
@@ -2152,29 +2153,6 @@
     return !!daySched[String(period)];
   }
 
-  /** Resolve which timetable period to use for 「空堂」checks. */
-  function periodForFreeCheck(ctx) {
-    if (!ctx || ctx.holiday || !ctx.slot) return null;
-    if (ctx.slot.kind === 'period' && ctx.slot.period != null) return ctx.slot.period;
-    // during breaks / gap: use next upcoming period if any, else previous
-    if (ctx.cycle && ctx.cycle.day != null) {
-      var sched = scheduleForDay(ctx.cycle.day);
-      if (sched && sched.slots) {
-        var nowM = nowHKTParts().minutes;
-        var prev = null;
-        for (var i = 0; i < sched.slots.length; i++) {
-          var s = sched.slots[i];
-          if (s.period == null) continue;
-          var a = hmToMinutes(s.start);
-          if (a != null && a > nowM) return s.period; // next
-          prev = s.period;
-        }
-        return prev;
-      }
-    }
-    return null;
-  }
-
   function allFreeTeachers(day, period) {
     var free = [];
     if (day == null || period == null) return free;
@@ -2185,99 +2163,146 @@
     return free;
   }
 
-  function prioritizeTeachers(list, ctx, rng) {
-    var playerCode = state.teacher && state.teacher.code;
-    var dutyCodes = {};
-    dutyTeachersFor(ctx.ymd).forEach(function (t) {
-      if (t && t.code) dutyCodes[String(t.code).toUpperCase()] = true;
-    });
-    var scored = list.map(function (t, idx) {
-      var code = String(t.code || '').toUpperCase();
-      var score = rng(); // stable jitter
-      if (playerCode && code === String(playerCode).toUpperCase()) score += 1000;
-      if (dutyCodes[code]) score += 500;
-      if (FORM_TEACHER_CODES[code]) score += 200;
-      return { t: t, score: score, idx: idx };
-    });
-    scored.sort(function (a, b) {
-      if (b.score !== a.score) return b.score - a.score;
-      return String(a.t.code).localeCompare(String(b.t.code));
-    });
-    return scored.map(function (x) { return x.t; });
+  /** Next working day in duty roster after fromYmd (roster already omits holidays/weekends). */
+  function nextDutyYmd(fromYmd) {
+    if (!DUTY || !DUTY.days || !fromYmd) return null;
+    var keys = Object.keys(DUTY.days).sort();
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i] > fromYmd) return keys[i];
+    }
+    return null;
   }
 
-  function pickStaffTeachers(ctx, mood) {
-    var day = ctx.cycle && ctx.cycle.day;
-    var period = periodForFreeCheck(ctx);
-    var ymd = ctx.ymd || todayYmdHK();
-    var seed = hashStr('staff|' + ymd + '|' + (day || '') + '|' + (period || '') + '|' + (ctx.slot && ctx.slot.kind || '') + '|' + (ctx.slot && ctx.slot.key || ''));
-    var rng = mulberry32(seed);
-    var list = [];
-    var cap = 10;
-    var labelHint = '教員室';
-
-    if (ctx.holiday) {
-      cap = 4;
-      labelHint = '假期教員室';
-      list = prioritizeTeachers(DATA.teachers || [], ctx, rng).slice(0, cap);
-      // prefer duty + player only on holiday
-      var duty = dutyTeachersFor(ymd);
-      var prefer = [];
-      if (state.teacher) prefer.push(state.teacher);
-      duty.forEach(function (t) { prefer.push(t); });
-      list = prioritizeTeachers(prefer.length ? prefer : list, ctx, rng).slice(0, cap);
-    } else if (!ctx.slot || ctx.slot.kind === 'before') {
-      cap = 5;
-      labelHint = '上課前教員室';
-      var dutyB = dutyTeachersFor(ymd);
-      var poolB = dutyB.slice();
-      if (state.teacher) poolB.unshift(state.teacher);
-      // a few early birds: random free for P1
-      allFreeTeachers(day, 1).forEach(function (t) { poolB.push(t); });
-      list = prioritizeTeachers(poolB, ctx, rng).slice(0, cap);
-    } else if (ctx.slot.kind === 'after') {
-      cap = 5;
-      labelHint = '放學後教員室';
-      var dutyA = dutyTeachersFor(ymd);
-      var poolA = dutyA.slice();
-      if (state.teacher) poolA.unshift(state.teacher);
-      var lastP = periodsForDay(day);
-      allFreeTeachers(day, lastP).forEach(function (t) { poolA.push(t); });
-      list = prioritizeTeachers(poolA, ctx, rng).slice(0, cap);
-    } else if (ctx.slot.kind === 'break') {
-      cap = 6;
-      var bk = ctx.slot.key;
-      if (bk === 'lunch') labelHint = '午飯教員室';
-      else if (bk === 'recess' || bk === 'gap') labelHint = '小息教員室';
-      else labelHint = (ctx.slot.label || '休息') + '教員室';
-      var poolBr = allFreeTeachers(day, period);
-      if (!poolBr.length) poolBr = (DATA.teachers || []).slice();
-      list = prioritizeTeachers(poolBr, ctx, rng).slice(0, cap);
-    } else if (ctx.slot.kind === 'period') {
-      cap = 12;
-      labelHint = '第' + ctx.slot.period + '節 · 空堂教員室';
-      list = prioritizeTeachers(allFreeTeachers(day, ctx.slot.period), ctx, rng).slice(0, cap);
-    } else {
-      cap = 6;
-      list = prioritizeTeachers(allFreeTeachers(day, period), ctx, rng).slice(0, cap);
-    }
-
-    // dedupe by code
+  function dedupeTeachers(list) {
     var seen = {};
     var uniq = [];
-    list.forEach(function (t) {
+    (list || []).forEach(function (t) {
+      if (!t) return;
       var c = String(t.code || '').toUpperCase();
       if (!c || seen[c]) return;
       seen[c] = true;
       uniq.push(t);
     });
-    return { teachers: uniq, labelHint: labelHint, period: period, totalFree: (day != null && period != null) ? allFreeTeachers(day, period).length : uniq.length, seed: seed, rng: rng };
+    return uniq;
+  }
+
+  function preferPlayerInPool(list) {
+    list = dedupeTeachers(list);
+    var playerCode = state.teacher && state.teacher.code;
+    if (!playerCode) return list;
+    var pc = String(playerCode).toUpperCase();
+    var idx = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].code || '').toUpperCase() === pc) { idx = i; break; }
+    }
+    if (idx <= 0) return list;
+    var copy = list.slice();
+    var me = copy.splice(idx, 1)[0];
+    copy.unshift(me);
+    return copy;
+  }
+
+  /**
+   * 教員室 who appears:
+   * - before / recess / lunch (+ other breaks): today's duty only
+   * - lesson periods: 空堂 teachers
+   * - after school: tomorrow's duty (next duty-roster school day)
+   */
+  function pickStaffTeachers(ctx, mood) {
+    var day = ctx.cycle && ctx.cycle.day;
+    var ymd = ctx.ymd || todayYmdHK();
+    var seed = hashStr('staff2|' + ymd + '|' + (day || '') + '|' + (ctx.slot && ctx.slot.kind || '') + '|' + (ctx.slot && ctx.slot.period || '') + '|' + (ctx.slot && ctx.slot.key || ''));
+    var rng = mulberry32(seed);
+    var list = [];
+    var labelHint = '教員室';
+    var mode = 'empty';
+    var period = null;
+    var totalFree = 0;
+    var nextYmd = null;
+
+    if (ctx.holiday) {
+      mode = 'holiday';
+      labelHint = '假期教員室';
+      list = [];
+    } else if (!ctx.slot || ctx.slot.kind === 'before') {
+      mode = 'duty-today';
+      labelHint = '上課前 · 今日當值';
+      list = dutyTeachersFor(ymd);
+    } else if (ctx.slot.kind === 'after') {
+      mode = 'duty-tomorrow';
+      nextYmd = nextDutyYmd(ymd);
+      labelHint = nextYmd ? ('放學後 · 明日當值\n' + nextYmd.slice(5)) : '放學後教員室';
+      list = nextYmd ? dutyTeachersFor(nextYmd) : [];
+    } else if (ctx.slot.kind === 'break') {
+      mode = 'duty-today';
+      var bk = ctx.slot.key;
+      if (bk === 'lunch') labelHint = '午膳 · 今日當值';
+      else if (bk === 'recess' || bk === 'gap') labelHint = '小息 · 今日當值';
+      else if (bk === 'homeroom') labelHint = '早會 · 今日當值';
+      else if (bk === 'reading') labelHint = '閱讀 · 今日當值';
+      else labelHint = (ctx.slot.label || '休息') + ' · 今日當值';
+      list = dutyTeachersFor(ymd);
+    } else if (ctx.slot.kind === 'period') {
+      mode = 'free-period';
+      period = ctx.slot.period;
+      labelHint = '第' + period + '節 · 空堂';
+      list = allFreeTeachers(day, period);
+      totalFree = list.length;
+      list = preferPlayerInPool(list);
+      if (list.length > 12) {
+        var head = list[0];
+        var rest = list.slice(1);
+        for (var i = rest.length - 1; i > 0; i--) {
+          var j = Math.floor(rng() * (i + 1));
+          var tmp = rest[i]; rest[i] = rest[j]; rest[j] = tmp;
+        }
+        list = preferPlayerInPool([head].concat(rest.slice(0, 11))).slice(0, 12);
+      }
+    } else {
+      mode = 'duty-today';
+      labelHint = '教員室 · 今日當值';
+      list = dutyTeachersFor(ymd);
+    }
+
+    list = preferPlayerInPool(list);
+    return {
+      teachers: list,
+      labelHint: labelHint,
+      mode: mode,
+      period: period,
+      totalFree: totalFree || list.length,
+      nextDutyYmd: nextYmd,
+      seed: seed,
+      rng: rng
+    };
+  }
+
+  function splitSitWalk(teachers, rng) {
+    var sit = [];
+    var walk = [];
+    if (!teachers.length) return { sit: sit, walk: walk };
+    if (teachers.length === 1) {
+      if (rng() >= 0.5) sit.push(teachers[0]);
+      else walk.push(teachers[0]);
+      return { sit: sit, walk: walk };
+    }
+    teachers.forEach(function (t, idx) {
+      if (idx % 2 === 0) sit.push(t);
+      else walk.push(t);
+    });
+    if (!sit.length && walk.length) sit.push(walk.pop());
+    if (!walk.length && sit.length > 1) walk.push(sit.pop());
+    if (sit.length > 8) {
+      walk = walk.concat(sit.slice(8));
+      sit = sit.slice(0, 8);
+    }
+    if (walk.length > 8) walk = walk.slice(0, 8);
+    return { sit: sit, walk: walk };
   }
 
   function clearStaffSeats() {
     var layer = document.getElementById('staffNpcLayer');
     if (layer) layer.innerHTML = '';
-    // also clear any npc appended into desk slots
     for (var i = 0; i < 12; i++) {
       var desk = document.getElementById('staffDesk' + i);
       if (!desk) continue;
@@ -2285,20 +2310,42 @@
       for (var j = 0; j < old.length; j++) old[j].remove();
     }
     staffNpcState.seated = [];
+    staffNpcState.walkers = [];
+  }
+
+  function makeStaffTeacherSpec(t, opts, rng) {
+    opts = opts || {};
+    var label = teacherDisplayName(t);
+    return {
+      role: 'teacher',
+      name: label,
+      code: t.code || '',
+      chi: t.chi || '',
+      label: label,
+      detail: (t.code || '') + (t.chi ? (' · ' + t.chi) : ''),
+      hair: HAIRS[Math.floor(rng() * HAIRS.length)],
+      sitting: !!opts.sitting,
+      wander: !!opts.wander,
+      bounce: !!opts.wander,
+      nearBoard: false,
+      sleep: false
+    };
   }
 
   function syncStaffNpcs(mood, ctx) {
     var picked = pickStaffTeachers(ctx, mood);
     var key = [
       'staff',
+      picked.mode,
       ctx.ymd || '',
+      picked.nextDutyYmd || '',
       (ctx.slot && ctx.slot.kind) || '',
       (ctx.slot && ctx.slot.period) || '',
       (ctx.slot && ctx.slot.key) || '',
       picked.teachers.map(function (t) { return t.code; }).join(',')
     ].join('|');
-    if (key === staffNpcState.key && staffNpcState.seated.length) {
-      // still refresh board labels
+    var hasAny = staffNpcState.seated.length || staffNpcState.walkers.length;
+    if (key === staffNpcState.key && (hasAny || !picked.teachers.length)) {
       updateStaffChrome(mood, ctx, picked);
       return;
     }
@@ -2310,39 +2357,50 @@
     if (!picked.teachers.length) {
       if (empty) {
         empty.hidden = false;
-        empty.textContent = ctx.holiday
-          ? '假期教員室空空地～'
-          : (ctx.slot && ctx.slot.kind === 'period'
-            ? '今節冇老師空堂（或全部出晒堂）'
-            : '而家教員室靜靜地～');
+        if (ctx.holiday) empty.textContent = '假期教員室空空地～';
+        else if (picked.mode === 'duty-tomorrow') empty.textContent = '未找到明日當值老師';
+        else if (picked.mode === 'duty-today') empty.textContent = '今日未有當值資料';
+        else if (picked.mode === 'free-period') empty.textContent = '今節冇老師空堂（或全部出晒堂）';
+        else empty.textContent = '而家教員室靜靜地～';
       }
       return;
     }
     if (empty) empty.hidden = true;
 
     var rng = picked.rng || mulberry32(picked.seed || 1);
-    picked.teachers.forEach(function (t, idx) {
-      if (idx >= 12) return;
+    var parts = splitSitWalk(picked.teachers, rng);
+
+    parts.sit.forEach(function (t, idx) {
       var desk = document.getElementById('staffDesk' + idx);
       if (!desk) return;
-      var label = teacherDisplayName(t);
-      var spec = {
-        role: 'teacher',
-        name: label,
-        code: t.code || '',
-        chi: t.chi || '',
-        label: label,
-        detail: (t.code || '') + (t.chi ? (' · ' + t.chi) : ''),
-        hair: HAIRS[Math.floor(rng() * HAIRS.length)],
-        sitting: true,
-        wander: false,
-        nearBoard: false,
-        sleep: false,
-        bounce: false
-      };
+      var spec = makeStaffTeacherSpec(t, { sitting: true, wander: false }, rng);
       var el = makeNpcEl(spec);
       desk.appendChild(el);
       staffNpcState.seated.push({ el: el, spec: spec, desk: idx });
+    });
+
+    var layer = document.getElementById('staffNpcLayer');
+    parts.walk.forEach(function (t) {
+      if (!layer) return;
+      var spec = makeStaffTeacherSpec(t, { sitting: false, wander: true }, rng);
+      var el = makeNpcEl(spec);
+      el.classList.add('wander-bounce');
+      var x = 10 + rng() * 75;
+      var y = 8 + rng() * 28;
+      var vx = (0.004 + rng() * 0.007) * (rng() > 0.5 ? 1 : -1);
+      el.style.left = x + '%';
+      el.style.bottom = y + '%';
+      if (vx < 0) el.classList.add('facing-left');
+      layer.appendChild(el);
+      staffNpcState.walkers.push({
+        el: el,
+        spec: spec,
+        x: x,
+        y: y,
+        vx: vx,
+        baseY: y,
+        phase: rng() * Math.PI * 2
+      });
     });
   }
 
@@ -2354,20 +2412,23 @@
     if (scene) scene.setAttribute('data-tod', tod);
     var lines = [];
     lines.push(picked.labelHint || '教員室');
-    if (picked.period != null && ctx.slot && ctx.slot.kind === 'period') {
-      lines.push('空堂 ' + picked.teachers.length + (picked.totalFree > picked.teachers.length ? ('／' + picked.totalFree) : '') + ' 位');
-    } else if (picked.teachers.length) {
-      lines.push('在座 ' + picked.teachers.length + ' 位');
+    var nShow = (picked.teachers && picked.teachers.length) ? picked.teachers.length : 0;
+    if (picked.mode === 'free-period') {
+      lines.push('空堂顯示 ' + nShow + (picked.totalFree > nShow ? ('／' + picked.totalFree) : '') + ' 位');
+    } else if (picked.mode === 'duty-tomorrow' && picked.nextDutyYmd) {
+      lines.push('明日當值 ' + nShow + ' 位');
+    } else if (nShow) {
+      lines.push('當值 ' + nShow + ' 位');
     }
     if (board) board.textContent = lines.join('\n');
     if (badge) {
       if (ctx.holiday) badge.textContent = '教員室 · 假期';
-      else if (ctx.slot && ctx.slot.kind === 'period') badge.textContent = '教員室 · P' + ctx.slot.period;
+      else if (ctx.slot && ctx.slot.kind === 'period') badge.textContent = '教員室 · 空堂 P' + ctx.slot.period;
       else if (ctx.slot && ctx.slot.kind === 'break') {
         var bk = ctx.slot.key;
-        badge.textContent = bk === 'lunch' ? '教員室 · 午飯' : (bk === 'recess' || bk === 'gap' ? '教員室 · 小息' : '教員室');
-      } else if (ctx.slot && ctx.slot.kind === 'after') badge.textContent = '教員室 · 放學後';
-      else if (!ctx.slot || ctx.slot.kind === 'before') badge.textContent = '教員室 · 上課前';
+        badge.textContent = bk === 'lunch' ? '教員室 · 午膳當值' : (bk === 'recess' || bk === 'gap' ? '教員室 · 小息當值' : '教員室 · 當值');
+      } else if (ctx.slot && ctx.slot.kind === 'after') badge.textContent = '教員室 · 明日當值';
+      else if (!ctx.slot || ctx.slot.kind === 'before') badge.textContent = '教員室 · 今日當值';
       else badge.textContent = '教員室';
     }
   }
