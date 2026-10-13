@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="classroom-smooth-walk-return-pace-v2" />
+  <meta name="game-build" content="reading-time-form-class-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -1489,6 +1489,25 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-1.5px); }
     }
+    /* Reading time: quiet seated pose with book */
+    .npc.reading .npc-book {
+      position: absolute;
+      left: 50%;
+      top: 13px;
+      transform: translateX(-50%);
+      font-size: 9px;
+      line-height: 1;
+      z-index: 3;
+      pointer-events: none;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.12));
+    }
+    .npc.reading.sitting .npc-book { top: 11px; }
+    .npc.reading.sitting.idle-bob .npc-sprite {
+      animation: sitBob 3.4s ease-in-out infinite;
+    }
+    .scene.classroom[data-mood="reading"] .board {
+      box-shadow: inset 0 0 0 2px rgba(240, 193, 75, 0.35);
+    }
     /* speech bubbles (classroom + staff room) */
     .npc .npc-bubble {
       position: absolute;
@@ -2409,7 +2428,7 @@
         if (s.key === 'recess') label = '小息中';
         else if (s.key === 'lunch') label = '午飯中';
         else if (s.key === 'homeroom') label = '班主任／早會中';
-        else if (s.key === 'reading') label = '閱讀時段中';
+        else if (s.key === 'reading') label = '閱讀時間中';
         else label = label ? (label + '中') : '休息中';
         return { kind: 'break', period: null, key: s.key, label: label, slot: s };
       }
@@ -3367,6 +3386,7 @@
     if (spec.class) el.dataset.class = spec.class;
     if (spec.no) el.dataset.no = spec.no;
     if (spec.sitting) el.classList.add('sitting', 'idle-bob');
+    if (spec.reading) el.classList.add('reading');
     el.innerHTML =
       '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 8 : 8)) + '</div>' +
       '<div class="npc-sprite">' +
@@ -3374,6 +3394,7 @@
         '<div class="npc-head"></div>' +
         '<div class="npc-body"></div>' +
         (spec.sitting ? '<div class="npc-legs"></div>' : '') +
+        (spec.reading ? '<span class="npc-book" aria-hidden="true">📖</span>' : '') +
         (spec.sleep ? '<span class="npc-zzz">z</span>' : '') +
       '</div>';
     el.addEventListener('click', function (ev) {
@@ -3433,6 +3454,7 @@
         bounce: !!opts.bounce,
         nearBoard: false,
         sitting: !!opts.sitting,
+        reading: !!opts.reading,
         wander: opts.wander !== false && !opts.sitting
       });
     }
@@ -3474,6 +3496,27 @@
       // Teacher free this period: empty-ish classroom + clear message (not school-wide students)
       addTeacher(player, { sleep: true, nearBoard: true, wander: false });
       emptyMsg = '而家空堂';
+    } else if (mood === 'reading') {
+      // 閱讀時間：班主任返課室睇住全班靜心閱讀（bells.js slot key=reading）
+      var rClass = readingClassForTeacher(player);
+      if (rClass) {
+        var allStuds = (studentsByClass[rClass] || []).slice().sort(function (a, b) {
+          return Number(a.no) - Number(b.no);
+        });
+        allStuds.forEach(function (s) {
+          addStudent(s, { bounce: false, wander: false, sitting: true, reading: true });
+        });
+        var cts = resolveFormTeacherObjs(rClass);
+        if (!cts.length && player) cts = [player];
+        cts.forEach(function (t) {
+          addTeacher(t, { nearBoard: true, wander: false, pace: true });
+        });
+        lessonNote = '閱讀時間 · ' + rClass + ' · 班主任睇班';
+        if (!allStuds.length) emptyMsg = '班別 ' + rClass + ' 暫未有同學名單';
+      } else {
+        if (player) addTeacher(player, { wander: true });
+        emptyMsg = '閱讀時間 · 各班喺課室睇書（你唔係班主任）';
+      }
     } else if (mood === 'recess' || mood === 'lunch') {
       // Not a teaching period in this classroom — keep it quiet; faculty room shows peers
       if (player) addTeacher(player, { wander: true, bounce: true });
@@ -3603,12 +3646,17 @@
 
   function syncNpcs(mood, ctx) {
     var lesson = ctx.lesson;
+    var readingCls = (mood === 'reading' && state.teacher)
+      ? (readingClassForTeacher(state.teacher) || '')
+      : '';
     var key = [
       mood,
       ctx.ymd || '',
       (ctx.slot && ctx.slot.kind) || '',
       (ctx.slot && ctx.slot.period) || '',
+      (ctx.slot && ctx.slot.key) || '',
       lesson ? (lesson.class || lesson.classShort || '') : '',
+      readingCls,
       state.teacher ? state.teacher.code : ''
     ].join('|');
     if (key === npcState.key) return;
@@ -3729,6 +3777,22 @@
     '想瞓…',
     '明白喇'
   ];
+  var READING_PHRASES = [
+    '靜心睇書…',
+    '呢本好得意',
+    '翻頁～',
+    '好靜啊',
+    '專心閱讀',
+    '唔好嘈',
+    '故事好正',
+    '借本書吖',
+    '班主任睇緊',
+    '嗯…'
+  ];
+  function isReadingMood() {
+    var scene = document.getElementById('scene');
+    return !!(scene && scene.getAttribute('data-mood') === 'reading');
+  }
 
   function applyNpcPos(n) {
     if (!n || !n.el) return;
@@ -3819,6 +3883,7 @@
 
   function maybeStartStudentWalk() {
     if (document.hidden || viewMode !== 'classroom') return;
+    if (isReadingMood()) return; // 閱讀時間：全班坐好睇書，唔行開
     var seated = [];
     var walking = [];
     var busy = 0;
@@ -3873,7 +3938,8 @@
     if (!candidates.length) return;
     clearClassBubbles();
     var n = candidates[Math.floor(Math.random() * candidates.length)];
-    var phrase = CLASS_PHRASES[Math.floor(Math.random() * CLASS_PHRASES.length)];
+    var phrasePool = isReadingMood() ? READING_PHRASES : CLASS_PHRASES;
+    var phrase = phrasePool[Math.floor(Math.random() * phrasePool.length)];
     var bubble = document.createElement('div');
     bubble.className = 'npc-bubble';
     bubble.textContent = phrase;
@@ -3950,6 +4016,69 @@
     (FT.nonForm || []).forEach(add);
     return set;
   })();
+
+  /** Normalize form-teachers id (S1A) → students.js class (1A). */
+  function formClassIdNorm(id) {
+    var m = String(id || '').trim().match(/^S?(\d+[A-D])$/i);
+    return m ? m[1].toUpperCase() : '';
+  }
+
+  /** teacher ShortName / alias → class id like "1A" (from form-teachers.js). */
+  var FORM_CLASS_BY_TEACHER = {};
+  /** "1A" → form-teacher rows from form-teachers.js */
+  var FORM_TEACHERS_BY_CLASS = {};
+  (function buildFormClassMaps() {
+    var FT = window.FORM_TEACHERS_DATA;
+    if (!FT) return;
+    (FT.classes || []).forEach(function (cl) {
+      var sid = formClassIdNorm(cl.id);
+      if (!sid) return;
+      var teachers = (cl.teachers || []).slice();
+      FORM_TEACHERS_BY_CLASS[sid] = teachers;
+      teachers.forEach(function (t) {
+        if (!t) return;
+        [t.code, t.timetableCode].forEach(function (c) {
+          c = String(c || '').trim().toUpperCase();
+          if (c) FORM_CLASS_BY_TEACHER[c] = sid;
+        });
+      });
+    });
+    var aliases = (FT.meta && FT.meta.codeAliases) || {};
+    Object.keys(aliases).forEach(function (from) {
+      var to = String(aliases[from] || '').toUpperCase();
+      from = String(from || '').toUpperCase();
+      if (!from || !to) return;
+      if (FORM_CLASS_BY_TEACHER[from] && !FORM_CLASS_BY_TEACHER[to]) {
+        FORM_CLASS_BY_TEACHER[to] = FORM_CLASS_BY_TEACHER[from];
+      }
+      if (FORM_CLASS_BY_TEACHER[to] && !FORM_CLASS_BY_TEACHER[from]) {
+        FORM_CLASS_BY_TEACHER[from] = FORM_CLASS_BY_TEACHER[to];
+      }
+    });
+  })();
+
+  function readingClassForTeacher(t) {
+    if (!t) return '';
+    return FORM_CLASS_BY_TEACHER[String(t.code || '').toUpperCase()] || '';
+  }
+
+  function resolveFormTeacherObjs(classId) {
+    var list = FORM_TEACHERS_BY_CLASS[classId] || [];
+    var out = [];
+    var seen = {};
+    list.forEach(function (ft) {
+      if (!ft) return;
+      var code = String(ft.timetableCode || ft.code || '').toUpperCase();
+      if (!code || seen[code]) return;
+      seen[code] = true;
+      out.push(lookupTeacher(code) || {
+        code: code,
+        chi: ft.chi || '',
+        eng: ft.eng || ''
+      });
+    });
+    return out;
+  }
 
   function setViewMode(mode) {
     viewMode = mode === 'staff' ? 'staff' : 'classroom';
@@ -4084,7 +4213,7 @@
         if (bk === 'lunch') labelHint = '午膳 · 今日當值';
         else if (bk === 'gap') labelHint = '轉堂 · 今日當值';
         else if (bk === 'homeroom') labelHint = '早會 · 今日當值';
-        else if (bk === 'reading') labelHint = '閱讀 · 今日當值';
+        else if (bk === 'reading') labelHint = '閱讀時間 · 今日當值';
         else labelHint = (ctx.slot.label || '休息') + ' · 今日當值';
         list = dutyTeachersFor(ymd);
       }
@@ -4816,9 +4945,9 @@
         badgeMsg = '午飯';
         document.getElementById('propLunch').hidden = false;
       } else if (key === 'reading') {
-        mood = 'class';
-        boardMsg = '閱讀時段\n靜心閱讀';
-        badgeMsg = '閱讀';
+        mood = 'reading';
+        boardMsg = '閱讀時間\n靜心閱讀';
+        badgeMsg = '閱讀時間';
         document.getElementById('propBook').hidden = false;
       } else if (key === 'homeroom') {
         mood = 'class';
@@ -5009,9 +5138,23 @@
           }
         }
       }
+      var readingExtra = '';
+      if (ctx.slot.kind === 'break' && ctx.slot.key === 'reading') {
+        var rcLine = readingClassForTeacher(state.teacher);
+        if (rcLine) {
+          var ctNames = resolveFormTeacherObjs(rcLine).map(function (t) {
+            return teacherDisplayName(t);
+          }).filter(Boolean);
+          readingExtra = '<br /><span class="muted">' + rcLine + ' 班 · 班主任：' +
+            (ctNames.length ? ctNames.join('、') : '—') + ' · 全班靜心閱讀</span>';
+        } else {
+          readingExtra = '<br /><span class="muted">各班喺課室睇書（搜班主任可見全班）</span>';
+        }
+      }
       lessonLine.innerHTML =
-        '<strong>' + ctx.slot.label + '</strong>' +
+        '<strong>' + (ctx.slot.key === 'reading' ? '閱讀時間' : ctx.slot.label) + '</strong>' +
         (ctx.slot.slot ? (' · ' + ctx.slot.slot.start + '–' + ctx.slot.slot.end) : '') +
+        readingExtra +
         (nextInfo ? ('<br /><span class="muted">' + nextInfo + '</span>') : '');
     }
 
