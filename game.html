@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-classroom-smooth-v1" />
+  <meta name="game-build" content="live-scene-init-fix-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／教員室 · 劉皇發中學</title>
@@ -2330,6 +2330,9 @@
     </div>
 
     <!-- hidden stubs so legacy listeners do not throw -->
+    <div class="currency" id="pointsCurrencyStub" aria-hidden="true" hidden>
+      <span class="coin-label" id="pointsVal">0</span>
+    </div>
     <div class="actions" aria-hidden="true">
       <button type="button" class="btn primary" id="checkInBtn" disabled>★ 準時到堂簽到</button>
       <button type="button" class="btn ghost" id="refreshBtn">重新整理狀態</button>
@@ -2383,14 +2386,14 @@
     <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn"></button>
   </div>
 
-  <script src="data.js?v=staff-classroom-smooth-v1"></script>
-  <script src="bells.js?v=staff-classroom-smooth-v1"></script>
-  <script src="calendar.js?v=staff-classroom-smooth-v1"></script>
-  <script src="duty.js?v=staff-classroom-smooth-v1"></script>
-  <script src="form-teachers.js?v=staff-classroom-smooth-v1"></script>
-  <script src="students.js?v=staff-classroom-smooth-v1"></script>
-  <script src="groups.js?v=staff-classroom-smooth-v1"></script>
-  <script src="seating.js?v=staff-classroom-smooth-v1"></script>
+  <script src="data.js?v=live-scene-init-fix-v1"></script>
+  <script src="bells.js?v=live-scene-init-fix-v1"></script>
+  <script src="calendar.js?v=live-scene-init-fix-v1"></script>
+  <script src="duty.js?v=live-scene-init-fix-v1"></script>
+  <script src="form-teachers.js?v=live-scene-init-fix-v1"></script>
+  <script src="students.js?v=live-scene-init-fix-v1"></script>
+  <script src="groups.js?v=live-scene-init-fix-v1"></script>
+  <script src="seating.js?v=live-scene-init-fix-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -2555,6 +2558,11 @@
       var hh = parseInt(map.hour, 10);
       var mm = parseInt(map.minute, 10);
       var ss = parseInt(map.second, 10);
+      // Some engines report 24:00 as hour 24; normalize for slot math.
+      if (!isFinite(hh) || hh < 0 || hh > 23) hh = 0;
+      if (!isFinite(mm) || mm < 0 || mm > 59) mm = 0;
+      if (!isFinite(ss) || ss < 0 || ss > 59) ss = 0;
+      if (hh === 24) { hh = 0; }
       return {
         ymd: map.year + '-' + map.month + '-' + map.day,
         hour: hh, minute: mm, second: ss,
@@ -2927,6 +2935,11 @@
     return findSlotAtMinutes(cycleDay, getEffectiveNowParts().minutes);
   }
 
+  function syncPointsBadge() {
+    var el = document.getElementById('pointsVal');
+    if (el) el.textContent = String(state.points);
+  }
+
   function loadPoints() {
     try {
       var n = parseInt(localStorage.getItem(LS_POINTS) || '0', 10);
@@ -2935,7 +2948,7 @@
     try {
       state.claimed = JSON.parse(localStorage.getItem(LS_CLAIMED) || '{}') || {};
     } catch (e2) { state.claimed = {}; }
-    document.getElementById('pointsVal').textContent = String(state.points);
+    syncPointsBadge();
   }
 
   function savePoints() {
@@ -2943,7 +2956,7 @@
       localStorage.setItem(LS_POINTS, String(state.points));
       localStorage.setItem(LS_CLAIMED, JSON.stringify(state.claimed));
     } catch (e) {}
-    document.getElementById('pointsVal').textContent = String(state.points);
+    syncPointsBadge();
   }
 
   function toast(msg) {
@@ -3185,8 +3198,10 @@
   function renderStarBoard() {
     var ym = monthKeyHK();
     if (ym !== praiseState.monthKey) loadPraiseMonth(ym);
-    document.getElementById('boardMonthLabel').textContent = ym;
+    var boardMonthLabel = document.getElementById('boardMonthLabel');
+    if (boardMonthLabel) boardMonthLabel.textContent = ym;
     var list = document.getElementById('starBoardList');
+    if (!list) return;
     var rows = Object.keys(praiseState.map).map(function (k) {
       return praiseState.map[k];
     }).filter(function (e) {
@@ -5834,16 +5849,20 @@
     var boardMsg = '歡迎返學';
     var badgeMsg = '課室';
 
-    document.getElementById('propLunch').hidden = true;
-    document.getElementById('propBook').hidden = true;
-    document.getElementById('propSun').hidden = false;
-    document.getElementById('propMoon').hidden = true;
+    function setPropHidden(id, hidden) {
+      var el = document.getElementById(id);
+      if (el) el.hidden = !!hidden;
+    }
+    setPropHidden('propLunch', true);
+    setPropHidden('propBook', true);
+    setPropHidden('propSun', false);
+    setPropHidden('propMoon', true);
 
     if (ctx.holiday) {
       mood = 'holiday';
       boardMsg = '今日假期\n好好休息';
       badgeMsg = '假期';
-      document.getElementById('propSun').hidden = false;
+      setPropHidden('propSun', false);
     } else if (!ctx.slot || ctx.slot.kind === 'before') {
       mood = 'before';
       boardMsg = '早晨！\n準備上課';
@@ -5852,8 +5871,8 @@
       mood = 'after';
       boardMsg = '放學喇\n再見！';
       badgeMsg = '放學後';
-      document.getElementById('propSun').hidden = true;
-      document.getElementById('propMoon').hidden = false;
+      setPropHidden('propSun', true);
+      setPropHidden('propMoon', false);
     } else if (ctx.slot.kind === 'break') {
       var key = ctx.slot.key;
       if (key === 'recess' || key === 'gap') {
@@ -5864,12 +5883,12 @@
         mood = 'lunch';
         boardMsg = '午飯時間\n慢慢食';
         badgeMsg = '午飯';
-        document.getElementById('propLunch').hidden = false;
+        setPropHidden('propLunch', false);
       } else if (key === 'reading') {
         mood = 'reading';
         boardMsg = '閱讀時間\n靜心閱讀';
         badgeMsg = '閱讀時間';
-        document.getElementById('propBook').hidden = false;
+        setPropHidden('propBook', false);
       } else if (key === 'homeroom') {
         mood = 'class';
         boardMsg = '早會／班主任';
@@ -5998,22 +6017,30 @@
 
   function render() {
     var ctx = getContext();
-    document.getElementById('clockHm').textContent = ctx.hm + (ctx.scrubbed ? ' 預覽' : '');
+    var clockEl = document.getElementById('clockHm');
+    if (clockEl) clockEl.textContent = ctx.hm + (ctx.scrubbed ? ' 預覽' : '');
 
     var pill = document.getElementById('dayPill');
-    pill.classList.remove('bf', 'holiday');
-    if (ctx.holiday) {
-      pill.textContent = '無上課／假期';
-      pill.classList.add('holiday');
-    } else {
-      var sid = ctx.schedId === 'bf' ? 'BF' : '一般';
-      pill.textContent = 'Day ' + ctx.cycle.day + ' · ' + sid;
-      if (ctx.schedId === 'bf') pill.classList.add('bf');
+    if (pill) {
+      pill.classList.remove('bf', 'holiday');
+      if (ctx.holiday) {
+        pill.textContent = '無上課／假期';
+        pill.classList.add('holiday');
+      } else {
+        var sid = ctx.schedId === 'bf' ? 'BF' : '一般';
+        pill.textContent = 'Day ' + ctx.cycle.day + ' · ' + sid;
+        if (ctx.schedId === 'bf') pill.classList.add('bf');
+      }
     }
 
     var slotLabel = document.getElementById('slotLabel');
     var cd = document.getElementById('countdown');
     var lessonLine = document.getElementById('lessonLine');
+    if (!slotLabel || !cd || !lessonLine) {
+      paintScene(ctx);
+      syncTimelineChrome(ctx);
+      return ctx;
+    }
 
     if (ctx.holiday) {
       slotLabel.textContent = '今日無正規循環日課';
@@ -6108,38 +6135,46 @@
     syncTimelineChrome(ctx);
 
     var btn = document.getElementById('checkInBtn');
-    if (canCheckIn(ctx)) {
-      btn.disabled = false;
-      btn.textContent = '★ 準時到堂簽到（+10）';
-    } else if (ctx.slot && ctx.slot.kind === 'period' && ctx.lesson) {
-      var k = claimKey(ctx.ymd, ctx.slot.period);
-      if (state.claimed[k]) {
-        btn.disabled = true;
-        btn.textContent = '✓ 本節已簽到';
+    if (btn) {
+      if (canCheckIn(ctx)) {
+        btn.disabled = false;
+        btn.textContent = '★ 準時到堂簽到（+10）';
+      } else if (ctx.slot && ctx.slot.kind === 'period' && ctx.lesson) {
+        var k = claimKey(ctx.ymd, ctx.slot.period);
+        if (state.claimed[k]) {
+          btn.disabled = true;
+          btn.textContent = '✓ 本節已簽到';
+        } else {
+          btn.disabled = true;
+          btn.textContent = '★ 超過準時窗口（首 ' + ONTIME_WINDOW_MIN + ' 分鐘）';
+        }
       } else {
         btn.disabled = true;
-        btn.textContent = '★ 超過準時窗口（首 ' + ONTIME_WINDOW_MIN + ' 分鐘）';
+        btn.textContent = '★ 準時到堂簽到';
       }
-    } else {
-      btn.disabled = true;
-      btn.textContent = '★ 準時到堂簽到';
     }
 
     return ctx;
   }
 
-  document.getElementById('checkInBtn').addEventListener('click', function () {
-    doCheckIn(getContext());
-  });
-  document.getElementById('refreshBtn').addEventListener('click', function () {
-    if (timelineState.live) {
-      render();
-      toast('已更新 · ' + nowHKTParts().hm + ' HKT');
-    } else {
-      render();
-      toast('預覽 · ' + (timelineState.scrubMinutes != null ? minutesToHm(timelineState.scrubMinutes) : '--:--'));
-    }
-  });
+  var checkInBtnBoot = document.getElementById('checkInBtn');
+  if (checkInBtnBoot) {
+    checkInBtnBoot.addEventListener('click', function () {
+      doCheckIn(getContext());
+    });
+  }
+  var refreshBtnBoot = document.getElementById('refreshBtn');
+  if (refreshBtnBoot) {
+    refreshBtnBoot.addEventListener('click', function () {
+      if (timelineState.live) {
+        render();
+        toast('已更新 · ' + nowHKTParts().hm + ' HKT');
+      } else {
+        render();
+        toast('預覽 · ' + (timelineState.scrubMinutes != null ? minutesToHm(timelineState.scrubMinutes) : '--:--'));
+      }
+    });
+  }
   function findTeachersByQuery(q) {
     q = String(q || '').trim().toUpperCase();
     if (!q) return (DATA.teachers || []).slice(0, 12);
@@ -6290,10 +6325,10 @@
   bindTimelineUI();
   setTimelineLive(true, { silent: true });
 
-  loadPoints();
-  loadPraiseMonth(monthKeyHK());
-  resolveTeacher();
-  renderStarBoard();
+  try { loadPoints(); } catch (ePts) {}
+  try { loadPraiseMonth(monthKeyHK()); } catch (ePm) {}
+  try { resolveTeacher(); } catch (eRt) {}
+  try { renderStarBoard(); } catch (eSb) {}
 
   // Focused UI: 課室 (selected teacher's current room) + 教員室
   state.pickClass = '';
@@ -6314,10 +6349,14 @@
   if (tabC) tabC.addEventListener('click', function () { setViewMode('classroom'); });
   if (tabS) tabS.addEventListener('click', function () { setViewMode('staff'); });
 
-  document.getElementById('giveStarBtn').addEventListener('click', function () { givePraise('star'); });
-  document.getElementById('giveHeartBtn').addEventListener('click', function () { givePraise('heart'); });
-  document.getElementById('praiseCloseBtn').addEventListener('click', closePraiseSheet);
-  document.getElementById('praiseBackdrop').addEventListener('click', closePraiseSheet);
+  var giveStarBtn = document.getElementById('giveStarBtn');
+  var giveHeartBtn = document.getElementById('giveHeartBtn');
+  var praiseCloseBtn = document.getElementById('praiseCloseBtn');
+  var praiseBackdropEl = document.getElementById('praiseBackdrop');
+  if (giveStarBtn) giveStarBtn.addEventListener('click', function () { givePraise('star'); });
+  if (giveHeartBtn) giveHeartBtn.addEventListener('click', function () { givePraise('heart'); });
+  if (praiseCloseBtn) praiseCloseBtn.addEventListener('click', closePraiseSheet);
+  if (praiseBackdropEl) praiseBackdropEl.addEventListener('click', closePraiseSheet);
   var thpClose = document.getElementById('teacherHpCloseBtn');
   var thpBackdrop = document.getElementById('teacherHpBackdrop');
   if (thpClose) thpClose.addEventListener('click', closeTeacherHpSheet);
