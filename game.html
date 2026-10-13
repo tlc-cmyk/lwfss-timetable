@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="minimal-classroom-v1" />
+  <meta name="game-build" content="staff-classroom-smooth-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
-  <title>準時到堂 · 課室模擬 · 劉皇發中學</title>
+  <title>準時到堂 · 課室／教員室 · 劉皇發中學</title>
   <style>
     :root {
       --cream: #f7efe3;
@@ -2164,51 +2164,8 @@
       pointer-events: none !important;
     }
 
-    /* ===== Minimal UI: pick teacher / classroom + timeline only ===== */
-    .pick-card {
-      background: var(--card);
-      border: 3px solid var(--wood-dark);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 12px 14px;
-      margin-bottom: 12px;
-    }
-    .pick-card .pick-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-top: 8px;
-    }
-    .pick-card .pick-row:first-child { margin-top: 0; }
-    .pick-card label {
-      font-size: 0.78rem;
-      font-weight: 800;
-      color: var(--wood-deeper);
-      min-width: 4.5em;
-    }
-    .pick-card select,
-    .pick-card .pick-btn {
-      flex: 1;
-      min-width: 140px;
-      font: inherit;
-      font-weight: 700;
-      font-size: 0.9rem;
-      padding: 8px 10px;
-      border: 2px solid var(--wood);
-      border-radius: 10px;
-      background: var(--cream);
-      color: var(--text);
-    }
-    .pick-card .pick-btn {
-      cursor: pointer;
-      background: linear-gradient(180deg, #f0c14b, #e8a05a);
-      border-color: var(--wood-dark);
-      flex: 0 0 auto;
-      min-width: 0;
-      white-space: nowrap;
-    }
-    .pick-card .pick-btn:active { transform: translateY(1px); }
+    /* ===== Focused UI: teacher + timeline + 課室／教員室 only ===== */
+    .pick-card { display: none !important; }
     .topbar .change-teacher-btn {
       color: #fff8ee;
       font-size: 0.78rem;
@@ -2222,14 +2179,16 @@
       font-family: inherit;
     }
     .topbar .change-teacher-btn:active { transform: translateY(1px); }
-    .timeline-hint { display: none !important; }
-    /* Strip clutter chrome (keep nodes that JS may touch via hidden ids where needed) */
+    .timeline-hint {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+    /* Strip clutter chrome; keep 課室 + 教員室 scenes and tabs */
     .currency,
     .status-card,
-    .scene-tabs,
-    .scene-badge,
-    .discipline-door,
-    .principal-door,
     .hint-card,
     .board-card,
     .next-list,
@@ -2238,9 +2197,7 @@
     .praise-backdrop,
     .praise-sheet,
     .teacher-hp-backdrop,
-    .teacher-hp-sheet,
-    #sceneStaff,
-    .staffroom { display: none !important; }
+    .teacher-hp-sheet { display: none !important; }
     body.view-staff .wrap { max-width: 480px; }
 
   </style>
@@ -2249,7 +2206,10 @@
   <script>
   (function () {
     try {
-      if (sessionStorage.getItem('lwfssMemberUnlocked') === '1') {
+      var k = 'lwfssMemberUnlocked';
+      var ok = sessionStorage.getItem(k) === '1' || localStorage.getItem(k) === '1';
+      if (ok) {
+        try { sessionStorage.setItem(k, '1'); } catch (e0) {}
         document.documentElement.classList.add('member-unlocked');
       } else {
         document.body.classList.add('member-gated');
@@ -2262,12 +2222,14 @@
   <div class="member-gate-screen" id="memberGateScreen" role="dialog" aria-modal="true" aria-labelledby="memberGateHeading">
     <div class="member-gate-card">
       <h1 id="memberGateHeading">會員付費</h1>
-      <p class="gate-hint">請輸入會員密碼以進入模擬遊戲。解鎖後本瀏覽器分頁／視窗有效（sessionStorage）。</p>
-      <label for="memberGatePassword">密碼</label>
-      <div class="member-gate-row">
-        <input type="password" id="memberGatePassword" placeholder="輸入密碼…" autocomplete="current-password" />
-        <button type="button" class="btn primary" id="memberGateUnlockBtn" style="grid-column:auto;padding:10px 14px;">進入</button>
-      </div>
+      <p class="gate-hint">請輸入會員密碼以進入模擬遊戲。解鎖後本瀏覽器會記住（唔會每次重新輸入）。</p>
+      <form id="memberGateForm" action="#" method="dialog" autocomplete="on">
+        <label for="memberGatePassword">密碼</label>
+        <div class="member-gate-row">
+          <input type="password" id="memberGatePassword" name="memberGatePassword" placeholder="輸入密碼…" autocomplete="current-password" />
+          <button type="submit" class="btn primary" id="memberGateUnlockBtn" style="grid-column:auto;padding:10px 14px;">進入</button>
+        </div>
+      </form>
       <div class="gate-error" id="memberGateError">密碼不正確，請再試。</div>
       <p class="gate-note">僅前端檢查，並非真正保安。</p>
       <a class="gate-back" href="index.html">← 返回課表</a>
@@ -2285,21 +2247,6 @@
   </header>
 
   <main class="wrap">
-    <div class="pick-card" id="classroomPickCard" aria-label="揀老師同課室">
-      <div class="pick-row">
-        <label for="classPickSelect">揀課室</label>
-        <select id="classPickSelect" aria-label="班別">
-          <option value="">自動（跟老師今節）</option>
-        </select>
-      </div>
-      <div class="pick-row">
-        <label for="roomPickSelect">課室／房間</label>
-        <select id="roomPickSelect" aria-label="房間">
-          <option value="">自動（跟今節房間）</option>
-        </select>
-      </div>
-    </div>
-
     <!-- hidden status nodes kept for render() null-safety / timeline sync -->
     <div class="status-card" id="statusCardHidden" aria-hidden="true">
       <div class="status-row">
@@ -2317,11 +2264,17 @@
         <button type="button" class="timeline-live-btn" id="timelineLiveBtn" disabled title="返到而家香港時間">實時</button>
       </div>
       <div class="timeline-period" id="timelinePeriodLabel">讀取時間線…</div>
-      <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室" />
+      <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室／教員室" />
       <div class="timeline-marks" id="timelineMarks" role="list"></div>
+      <div class="timeline-hint">拖曳睇「當時」課室／教員室；撳「實時」返到而家。課室跟所選老師而家所在班房。</div>
     </div>
 
-    <div class="scene-frame" aria-label="課室場景">
+    <div class="scene-tabs" role="tablist" aria-label="場景切換">
+      <button type="button" class="scene-tab active" id="tabClassroom" role="tab" aria-selected="true" data-view="classroom">🏫 課室</button>
+      <button type="button" class="scene-tab" id="tabStaff" role="tab" aria-selected="false" data-view="staff">☕ 教員室</button>
+    </div>
+
+    <div class="scene-frame" aria-label="學校場景">
       <div class="scene classroom is-active" id="scene" data-mood="before">
         <div class="wall"></div>
         <div class="ceiling"></div>
@@ -2336,7 +2289,43 @@
         <span class="prop book" id="propBook" hidden>📖</span>
         <span class="prop sun" id="propSun">☀️</span>
         <span class="prop moon" id="propMoon" hidden>🌙</span>
+        <div class="discipline-door" id="disciplineDoor" title="入訓導室" aria-label="訓導室，可將同學拖入">
+          <span class="door-hint">入訓導室</span>
+          <div class="door-frame" aria-hidden="true"></div>
+          <div class="door-panel" aria-hidden="true"></div>
+          <span class="door-knob" aria-hidden="true"></span>
+          <span class="door-sign">訓導室</span>
+        </div>
         <div class="classroom-empty" id="classroomEmpty" hidden>而家空堂</div>
+        <span class="scene-badge" id="sceneBadge">課室</span>
+      </div>
+
+      <div class="scene staffroom" id="sceneStaff" data-tod="before" data-staff-theme="white-v3" aria-label="教員室">
+        <div class="wall"></div>
+        <div class="ceiling"></div>
+        <div class="floor"></div>
+        <div class="window" id="staffWindow"></div>
+        <div class="staff-banner">教員室</div>
+        <div class="pigeon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="bookshelf" aria-hidden="true"><span class="book b1"></span><span class="book b2"></span><span class="book b3"></span><span class="book b4"></span><span class="book b5"></span><span class="book b6"></span><span class="book b7"></span><span class="book b8"></span><span class="book b9"></span><span class="book b10"></span></div>
+        <div class="whiteboard"><div class="board-text" id="staffBoardText">教員室</div></div>
+        <div class="coffee-bar" aria-hidden="true">
+          <span class="drink d1">☕</span>
+          <span class="drink d2">🍵</span>
+          <span class="drink d3">💧</span>
+        </div>
+        <div class="staff-desks" id="staffDesks" aria-hidden="true"></div>
+        <div class="npc-layer" id="staffNpcLayer" aria-label="教員室老師"></div>
+        <div class="staff-empty" id="staffEmpty" hidden>而家教員室靜靜地～</div>
+        <span class="prop plant" style="bottom:44%;left:36%;filter:grayscale(0.2);">🪴</span>
+        <div class="principal-door" id="principalDoor" title="見校長" aria-label="校長室，可將老師拖入見校長">
+          <span class="door-hint">見校長</span>
+          <div class="door-frame" aria-hidden="true"></div>
+          <div class="door-panel" aria-hidden="true"></div>
+          <span class="door-knob" aria-hidden="true"></span>
+          <span class="door-sign">校長室</span>
+        </div>
+        <span class="scene-badge" id="staffBadge" style="background:#fff;border-color:#9aa3b2;color:#2c3e50;">教員室</span>
       </div>
     </div>
 
@@ -2394,49 +2383,57 @@
     <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn"></button>
   </div>
 
-  <script src="data.js?v=minimal-classroom-v1"></script>
-  <script src="bells.js?v=minimal-classroom-v1"></script>
-  <script src="calendar.js?v=minimal-classroom-v1"></script>
-  <script src="duty.js?v=minimal-classroom-v1"></script>
-  <script src="form-teachers.js?v=minimal-classroom-v1"></script>
-  <script src="students.js?v=minimal-classroom-v1"></script>
-  <script src="groups.js?v=minimal-classroom-v1"></script>
-  <script src="seating.js?v=minimal-classroom-v1"></script>
+  <script src="data.js?v=staff-classroom-smooth-v1"></script>
+  <script src="bells.js?v=staff-classroom-smooth-v1"></script>
+  <script src="calendar.js?v=staff-classroom-smooth-v1"></script>
+  <script src="duty.js?v=staff-classroom-smooth-v1"></script>
+  <script src="form-teachers.js?v=staff-classroom-smooth-v1"></script>
+  <script src="students.js?v=staff-classroom-smooth-v1"></script>
+  <script src="groups.js?v=staff-classroom-smooth-v1"></script>
+  <script src="seating.js?v=staff-classroom-smooth-v1"></script>
   <script>
 (function () {
   'use strict';
 
-  // --- Member password gate (client-side only) ---
+  // --- Member password gate (client-side only; persist; no re-prompt loop) ---
   var MEMBER_GATE_KEY = 'lwfssMemberUnlocked';
   var MEMBER_PASSWORD = '111';
   var memberGateScreen = document.getElementById('memberGateScreen');
   var memberGatePassword = document.getElementById('memberGatePassword');
   var memberGateUnlockBtn = document.getElementById('memberGateUnlockBtn');
   var memberGateError = document.getElementById('memberGateError');
+  var memberGateForm = document.getElementById('memberGateForm');
+  var memberUnlockedMemory = false;
 
   function isMemberUnlocked() {
+    if (memberUnlockedMemory) return true;
     try {
-      return sessionStorage.getItem(MEMBER_GATE_KEY) === '1';
-    } catch (e) {
-      return false;
-    }
+      if (sessionStorage.getItem(MEMBER_GATE_KEY) === '1') return true;
+      if (localStorage.getItem(MEMBER_GATE_KEY) === '1') {
+        try { sessionStorage.setItem(MEMBER_GATE_KEY, '1'); } catch (e1) {}
+        return true;
+      }
+    } catch (e) {}
+    return false;
   }
 
   function setMemberUnlocked() {
-    try {
-      sessionStorage.setItem(MEMBER_GATE_KEY, '1');
-    } catch (e) { /* ignore */ }
+    memberUnlockedMemory = true;
+    try { sessionStorage.setItem(MEMBER_GATE_KEY, '1'); } catch (e) {}
+    try { localStorage.setItem(MEMBER_GATE_KEY, '1'); } catch (e2) {}
   }
 
   function applyMemberGate() {
     var unlocked = isMemberUnlocked();
     if (unlocked) {
+      memberUnlockedMemory = true;
       document.documentElement.classList.add('member-unlocked');
       document.body.classList.remove('member-gated');
       if (memberGateScreen) {
         memberGateScreen.hidden = true;
         memberGateScreen.setAttribute('aria-hidden', 'true');
       }
+      if (memberGateError) memberGateError.classList.remove('show');
     } else {
       document.documentElement.classList.remove('member-unlocked');
       document.body.classList.add('member-gated');
@@ -2445,8 +2442,7 @@
         memberGateScreen.setAttribute('aria-hidden', 'false');
       }
       if (memberGateError) memberGateError.classList.remove('show');
-      if (memberGatePassword) {
-        memberGatePassword.value = '';
+      if (memberGatePassword && !memberGatePassword.value) {
         setTimeout(function () {
           try { memberGatePassword.focus(); } catch (e) {}
         }, 0);
@@ -2456,26 +2452,44 @@
   }
 
   function tryUnlockMember() {
+    if (memberUnlockedMemory || isMemberUnlocked()) {
+      setMemberUnlocked();
+      applyMemberGate();
+      return true;
+    }
     var pw = memberGatePassword ? String(memberGatePassword.value || '') : '';
     if (pw === MEMBER_PASSWORD) {
       setMemberUnlocked();
       applyMemberGate();
-      return;
+      return true;
     }
     if (memberGateError) memberGateError.classList.add('show');
     if (memberGatePassword) {
       memberGatePassword.value = '';
       memberGatePassword.focus();
     }
+    return false;
   }
 
+  if (memberGateForm) {
+    memberGateForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      tryUnlockMember();
+      return false;
+    });
+  }
   if (memberGateUnlockBtn) {
-    memberGateUnlockBtn.addEventListener('click', tryUnlockMember);
+    memberGateUnlockBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      tryUnlockMember();
+    });
   }
   if (memberGatePassword) {
     memberGatePassword.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         e.preventDefault();
+        e.stopPropagation();
         tryUnlockMember();
       }
     });
@@ -2688,9 +2702,7 @@
     if (mode) mode.textContent = timelineState.live ? '● 實時' : '◎ 預覽';
     if (btn) btn.disabled = timelineState.live;
     if (!opts.silent) {
-      // force NPC rebuild when jumping eras
-      try { npcState.key = ''; } catch (e1) {}
-      try { if (typeof staffNpcState !== 'undefined') staffNpcState.key = ''; } catch (e2) {}
+      // syncNpcs / syncStaffNpcs rebuild only when slot/mood key changes
       render();
     }
   }
@@ -2713,8 +2725,7 @@
     var scrub = document.getElementById('timelineScrubber');
     if (scrub && (scrub.value | 0) !== mins) scrub.value = String(mins);
     if (!opts.silent) {
-      try { npcState.key = ''; } catch (e1) {}
-      try { if (typeof staffNpcState !== 'undefined') staffNpcState.key = ''; } catch (e2) {}
+      // Avoid scene thrash while scrubbing within the same period
       render();
     }
   }
@@ -5895,8 +5906,7 @@
     if (badge) badge.textContent = badgeMsg;
     syncNpcs(mood, ctx);
     startNpcLoop();
-    // 教員室 removed from UI — never sync staff scene
-    if (viewMode === 'staff') setViewMode('classroom');
+    syncStaffNpcs(mood, ctx);
     var ymNow = monthKeyHK(ctx.ymd);
     if (ymNow !== praiseState.monthKey) {
       loadPraiseMonth(ymNow);
@@ -6285,14 +6295,24 @@
   resolveTeacher();
   renderStarBoard();
 
-  // Minimal UI: classroom only (教員室 tab removed)
-  try { setViewMode('classroom'); } catch (eView) {}
-  bindClassroomPickers();
+  // Focused UI: 課室 (selected teacher's current room) + 教員室
+  state.pickClass = '';
+  state.pickRoom = '';
+  try {
+    localStorage.removeItem(LS_PICK_CLASS);
+    localStorage.removeItem(LS_PICK_ROOM);
+  } catch (ePick) {}
+  try {
+    var savedView = localStorage.getItem('tt_game_view');
+    setViewMode(savedView === 'staff' ? 'staff' : 'classroom');
+  } catch (eView) {
+    try { setViewMode('classroom'); } catch (eView2) {}
+  }
 
   var tabC = document.getElementById('tabClassroom');
   var tabS = document.getElementById('tabStaff');
   if (tabC) tabC.addEventListener('click', function () { setViewMode('classroom'); });
-  if (tabS) tabS.addEventListener('click', function () { setViewMode('classroom'); });
+  if (tabS) tabS.addEventListener('click', function () { setViewMode('staff'); });
 
   document.getElementById('giveStarBtn').addEventListener('click', function () { givePraise('star'); });
   document.getElementById('giveHeartBtn').addEventListener('click', function () { givePraise('heart'); });

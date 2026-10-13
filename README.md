@@ -122,7 +122,7 @@ python3 -m http.server 8765
 | `duty.js` / `duty.json` | 當值表日期 → Teacher1／Teacher2 |
 | `students.js` / `students.json` | 模擬遊戲學生名單（班別＋中文姓名＋Sex＋House；無電郵；NPC 校服／髮型） |
 | `groups.js` / `groups.json` | 中四至中六科組→學生（含 Sex＋House，由 class register 合併；無電郵；key=`TEACHER|form|sheetSubject`，由 S4/S5/S6 Excel 產生） |
-| `game.html` | 會員付費 · 準時到堂像素課室小遊戲（密碼閘；課室跟搜尋老師現節） |
+| `game.html` | 會員付費 · 準時到堂（密碼閘；揀老師；實時＋時間線；課室＝老師而家班房；教員室） |
 | `form-teachers.js` / `form-teachers.json` | 26/27 班主任／非班主任 |
 | `cycle-config.json` | 可選全校覆寫 |
 | `README.md` | 說明 |
