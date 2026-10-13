@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="classroom-ambience-walk-bubble-pace-v1" />
+  <meta name="game-build" content="classroom-smooth-walk-return-pace-v2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -1434,18 +1434,17 @@
 
     .npc.sitting {
       position: absolute;
-      left: 50%;
-      bottom: 28%;
       width: 22px;
       height: 30px;
-      transform: translateX(-50%);
       pointer-events: auto;
       z-index: 6;
     }
     #sceneStaff .npc.sitting {
+      left: 50%;
+      bottom: 22%;
       width: 18px;
       height: 26px;
-      bottom: 22%;
+      transform: translateX(-50%);
     }
     #sceneStaff .npc.sitting .npc-sprite { height: 24px; }
     #sceneStaff .npc.sitting .npc-body { height: 10px; top: 13px; }
@@ -3252,8 +3251,8 @@
     if (n.homeX != null) {
       clearTimeout(n._returnTimer);
       n._returnTimer = setTimeout(function () {
-        if (!n.inBin && !n.dragging && typeof seatStudentNpc === 'function') {
-          seatStudentNpc(n);
+        if (!n.inBin && !n.dragging && typeof beginReturnToSeat === 'function') {
+          beginReturnToSeat(n);
         }
       }, 3500 + Math.floor(Math.random() * 2500));
     }
@@ -3635,39 +3634,76 @@
     }
     var dt = Math.min(48, ts - npcState.lastTs);
     npcState.lastTs = ts;
+    function stepToward(n, tx, ty, speed, arrive) {
+      var dx = tx - n.x;
+      var dy = ty - n.y;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist <= arrive) {
+        n.x = tx;
+        n.y = ty;
+        return true;
+      }
+      var step = Math.min(dist, speed * dt);
+      n.x += (dx / dist) * step;
+      n.y += (dy / dist) * step;
+      faceNpcToward(n, tx);
+      return false;
+    }
     function stepWalkers(list, yMax) {
       for (var i = 0; i < list.length; i++) {
         var n = list[i];
         if (!n.spec || n.inBin || n.inPrincipal || n.dragging) continue;
-        // Teacher paces in front of blackboard; occasionally stops
+        // Smooth walk back to desk (no teleport / respawn)
+        if (n.walkState === 'returning' && n.returnTx != null) {
+          var arrived = stepToward(n, n.returnTx, n.returnTy, 0.022, 0.65);
+          n.baseY = n.y;
+          applyNpcPos(n);
+          if (arrived) seatStudentNpc(n, true);
+          continue;
+        }
+        // Teacher paces in front of blackboard; continuous motion + soft edge turn
         if (n.spec.pace) {
-          if (n.pauseUntil && ts < n.pauseUntil) continue;
           if (!n.vx) n.vx = 0.007;
-          n.x += n.vx * dt;
-          n.y = n.baseY + Math.sin((ts / 1100) + n.phase) * 0.7;
-          if (n.x < 28) { n.x = 28; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
-          if (n.x > 72) { n.x = 72; n.vx = -Math.abs(n.vx); n.el.classList.add('facing-left'); }
-          if (n.y < 74) n.y = 74;
-          if (n.y > 86) n.y = 86;
-          // ~stop every few seconds of walking
-          if (Math.random() < 0.00055 * dt) {
-            n.pauseUntil = ts + 1400 + Math.random() * 3200;
+          var paused = n.pauseUntil && ts < n.pauseUntil;
+          if (!paused) {
+            n.x += n.vx * dt;
+            if (n.x <= 28) {
+              n.x = 28;
+              n.vx = Math.abs(n.vx);
+              n.el.classList.remove('facing-left');
+            } else if (n.x >= 72) {
+              n.x = 72;
+              n.vx = -Math.abs(n.vx);
+              n.el.classList.add('facing-left');
+            }
+            if (Math.random() < 0.00055 * dt) {
+              n.pauseUntil = ts + 1400 + Math.random() * 3200;
+            }
           }
-          n.el.style.left = n.x.toFixed(2) + '%';
-          n.el.style.bottom = n.y.toFixed(2) + '%';
-          n.el.style.zIndex = String(7 + Math.round(n.y));
+          // Keep bob continuous even while paused (avoids Y snap on resume)
+          var bobY = n.baseY + Math.sin((ts / 1100) + n.phase) * 0.55;
+          n.y = Math.max(74, Math.min(86, bobY));
+          applyNpcPos(n);
           continue;
         }
         if (!n.spec.wander || !n.vx) continue;
+        // Ease aisle height when leaving a desk
+        if (n.walkTargetY != null) {
+          var dyAisle = n.walkTargetY - n.baseY;
+          if (Math.abs(dyAisle) < 0.12) {
+            n.baseY = n.walkTargetY;
+            n.walkTargetY = null;
+          } else {
+            n.baseY += (dyAisle > 0 ? 1 : -1) * Math.min(Math.abs(dyAisle), 0.014 * dt);
+          }
+        }
         n.x += n.vx * dt;
         n.y = n.baseY + Math.sin((ts / 900) + n.phase) * 1.2;
         if (n.x < 6) { n.x = 6; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
         if (n.x > 90) { n.x = 90; n.vx = -Math.abs(n.vx); n.el.classList.add('facing-left'); }
         if (n.y < 3) n.y = 3;
         if (n.y > yMax) n.y = yMax;
-        n.el.style.left = n.x.toFixed(2) + '%';
-        n.el.style.bottom = n.y.toFixed(2) + '%';
-        n.el.style.zIndex = String(7 + Math.round(n.y));
+        applyNpcPos(n);
       }
     }
     stepWalkers(npcState.npcs, 72);
@@ -3694,15 +3730,33 @@
     '明白喇'
   ];
 
-  function seatStudentNpc(n) {
+  function applyNpcPos(n) {
+    if (!n || !n.el) return;
+    n.el.style.left = n.x.toFixed(2) + '%';
+    n.el.style.bottom = n.y.toFixed(2) + '%';
+    n.el.style.zIndex = String(7 + Math.round(n.y));
+  }
+
+  function faceNpcToward(n, tx) {
+    if (!n || !n.el) return;
+    if (tx < n.x - 0.15) n.el.classList.add('facing-left');
+    else if (tx > n.x + 0.15) n.el.classList.remove('facing-left');
+  }
+
+  function seatStudentNpc(n, snap) {
     if (!n || !n.el || n.homeX == null) return;
     clearTimeout(n._returnTimer);
     n._returnTimer = 0;
     n.walkState = 'seated';
+    n.walkTargetY = null;
+    n.returnTx = null;
+    n.returnTy = null;
     if (n.spec) n.spec.wander = false;
     n.vx = 0;
-    n.x = n.homeX;
-    n.y = n.homeY;
+    if (snap !== false) {
+      n.x = n.homeX;
+      n.y = n.homeY;
+    }
     n.baseY = n.homeY;
     n.el.classList.add('sitting', 'idle-bob');
     n.el.classList.remove('wander-bounce', 'facing-left');
@@ -3712,24 +3766,44 @@
       legs.className = 'npc-legs';
       sprite.appendChild(legs);
     }
-    n.el.style.left = n.x.toFixed(2) + '%';
-    n.el.style.bottom = n.y.toFixed(2) + '%';
-    n.el.style.zIndex = String(7 + Math.round(n.y));
+    applyNpcPos(n);
+  }
+
+  function beginReturnToSeat(n) {
+    if (!n || !n.el || n.homeX == null || n.inBin || n.dragging) return;
+    if (n.walkState === 'returning' || n.walkState === 'seated') return;
+    clearTimeout(n._returnTimer);
+    n._returnTimer = 0;
+    n.walkState = 'returning';
+    n.walkTargetY = null;
+    if (n.spec) n.spec.wander = false;
+    n.vx = 0;
+    n.returnTx = n.homeX;
+    n.returnTy = n.homeY;
+    n.el.classList.remove('sitting', 'idle-bob');
+    n.el.classList.add('wander-bounce');
+    var legs = n.el.querySelector('.npc-legs');
+    if (legs) legs.remove();
+    faceNpcToward(n, n.homeX);
   }
 
   function standStudentNpc(n) {
     if (!n || !n.el || n.inBin || n.dragging) return;
     n.walkState = 'walking';
+    n.returnTx = null;
+    n.returnTy = null;
     if (n.spec) n.spec.wander = true;
     n.vx = (0.005 + Math.random() * 0.008) * (Math.random() > 0.5 ? 1 : -1);
-    n.baseY = Math.min(58, Math.max(10, (n.homeY != null ? n.homeY : 30) + (Math.random() - 0.5) * 18));
-    n.y = n.baseY;
+    // Ease into aisle Y — never teleport vertically from the desk
+    n.walkTargetY = Math.min(58, Math.max(10, (n.homeY != null ? n.homeY : 30) + (Math.random() - 0.5) * 18));
+    if (n.baseY == null) n.baseY = n.y;
     n.el.classList.remove('sitting', 'idle-bob');
     n.el.classList.add('wander-bounce');
     var legs = n.el.querySelector('.npc-legs');
     if (legs) legs.remove();
     if (n.vx < 0) n.el.classList.add('facing-left');
     else n.el.classList.remove('facing-left');
+    applyNpcPos(n);
   }
 
   function clearClassWalkTimers() {
@@ -3747,26 +3821,28 @@
     if (document.hidden || viewMode !== 'classroom') return;
     var seated = [];
     var walking = [];
+    var busy = 0;
     (npcState.npcs || []).forEach(function (n) {
       if (!n || !n.spec || n.spec.role !== 'student' || n.inBin || n.dragging) return;
       if (n.walkState === 'walking') walking.push(n);
+      else if (n.walkState === 'returning') busy++;
       else if (n.homeX != null) seated.push(n);
     });
-    // Occasionally send a walker back to their desk
+    // Occasionally send a walker back to their desk (smooth path)
     if (walking.length && Math.random() < 0.5) {
-      seatStudentNpc(walking[Math.floor(Math.random() * walking.length)]);
+      beginReturnToSeat(walking[Math.floor(Math.random() * walking.length)]);
       walking = walking.filter(function (n) { return n.walkState === 'walking'; });
     }
-    // Keep at most 1–2 walkers
-    if (walking.length >= 2 || !seated.length) return;
-    if (walking.length === 1 && Math.random() > 0.5) return;
+    // Keep at most 1–2 walkers (returning counts toward busy lane)
+    if (walking.length + busy >= 2 || !seated.length) return;
+    if (walking.length + busy === 1 && Math.random() > 0.5) return;
     var pick = seated[Math.floor(Math.random() * seated.length)];
     standStudentNpc(pick);
     var retDelay = 5500 + Math.floor(Math.random() * 9000);
     clearTimeout(pick._returnTimer);
     pick._returnTimer = setTimeout(function () {
       if (pick.walkState === 'walking' && !pick.inBin && !pick.dragging) {
-        seatStudentNpc(pick);
+        beginReturnToSeat(pick);
       }
     }, retDelay);
   }
@@ -3835,7 +3911,7 @@
     clearClassWalkTimers();
     if (!keepWalkers) {
       (npcState.npcs || []).forEach(function (n) {
-        if (n && n.walkState === 'walking') seatStudentNpc(n);
+        if (n && (n.walkState === 'walking' || n.walkState === 'returning')) seatStudentNpc(n, true);
       });
     }
   }
