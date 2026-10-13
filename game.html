@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="playground-weather-tkt-v1" />
+  <meta name="game-build" content="tod-sky-lighting-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -1309,6 +1309,196 @@
     .scene[data-mood="class"] .board { box-shadow: 2px 3px 0 rgba(0,0,0,.15), 0 0 12px rgba(240,193,75,0.25); }
     .scene[data-mood="free"] .board { background: #5a7a68; }
 
+    /* ===== Time-of-day sky lighting (HKT live + timeline scrub) =====
+       morning 05:00–10:59 cooler dawn | noon 11:00–14:59 bright |
+       evening 15:00–18:29 warm dusk | night 18:30–04:59 ========== */
+    .scene .sky-ambient {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      z-index: 7;
+      opacity: 0;
+      transition: opacity 0.55s ease, background 0.55s ease;
+      mix-blend-mode: soft-light;
+    }
+    .scene.classroom[data-sky="morning"] .sky-ambient {
+      opacity: 0.42;
+      background: linear-gradient(165deg, rgba(160,200,255,0.55) 0%, rgba(255,210,170,0.22) 55%, transparent 100%);
+    }
+    .scene.classroom[data-sky="noon"] .sky-ambient {
+      opacity: 0.28;
+      background: linear-gradient(180deg, rgba(255,250,210,0.45) 0%, rgba(180,220,255,0.12) 50%, transparent 100%);
+    }
+    .scene.classroom[data-sky="evening"] .sky-ambient {
+      opacity: 0.5;
+      background: linear-gradient(160deg, rgba(255,140,70,0.4) 0%, rgba(255,180,100,0.28) 40%, rgba(80,50,90,0.18) 100%);
+    }
+    .scene.classroom[data-sky="night"] .sky-ambient {
+      opacity: 0.55;
+      background: linear-gradient(180deg, rgba(30,40,80,0.55) 0%, rgba(20,25,50,0.35) 100%);
+      mix-blend-mode: multiply;
+    }
+    .scene.classroom[data-sky="morning"] .window { background: #9ec8e8; box-shadow: inset 0 0 0 2px #fff8ee, 0 0 10px rgba(160,200,255,0.35); }
+    .scene.classroom[data-sky="noon"] .window { background: #6ec4f2; box-shadow: inset 0 0 0 2px #fff8ee, 0 0 14px rgba(255,230,120,0.45); }
+    .scene.classroom[data-sky="evening"] .window { background: #e8a070; box-shadow: inset 0 0 0 2px #fff0e0, 0 0 12px rgba(255,150,60,0.4); }
+    .scene.classroom[data-sky="night"] .window { background: #2a3558; box-shadow: inset 0 0 0 2px #1a2038, 0 0 10px rgba(100,130,200,0.25); }
+    .scene.classroom[data-sky="morning"] .wall { background: #f0e8dc; }
+    .scene.classroom[data-sky="noon"] .wall { background: var(--wall); }
+    .scene.classroom[data-sky="evening"] .wall { background: #edd8c0; }
+    .scene.classroom[data-sky="night"] .wall { background: #c8b8a4; }
+    .scene.classroom[data-sky="night"] .floor {
+      filter: brightness(0.88);
+    }
+
+    /* Staff room window / ambient follow clock sky (overrides period-mood window tints) */
+    #sceneStaff.staffroom .sky-ambient {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      opacity: 0;
+      transition: opacity 0.55s ease, background 0.55s ease;
+      mix-blend-mode: soft-light;
+    }
+    #sceneStaff.staffroom[data-sky="morning"] .sky-ambient {
+      opacity: 0.32;
+      background: linear-gradient(165deg, rgba(170,210,255,0.5) 0%, rgba(255,220,190,0.18) 60%, transparent 100%);
+    }
+    #sceneStaff.staffroom[data-sky="noon"] .sky-ambient {
+      opacity: 0.22;
+      background: linear-gradient(180deg, rgba(255,252,220,0.4) 0%, transparent 55%);
+    }
+    #sceneStaff.staffroom[data-sky="evening"] .sky-ambient {
+      opacity: 0.4;
+      background: linear-gradient(160deg, rgba(255,150,80,0.35) 0%, rgba(200,120,80,0.15) 50%, rgba(60,50,80,0.12) 100%);
+    }
+    #sceneStaff.staffroom[data-sky="night"] .sky-ambient {
+      opacity: 0.48;
+      background: linear-gradient(180deg, rgba(40,50,90,0.45) 0%, rgba(30,35,60,0.3) 100%);
+      mix-blend-mode: multiply;
+    }
+    #sceneStaff.staffroom[data-sky="morning"] .window { background: #b8daf8 !important; box-shadow: inset 0 0 0 1px #ffffff, 0 0 8px rgba(150,200,255,0.4) !important; }
+    #sceneStaff.staffroom[data-sky="noon"] .window { background: #7ec8f0 !important; box-shadow: inset 0 0 0 1px #ffffff, 0 0 10px rgba(255,230,140,0.45) !important; }
+    #sceneStaff.staffroom[data-sky="evening"] .window { background: #f0a878 !important; box-shadow: inset 0 0 0 1px #fff4e8, 0 0 8px rgba(255,140,60,0.4) !important; }
+    #sceneStaff.staffroom[data-sky="night"] .window { background: #3a4568 !important; box-shadow: inset 0 0 0 1px #2a3050, 0 0 6px rgba(120,150,220,0.3) !important; }
+    #sceneStaff.staffroom[data-sky="evening"] .ceiling { background: linear-gradient(180deg, #f8e8d8 0%, transparent 100%) !important; }
+    #sceneStaff.staffroom[data-sky="night"] .ceiling { background: linear-gradient(180deg, #d8dde8 0%, transparent 100%) !important; }
+    #sceneStaff.staffroom[data-sky="night"] .floor {
+      filter: brightness(0.92);
+    }
+
+    /* Playground outdoor sky / sun / moon */
+    .scene.playground .pg-moon {
+      position: absolute;
+      top: 5%;
+      right: 11%;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 32%, #f8f4e0 0 40%, #e8e0c0 70%, #d0c8a0 100%);
+      box-shadow: 0 0 0 2px rgba(220,220,255,0.25), 0 0 12px rgba(180,200,255,0.4);
+      z-index: 3;
+      image-rendering: pixelated;
+      pointer-events: none;
+      display: none;
+    }
+    .scene.playground .sky-ambient {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 0.55s ease, background 0.55s ease;
+    }
+    .scene.playground[data-sky="morning"] .pg-sky {
+      background:
+        radial-gradient(circle at 82% 42%, rgba(255,220,160,0.5) 0 7%, transparent 14%),
+        linear-gradient(180deg, #6aa8d8 0%, #b8d4ec 55%, #d8e8f4 100%);
+    }
+    .scene.playground[data-sky="morning"] {
+      background: linear-gradient(180deg, #6aa8d8 0%, #b8d4ec 28%, #6fbf6a 28%, #6fbf6a 42%, #c4a35a 42%, #c4a35a 100%) !important;
+    }
+    .scene.playground[data-sky="morning"] .pg-sun {
+      top: 10%;
+      background:
+        radial-gradient(circle at 38% 35%, #fff6d8 0 28%, #ffcc70 42%, #f0a040 75%, #e08020 100%);
+      box-shadow: 0 0 0 3px rgba(255,200,120,0.35), 0 0 12px rgba(255,180,80,0.4);
+    }
+    .scene.playground[data-sky="morning"] .sky-ambient {
+      opacity: 0.25;
+      background: linear-gradient(180deg, rgba(180,210,255,0.3), transparent 40%);
+    }
+    .scene.playground[data-sky="noon"] .pg-sky {
+      background:
+        radial-gradient(circle at 86% 22%, rgba(255,248,200,0.65) 0 8%, transparent 13%),
+        linear-gradient(180deg, #3a9fe0 0%, #7ec8f0 50%, #a8d8f0 100%);
+    }
+    .scene.playground[data-sky="noon"] {
+      background: linear-gradient(180deg, #3a9fe0 0%, #7ec8f0 28%, #6fbf6a 28%, #6fbf6a 42%, #c4a35a 42%, #c4a35a 100%) !important;
+    }
+    .scene.playground[data-sky="noon"] .pg-sun {
+      top: 4%;
+      background:
+        radial-gradient(circle at 38% 35%, #fff8d0 0 28%, #ffd54a 40%, #f0a020 72%, #e08810 100%);
+      box-shadow: 0 0 0 4px rgba(255,230,120,0.5), 0 0 18px rgba(255,210,80,0.65);
+    }
+    .scene.playground[data-sky="noon"] .sky-ambient {
+      opacity: 0.18;
+      background: radial-gradient(circle at 85% 15%, rgba(255,250,200,0.5), transparent 45%);
+    }
+    .scene.playground[data-sky="evening"] .pg-sky {
+      background:
+        radial-gradient(circle at 78% 48%, rgba(255,160,60,0.55) 0 9%, transparent 16%),
+        linear-gradient(180deg, #4a5088 0%, #c07050 45%, #e8a070 75%, #f0c090 100%);
+    }
+    .scene.playground[data-sky="evening"] {
+      background: linear-gradient(180deg, #4a5088 0%, #c07050 28%, #5a9a55 28%, #5a9a55 42%, #b89050 42%, #b89050 100%) !important;
+    }
+    .scene.playground[data-sky="evening"] .pg-sun {
+      top: 12%;
+      right: 8%;
+      background:
+        radial-gradient(circle at 38% 35%, #ffe0a0 0 28%, #ff9a40 45%, #e06020 78%, #c04010 100%);
+      box-shadow: 0 0 0 3px rgba(255,140,60,0.4), 0 0 16px rgba(255,100,40,0.5);
+    }
+    .scene.playground[data-sky="evening"] .sky-ambient {
+      opacity: 0.35;
+      background: linear-gradient(180deg, rgba(255,120,40,0.25) 0%, rgba(80,40,90,0.2) 100%);
+      mix-blend-mode: soft-light;
+    }
+    .scene.playground[data-sky="evening"] .pg-grass {
+      filter: brightness(0.92) saturate(1.05);
+    }
+    .scene.playground[data-sky="night"] .pg-sky {
+      background:
+        radial-gradient(circle at 18% 30%, rgba(255,255,255,0.7) 0 1px, transparent 2px),
+        radial-gradient(circle at 40% 18%, rgba(255,255,255,0.55) 0 1px, transparent 2px),
+        radial-gradient(circle at 62% 35%, rgba(255,255,255,0.65) 0 1px, transparent 2px),
+        radial-gradient(circle at 75% 12%, rgba(255,255,255,0.45) 0 1px, transparent 2px),
+        linear-gradient(180deg, #0c1228 0%, #1a2448 55%, #2a3058 100%);
+    }
+    .scene.playground[data-sky="night"] {
+      background: linear-gradient(180deg, #0c1228 0%, #1a2448 28%, #2d5a32 28%, #2d5a32 42%, #6a5a38 42%, #6a5a38 100%) !important;
+    }
+    .scene.playground[data-sky="night"] .pg-sun { display: none; }
+    .scene.playground[data-sky="night"] .pg-moon { display: block; }
+    .scene.playground[data-sky="night"] .sky-ambient {
+      opacity: 0.4;
+      background: linear-gradient(180deg, rgba(20,30,70,0.45), rgba(10,15,40,0.25));
+      mix-blend-mode: multiply;
+    }
+    .scene.playground[data-sky="night"] .pg-grass {
+      filter: brightness(0.55) saturate(0.7);
+    }
+    .scene.playground[data-sky="night"] .pg-court {
+      filter: brightness(0.7);
+    }
+    .scene.playground[data-sky="night"] .pg-fence {
+      filter: brightness(0.65);
+    }
+    .scene-frame.scene-frame--playground[data-sky-frame="morning"] { background: #6aa8d8; }
+    .scene-frame.scene-frame--playground[data-sky-frame="noon"] { background: #7ec8f0; }
+    .scene-frame.scene-frame--playground[data-sky-frame="evening"] { background: #c07050; }
+    .scene-frame.scene-frame--playground[data-sky-frame="night"] { background: #0c1228; }
+
     /* ===== Scene tabs: 課室 | 操場 | 教員室 ===== */
     .scene-tabs {
       display: grid;
@@ -1817,6 +2007,11 @@
     #sceneStaff.staffroom[data-tod="recess"] .window { background: #c5ecd0 !important; }
     #sceneStaff.staffroom[data-tod="holiday"] .wall { background: #ffffff !important; }
 
+    /* Clock sky wins over period-mood window tints on 教員室 */
+    #sceneStaff.staffroom[data-sky="morning"] .window { background: #b8daf8 !important; box-shadow: inset 0 0 0 1px #ffffff, 0 0 8px rgba(150,200,255,0.4) !important; }
+    #sceneStaff.staffroom[data-sky="noon"] .window { background: #7ec8f0 !important; box-shadow: inset 0 0 0 1px #ffffff, 0 0 10px rgba(255,230,140,0.45) !important; }
+    #sceneStaff.staffroom[data-sky="evening"] .window { background: #f0a878 !important; box-shadow: inset 0 0 0 1px #fff4e8, 0 0 8px rgba(255,140,60,0.4) !important; }
+    #sceneStaff.staffroom[data-sky="night"] .window { background: #3a4568 !important; box-shadow: inset 0 0 0 1px #2a3050, 0 0 6px rgba(120,150,220,0.3) !important; }
 
     /* ===== Teacher HP popup (教員室 tap) ===== */
     .teacher-hp-backdrop {
@@ -2672,11 +2867,12 @@
     </div>
 
     <div class="scene-frame" aria-label="學校場景">
-      <div class="scene classroom is-active" id="scene" data-mood="before">
+      <div class="scene classroom is-active" id="scene" data-mood="before" data-sky="morning">
         <div class="wall"></div>
         <div class="ceiling"></div>
         <div class="floor"></div>
         <div class="window" id="sceneWindow"></div>
+        <div class="sky-ambient" id="classroomSkyAmbient" aria-hidden="true"></div>
         <div class="board"><div class="board-text" id="boardText">歡迎</div></div>
         <div class="class-desks" id="classDesks" aria-hidden="true"></div>
         <div class="npc-layer" id="npcLayer" aria-label="課室人物"></div>
@@ -2697,11 +2893,12 @@
         <span class="scene-badge" id="sceneBadge">課室</span>
       </div>
 
-      <div class="scene staffroom" id="sceneStaff" data-tod="before" data-staff-theme="white-v3" aria-label="教員室">
+      <div class="scene staffroom" id="sceneStaff" data-tod="before" data-sky="morning" data-staff-theme="white-v3" aria-label="教員室">
         <div class="wall"></div>
         <div class="ceiling"></div>
         <div class="floor"></div>
         <div class="window" id="staffWindow"></div>
+        <div class="sky-ambient" id="staffSkyAmbient" aria-hidden="true"></div>
         <div class="staff-banner">教員室</div>
         <div class="pigeon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <div class="bookshelf" aria-hidden="true"><span class="book b1"></span><span class="book b2"></span><span class="book b3"></span><span class="book b4"></span><span class="book b5"></span><span class="book b6"></span><span class="book b7"></span><span class="book b8"></span><span class="book b9"></span><span class="book b10"></span></div>
@@ -2726,9 +2923,11 @@
         <span class="scene-badge" id="staffBadge" style="background:#fff;border-color:#9aa3b2;color:#2c3e50;">教員室</span>
       </div>
 
-      <div class="scene playground" id="scenePlayground" data-mood="before" aria-label="學校操場籃球場 PLAYGROUND1">
+      <div class="scene playground" id="scenePlayground" data-mood="before" data-sky="morning" aria-label="學校操場籃球場 PLAYGROUND1">
         <div class="pg-sky" aria-hidden="true"></div>
         <span class="pg-sun" id="playgroundSun" title="太陽" aria-hidden="true"></span>
+        <span class="pg-moon" id="playgroundMoon" title="月亮" aria-hidden="true"></span>
+        <div class="sky-ambient" id="playgroundSkyAmbient" aria-hidden="true"></div>
         <div class="pg-china-flag" id="playgroundChinaFlag" hidden title="中國國旗 · 逢星期二升國旗" aria-label="中國國旗（逢星期二升國旗）">
           <span class="flag-pole" aria-hidden="true"></span>
           <div class="flag-cloth" aria-hidden="true">
@@ -3066,6 +3265,62 @@
       scrubbed: true
     };
   }
+
+  /** Clock-based sky period from HKT minutes-from-midnight (live or scrubbed). */
+  var SKY_PERIODS = [
+    { id: 'morning', label: '早晨', from: 5 * 60, to: 11 * 60 },      // 05:00–10:59 cooler dawn
+    { id: 'noon', label: '正午', from: 11 * 60, to: 15 * 60 },         // 11:00–14:59 bright midday
+    { id: 'evening', label: '黃昏', from: 15 * 60, to: 18 * 60 + 30 },  // 15:00–18:29 warm dusk
+    { id: 'night', label: '夜晚', from: 18 * 60 + 30, to: 24 * 60 }     // 18:30–23:59 (+ before 05:00)
+  ];
+
+  function timeOfDayFromMinutes(mins) {
+    var m = mins | 0;
+    if (m < 0) m = 0;
+    if (m >= 24 * 60) m = 24 * 60 - 1;
+    // Before dawn → night
+    if (m < 5 * 60) {
+      return { id: 'night', label: '夜晚', from: 0, to: 5 * 60 };
+    }
+    for (var i = 0; i < SKY_PERIODS.length; i++) {
+      var p = SKY_PERIODS[i];
+      if (m >= p.from && m < p.to) return p;
+    }
+    return SKY_PERIODS[SKY_PERIODS.length - 1];
+  }
+
+  function applySkyLighting(ctxOrMinutes) {
+    var mins;
+    if (typeof ctxOrMinutes === 'number') {
+      mins = ctxOrMinutes;
+    } else if (ctxOrMinutes && ctxOrMinutes.minutes != null) {
+      mins = ctxOrMinutes.minutes;
+    } else {
+      mins = getEffectiveNowParts().minutes;
+    }
+    var period = timeOfDayFromMinutes(mins);
+    var sky = period.id;
+    var ids = ['scene', 'sceneStaff', 'scenePlayground'];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el) el.setAttribute('data-sky', sky);
+    }
+    var frame = document.querySelector('.scene-frame');
+    if (frame) {
+      if (frame.classList.contains('scene-frame--playground')) {
+        frame.setAttribute('data-sky-frame', sky);
+      } else {
+        frame.removeAttribute('data-sky-frame');
+      }
+    }
+    // Classroom sun/moon props track clock sky (not only 放學後 mood)
+    var sun = document.getElementById('propSun');
+    var moon = document.getElementById('propMoon');
+    if (sun) sun.hidden = (sky === 'night');
+    if (moon) moon.hidden = (sky !== 'night');
+    return period;
+  }
+
 
   function timelineRangeForDay(cycleDay) {
     var sched = cycleDay != null ? scheduleForDay(cycleDay) : null;
@@ -5921,6 +6176,7 @@
       frame.classList.toggle('scene-frame--staff', viewMode === 'staff');
       frame.classList.toggle('scene-frame--playground', viewMode === 'playground');
     }
+    try { applySkyLighting(); } catch (eSky) {}
     document.body.classList.toggle('view-staff', viewMode === 'staff');
     document.body.classList.toggle('view-playground', viewMode === 'playground');
     if (viewMode === 'classroom') ensureClassroomDesks(classroomDeskLayout.count, classroomDeskLayout.cols, classroomDeskLayout.rows);
@@ -6807,6 +7063,7 @@
     var mood = 'before';
     var boardMsg = '歡迎返學';
     var badgeMsg = '課室';
+    var skyPeriod = applySkyLighting(ctx);
 
     function setPropHidden(id, hidden) {
       var el = document.getElementById(id);
@@ -6814,14 +7071,16 @@
     }
     setPropHidden('propLunch', true);
     setPropHidden('propBook', true);
-    setPropHidden('propSun', false);
-    setPropHidden('propMoon', true);
+    // Sun/moon defaults from sky; after/holiday branches may still tweak props
+    setPropHidden('propSun', skyPeriod && skyPeriod.id === 'night');
+    setPropHidden('propMoon', !(skyPeriod && skyPeriod.id === 'night'));
 
     if (ctx.holiday) {
       mood = 'holiday';
       boardMsg = '今日假期\n好好休息';
       badgeMsg = '假期';
-      setPropHidden('propSun', false);
+      setPropHidden('propSun', skyPeriod && skyPeriod.id === 'night');
+      setPropHidden('propMoon', !(skyPeriod && skyPeriod.id === 'night'));
     } else if (isMorningAssembly(ctx)) {
       // 早會 07:55–08:05：全校喺操場（優先於一般 before／homeroom 判斷）
       mood = 'assembly';
@@ -6836,8 +7095,9 @@
       mood = 'after';
       boardMsg = '放學喇\n再見！';
       badgeMsg = '放學後';
-      setPropHidden('propSun', true);
-      setPropHidden('propMoon', false);
+      // Keep sun/moon aligned with HKT sky (evening still has sun; night → moon)
+      setPropHidden('propSun', skyPeriod && skyPeriod.id === 'night');
+      setPropHidden('propMoon', !(skyPeriod && skyPeriod.id === 'night'));
     } else if (ctx.slot.kind === 'break') {
       var key = ctx.slot.key;
       if (key === 'recess' || key === 'gap') {
