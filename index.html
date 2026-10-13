@@ -972,6 +972,63 @@
     #coverUnlocked[hidden],
     #coverGateCard[hidden] { display: none !important; }
 
+    /* Member / game password gate modal */
+    .member-gate-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(30, 45, 70, 0.45);
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .member-gate-backdrop.show { display: flex; }
+    .member-gate-modal {
+      width: min(420px, 100%);
+      background: var(--card, #fff);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius, 14px);
+      box-shadow: 0 12px 40px rgba(30, 45, 70, 0.25);
+      padding: 18px 16px 16px;
+    }
+    .member-gate-modal h2 {
+      font-size: 1.1rem;
+      margin: 0 0 6px;
+      color: var(--text);
+    }
+    .member-gate-modal .hint { margin-bottom: 10px; }
+    .member-gate-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .member-gate-row input[type="password"] {
+      flex: 1;
+      min-width: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      background: #fff;
+      font-family: inherit;
+    }
+    .member-gate-row input[type="password"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+    .member-gate-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: flex-end;
+    }
+    .member-gate-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
     /* Cover / substitute assistant */
     .cover-controls {
       display: grid;
@@ -2140,7 +2197,7 @@
       <button class="tab" data-tab="formteachers" type="button">班主任</button>
       <button class="tab" data-tab="rooms" type="button">房間預約</button>
       <button class="tab" data-tab="training" type="button">教師進修申請</button>
-      <a class="tab" data-tab="game" href="game.html" id="gameTabLink">模擬遊戲</a>
+      <a class="tab" data-tab="game" href="game.html" id="gameTabLink">會員付費</a>
     </nav>
 
     <!-- Day view -->
@@ -2651,6 +2708,23 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <div class="member-gate-backdrop" id="memberGateBackdrop" hidden aria-hidden="true">
+    <div class="member-gate-modal" role="dialog" aria-modal="true" aria-labelledby="memberGateTitle">
+      <h2 id="memberGateTitle">會員付費</h2>
+      <p class="hint">請輸入會員密碼以進入模擬遊戲。解鎖後本瀏覽器分頁／視窗有效（sessionStorage）。</p>
+      <label class="field-label" for="memberGatePassword">密碼</label>
+      <div class="member-gate-row">
+        <input type="password" id="memberGatePassword" placeholder="輸入密碼…" autocomplete="current-password" />
+        <button class="btn" id="memberGateUnlockBtn" type="button">進入</button>
+      </div>
+      <div class="error-msg" id="memberGateError">密碼不正確，請再試。</div>
+      <div class="member-gate-actions">
+        <button class="btn btn-ghost" id="memberGateCancelBtn" type="button">取消</button>
+      </div>
+      <p class="member-gate-note">僅前端檢查，並非真正保安。</p>
+    </div>
   </div>
 
   <footer class="app-footer" id="appFooter"></footer>
@@ -5862,10 +5936,103 @@
     }
   });
 
+  // --- Member / game password gate (client-side only) ---
+  var MEMBER_GATE_KEY = 'lwfssMemberUnlocked';
+  var MEMBER_PASSWORD = '111';
+  var memberGateBackdrop = document.getElementById('memberGateBackdrop');
+  var memberGatePassword = document.getElementById('memberGatePassword');
+  var memberGateUnlockBtn = document.getElementById('memberGateUnlockBtn');
+  var memberGateCancelBtn = document.getElementById('memberGateCancelBtn');
+  var memberGateError = document.getElementById('memberGateError');
+  var gameTabLink = document.getElementById('gameTabLink');
+
+  function isMemberUnlocked() {
+    try {
+      return sessionStorage.getItem(MEMBER_GATE_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setMemberUnlocked() {
+    try {
+      sessionStorage.setItem(MEMBER_GATE_KEY, '1');
+    } catch (e) { /* ignore quota / private mode */ }
+  }
+
+  function openMemberGate() {
+    if (!memberGateBackdrop) return;
+    memberGateBackdrop.hidden = false;
+    memberGateBackdrop.setAttribute('aria-hidden', 'false');
+    memberGateBackdrop.classList.add('show');
+    if (memberGateError) memberGateError.classList.remove('show');
+    if (memberGatePassword) {
+      memberGatePassword.value = '';
+      setTimeout(function () {
+        try { memberGatePassword.focus(); } catch (e) {}
+      }, 0);
+    }
+  }
+
+  function closeMemberGate() {
+    if (!memberGateBackdrop) return;
+    memberGateBackdrop.classList.remove('show');
+    memberGateBackdrop.hidden = true;
+    memberGateBackdrop.setAttribute('aria-hidden', 'true');
+    if (memberGateError) memberGateError.classList.remove('show');
+    if (memberGatePassword) memberGatePassword.value = '';
+  }
+
+  function tryUnlockMember() {
+    var pw = memberGatePassword ? String(memberGatePassword.value || '') : '';
+    if (pw === MEMBER_PASSWORD) {
+      setMemberUnlocked();
+      closeMemberGate();
+      window.location.href = 'game.html';
+      return;
+    }
+    if (memberGateError) memberGateError.classList.add('show');
+    if (memberGatePassword) {
+      memberGatePassword.value = '';
+      memberGatePassword.focus();
+    }
+  }
+
+  if (memberGateUnlockBtn) {
+    memberGateUnlockBtn.addEventListener('click', tryUnlockMember);
+  }
+  if (memberGateCancelBtn) {
+    memberGateCancelBtn.addEventListener('click', closeMemberGate);
+  }
+  if (memberGatePassword) {
+    memberGatePassword.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        tryUnlockMember();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeMemberGate();
+      }
+    });
+  }
+  if (memberGateBackdrop) {
+    memberGateBackdrop.addEventListener('click', function (e) {
+      if (e.target === memberGateBackdrop) closeMemberGate();
+    });
+  }
+
   document.querySelectorAll('.tab').forEach(function (tab) {
     tab.addEventListener('click', function (e) {
-      // External / linked tabs (e.g. 模擬遊戲 → game.html) navigate normally
-      if (tab.tagName === 'A' && tab.getAttribute('href')) return;
+      // External linked tab: 會員付費 → game.html (password-gated)
+      if (tab.tagName === 'A' && tab.getAttribute('href')) {
+        if (tab.id === 'gameTabLink' || tab.dataset.tab === 'game') {
+          if (isMemberUnlocked()) return; // allow navigation
+          e.preventDefault();
+          openMemberGate();
+          return;
+        }
+        return;
+      }
       e.preventDefault();
       switchTab(tab.dataset.tab);
     });

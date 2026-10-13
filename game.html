@@ -7,7 +7,7 @@
   <meta name="game-build" content="staff-room-hp-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
-  <title>模擬遊戲 · 準時到堂 · 劉皇發中學</title>
+  <title>會員付費 · 準時到堂 · 劉皇發中學</title>
   <style>
     :root {
       --cream: #f7efe3;
@@ -1689,9 +1689,142 @@
     @media (min-width: 480px) {
       .scene-frame:not(.scene-frame--staff) { aspect-ratio: 4 / 3; }
     }
+
+    /* Member password gate (full-page) */
+    .member-gate-screen {
+      position: fixed; inset: 0;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, #e8d5b8 0%, var(--cream) 40%, #e6d0b0 100%);
+    }
+    .member-gate-screen[hidden] { display: none !important; }
+    html.member-unlocked .member-gate-screen { display: none !important; }
+    html.member-unlocked body.member-gated .topbar,
+    html.member-unlocked body.member-gated .wrap,
+    html.member-unlocked body.member-gated .toast,
+    html.member-unlocked body.member-gated .praise-backdrop,
+    html.member-unlocked body.member-gated .praise-sheet,
+    html.member-unlocked body.member-gated .teacher-hp-backdrop,
+    html.member-unlocked body.member-gated .teacher-hp-sheet {
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+    .member-gate-card {
+      width: min(400px, 100%);
+      background: var(--card);
+      border: 3px solid var(--wood-deeper);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 16px 16px;
+      color: var(--text);
+    }
+    .member-gate-card h1 {
+      font-size: 1.15rem;
+      margin: 0 0 8px;
+      color: var(--wood-deeper);
+    }
+    .member-gate-card .gate-hint {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+    .member-gate-card label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+    .member-gate-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .member-gate-row input[type="password"] {
+      flex: 1;
+      min-width: 0;
+      border: 2px solid var(--wood);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #fffaf2;
+      color: var(--text);
+    }
+    .member-gate-row input[type="password"]:focus {
+      outline: none;
+      border-color: var(--wood-dark);
+      box-shadow: 0 0 0 3px rgba(232, 160, 90, 0.35);
+    }
+    .member-gate-card .gate-error {
+      color: #b33;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 4px 0 8px;
+      display: none;
+    }
+    .member-gate-card .gate-error.show { display: block; }
+    .member-gate-card .gate-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .member-gate-card .gate-back {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--wood-dark);
+      text-decoration: none;
+    }
+    .member-gate-card .gate-back:hover { text-decoration: underline; }
+    body.member-gated .topbar,
+    body.member-gated .wrap,
+    body.member-gated .toast,
+    body.member-gated .praise-backdrop,
+    body.member-gated .praise-sheet,
+    body.member-gated .teacher-hp-backdrop,
+    body.member-gated .teacher-hp-sheet {
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
   </style>
 </head>
 <body>
+  <script>
+  (function () {
+    try {
+      if (sessionStorage.getItem('lwfssMemberUnlocked') === '1') {
+        document.documentElement.classList.add('member-unlocked');
+      } else {
+        document.body.classList.add('member-gated');
+      }
+    } catch (e) {
+      document.body.classList.add('member-gated');
+    }
+  })();
+  </script>
+  <div class="member-gate-screen" id="memberGateScreen" role="dialog" aria-modal="true" aria-labelledby="memberGateHeading">
+    <div class="member-gate-card">
+      <h1 id="memberGateHeading">會員付費</h1>
+      <p class="gate-hint">請輸入會員密碼以進入模擬遊戲。解鎖後本瀏覽器分頁／視窗有效（sessionStorage）。</p>
+      <label for="memberGatePassword">密碼</label>
+      <div class="member-gate-row">
+        <input type="password" id="memberGatePassword" placeholder="輸入密碼…" autocomplete="current-password" />
+        <button type="button" class="btn primary" id="memberGateUnlockBtn" style="grid-column:auto;padding:10px 14px;">進入</button>
+      </div>
+      <div class="gate-error" id="memberGateError">密碼不正確，請再試。</div>
+      <p class="gate-note">僅前端檢查，並非真正保安。</p>
+      <a class="gate-back" href="index.html">← 返回課表</a>
+    </div>
+  </div>
+
   <header class="topbar">
     <a class="back-link" href="index.html" title="返回時間表">← 課表</a>
     <div class="avatar" id="avatarFace" aria-hidden="true">🧑‍🏫</div>
@@ -1811,7 +1944,7 @@
       <div id="todayList"></div>
     </div>
 
-    <p class="footer-note">世界龍岡學校劉皇發中學 · 模擬遊戲用真實校曆／鐘聲／時間表資料 · zh-HK</p>
+    <p class="footer-note">世界龍岡學校劉皇發中學 · 會員付費模擬遊戲用真實校曆／鐘聲／時間表資料 · zh-HK</p>
   </main>
 
   <div class="toast" id="toast" role="status"></div>
@@ -1854,6 +1987,82 @@
   <script>
 (function () {
   'use strict';
+
+  // --- Member password gate (client-side only) ---
+  var MEMBER_GATE_KEY = 'lwfssMemberUnlocked';
+  var MEMBER_PASSWORD = '111';
+  var memberGateScreen = document.getElementById('memberGateScreen');
+  var memberGatePassword = document.getElementById('memberGatePassword');
+  var memberGateUnlockBtn = document.getElementById('memberGateUnlockBtn');
+  var memberGateError = document.getElementById('memberGateError');
+
+  function isMemberUnlocked() {
+    try {
+      return sessionStorage.getItem(MEMBER_GATE_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setMemberUnlocked() {
+    try {
+      sessionStorage.setItem(MEMBER_GATE_KEY, '1');
+    } catch (e) { /* ignore */ }
+  }
+
+  function applyMemberGate() {
+    var unlocked = isMemberUnlocked();
+    if (unlocked) {
+      document.documentElement.classList.add('member-unlocked');
+      document.body.classList.remove('member-gated');
+      if (memberGateScreen) {
+        memberGateScreen.hidden = true;
+        memberGateScreen.setAttribute('aria-hidden', 'true');
+      }
+    } else {
+      document.documentElement.classList.remove('member-unlocked');
+      document.body.classList.add('member-gated');
+      if (memberGateScreen) {
+        memberGateScreen.hidden = false;
+        memberGateScreen.setAttribute('aria-hidden', 'false');
+      }
+      if (memberGateError) memberGateError.classList.remove('show');
+      if (memberGatePassword) {
+        memberGatePassword.value = '';
+        setTimeout(function () {
+          try { memberGatePassword.focus(); } catch (e) {}
+        }, 0);
+      }
+    }
+    return unlocked;
+  }
+
+  function tryUnlockMember() {
+    var pw = memberGatePassword ? String(memberGatePassword.value || '') : '';
+    if (pw === MEMBER_PASSWORD) {
+      setMemberUnlocked();
+      applyMemberGate();
+      return;
+    }
+    if (memberGateError) memberGateError.classList.add('show');
+    if (memberGatePassword) {
+      memberGatePassword.value = '';
+      memberGatePassword.focus();
+    }
+  }
+
+  if (memberGateUnlockBtn) {
+    memberGateUnlockBtn.addEventListener('click', tryUnlockMember);
+  }
+  if (memberGatePassword) {
+    memberGatePassword.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        tryUnlockMember();
+      }
+    });
+  }
+  applyMemberGate();
 
   var LS_TEACHER = 'tt_teacher_code';
   var LS_POINTS = 'tt_game_ontime_points';
