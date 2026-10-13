@@ -498,6 +498,136 @@
       line-height: 1.45;
       margin: 0 0 10px;
     }
+    /* 早會日程 */
+    .assembly-banner {
+      margin-top: 6px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.14);
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+    }
+    .assembly-banner .asm-label { opacity: .9; font-weight: 700; }
+    .assembly-banner .asm-theme { font-weight: 800; }
+    .assembly-banner.asm-off { background: rgba(0,0,0,.14); opacity: .9; }
+    .asm-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+    }
+    .asm-badge.flag {
+      background: #fff3cd;
+      color: #8a5a00;
+      border: 1px solid rgba(180,120,0,.35);
+    }
+    .asm-badge.x3 {
+      background: #fce4ec;
+      color: #8e0e42;
+      border: 1px solid rgba(194,24,91,.28);
+    }
+    .asm-badge.bf {
+      background: #e0f2ea;
+      color: #0d5238;
+      border: 1px solid rgba(21,122,82,.3);
+    }
+    html[data-day-theme="bf"] .asm-badge.bf {
+      background: rgba(255,255,255,.85);
+    }
+    .assembly-day-hint {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .assembly-day-hint .asm-theme { font-weight: 800; }
+    .asm-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.88rem;
+    }
+    .asm-table th, .asm-table td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .asm-table th {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 700;
+      background: var(--primary-soft);
+    }
+    .asm-table tr.asm-row-active {
+      background: var(--primary-soft);
+      outline: 2px solid var(--primary);
+      outline-offset: -2px;
+    }
+    .asm-table tr.asm-row-bf td:first-child { color: #157a52; font-weight: 800; }
+    .asm-table .asm-day-cell {
+      font-weight: 800;
+      white-space: nowrap;
+      color: var(--primary);
+      min-width: 4.5rem;
+    }
+    .asm-table .asm-flags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .asm-notes {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      padding: 0 12px;
+    }
+    .asm-notes summary {
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 10px 0;
+      list-style: none;
+    }
+    .asm-notes summary::-webkit-details-marker { display: none; }
+    .asm-notes summary::before {
+      content: "▸ ";
+      color: var(--primary);
+    }
+    .asm-notes[open] summary::before { content: "▾ "; }
+    .asm-notes ol {
+      margin: 0 0 12px 1.1rem;
+      padding: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .asm-notes li { margin-bottom: 6px; }
+    .asm-today-card {
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--primary-soft);
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+    }
+    .asm-today-card .asm-k { color: var(--muted); font-weight: 700; font-size: 0.78rem; }
+    .asm-today-card .asm-v { color: var(--primary-dark); font-weight: 800; }
+
     .room-free-card { margin-top: 12px; }
     .room-free-list {
       display: flex;
@@ -1947,6 +2077,11 @@
     <div class="duty-banner" id="dutyBanner">
       <span class="duty-main" id="dutyBannerMain">載入當值…</span>
     </div>
+    <div class="assembly-banner" id="assemblyBanner" hidden>
+      <span class="asm-label" id="assemblyBannerLabel">早會</span>
+      <span class="asm-theme" id="assemblyBannerTheme"></span>
+      <span id="assemblyBannerBadges"></span>
+    </div>
   </header>
 
   <div class="wrap">
@@ -1980,6 +2115,7 @@
       <button class="tab" data-tab="cycle" type="button">循環日覆寫</button>
       <button class="tab" data-tab="cal" type="button">校曆</button>
       <button class="tab" data-tab="duty" type="button">當值</button>
+      <button class="tab" data-tab="assembly" type="button">早會</button>
       <button class="tab" data-tab="formteachers" type="button">班主任</button>
       <button class="tab" data-tab="rooms" type="button">房間預約</button>
       <button class="tab" data-tab="training" type="button">教師進修申請</button>
@@ -2001,6 +2137,7 @@
           <span id="dayTitle">Day 1</span>
           <span class="badge-count" id="dayLessonCount"></span>
         </div>
+        <div class="assembly-day-hint" id="dayAssemblyHint" hidden></div>
         <div class="now-slot-banner" id="nowSlotBanner" hidden></div>
         <div class="lesson-list" id="lessonList"></div>
       </div>
@@ -2208,6 +2345,33 @@
         <h2 style="font-size:1rem;margin-top:4px;">即將當值</h2>
         <p class="hint" style="margin-bottom:6px;">由頂部日期起計未來當值日子（來源：2026–2027 當值表）。點一列可改頂部日期。</p>
         <div class="duty-upcoming-list" id="dutyUpcomingList"></div>
+      </div>
+    </section>
+
+    <!-- 早會日程表 -->
+    <section class="panel" id="panel-assembly">
+      <div class="card">
+        <h2>早會日程表</h2>
+        <p class="hint" style="margin-bottom:8px;">依十日循環固定主題。當日早會見頂部；以下為 Day 1–10 一覽（2026–27）。</p>
+        <div class="asm-today-card" id="assemblyTodayCard" hidden>
+          <span class="asm-k" id="assemblyTodayLabel">當日早會</span>
+          <span class="asm-v" id="assemblyTodayTheme"></span>
+          <span id="assemblyTodayBadges"></span>
+        </div>
+        <table class="asm-table" id="assemblyTable" aria-label="早會日程表">
+          <thead>
+            <tr>
+              <th>循環日</th>
+              <th>主題</th>
+              <th>標記</th>
+            </tr>
+          </thead>
+          <tbody id="assemblyTableBody"></tbody>
+        </table>
+        <details class="asm-notes" id="assemblyNotes">
+          <summary>注意事項</summary>
+          <ol id="assemblyNotesList"></ol>
+        </details>
       </div>
     </section>
 
@@ -2474,6 +2638,7 @@
   <script src="calendar.js"></script>
   <script src="bells.js"></script>
   <script src="duty.js"></script>
+  <script src="assembly.js"></script>
   <script src="form-teachers.js"></script>
   <script>
 (function () {
@@ -2529,6 +2694,17 @@
   var dutyBannerMain = document.getElementById('dutyBannerMain');
   var dutyUpcomingList = document.getElementById('dutyUpcomingList');
   var dutyRoleHint = document.getElementById('dutyRoleHint');
+  var assemblyBanner = document.getElementById('assemblyBanner');
+  var assemblyBannerLabel = document.getElementById('assemblyBannerLabel');
+  var assemblyBannerTheme = document.getElementById('assemblyBannerTheme');
+  var assemblyBannerBadges = document.getElementById('assemblyBannerBadges');
+  var dayAssemblyHint = document.getElementById('dayAssemblyHint');
+  var assemblyTableBody = document.getElementById('assemblyTableBody');
+  var assemblyNotesList = document.getElementById('assemblyNotesList');
+  var assemblyTodayCard = document.getElementById('assemblyTodayCard');
+  var assemblyTodayLabel = document.getElementById('assemblyTodayLabel');
+  var assemblyTodayTheme = document.getElementById('assemblyTodayTheme');
+  var assemblyTodayBadges = document.getElementById('assemblyTodayBadges');
   var ftSearchInput = document.getElementById('ftSearchInput');
   var ftSearchClearBtn = document.getElementById('ftSearchClearBtn');
   var ftMeta = document.getElementById('ftMeta');
@@ -2577,6 +2753,7 @@
 
   var BELLS = window.BELLS_DATA || null;
   var DUTY = window.DUTY_DATA || null;
+  var ASSEMBLY = window.ASSEMBLY_DATA || null;
   var FORM_TEACHERS = window.FORM_TEACHERS_DATA || null;
 
   function scheduleIdForDay(d) {
@@ -2921,11 +3098,170 @@
     }
   }
 
+  function assemblyForDay(day) {
+    if (!ASSEMBLY || !ASSEMBLY.days || day == null) return null;
+    return ASSEMBLY.days[String(day)] || null;
+  }
+
+  function cycleDayForYmd(ymd) {
+    ymd = ymd || state.browseDate || todayYmdHK();
+    if (ymd === todayYmdHK()) {
+      var r = resolveTodayCycle();
+      return r.day != null ? r.day : null;
+    }
+    var info = lookupCalendarDate(ymd);
+    if (info.status === 'school' && info.day != null) return info.day;
+    return null;
+  }
+
+  function fillAssemblyBadges(el, entry) {
+    if (!el) return;
+    el.textContent = '';
+    if (!entry) return;
+    if (entry.flagCeremony) {
+      var b1 = document.createElement('span');
+      b1.className = 'asm-badge flag';
+      b1.textContent = '升國旗';
+      el.appendChild(b1);
+    }
+    if (entry.is3X) {
+      var b2 = document.createElement('span');
+      b2.className = 'asm-badge x3';
+      b2.textContent = '3X／頒獎';
+      el.appendChild(b2);
+    }
+    if (entry.bf) {
+      var b3 = document.createElement('span');
+      b3.className = 'asm-badge bf';
+      b3.textContent = 'BF';
+      el.appendChild(b3);
+    }
+  }
+
+  function refreshAssemblyBanner(ymd) {
+    if (!assemblyBanner) return;
+    ymd = ymd || state.browseDate || todayYmdHK();
+    var isToday = ymd === todayYmdHK();
+    var day = cycleDayForYmd(ymd);
+    var entry = assemblyForDay(day);
+    if (day != null && entry) {
+      assemblyBanner.hidden = false;
+      assemblyBanner.classList.remove('asm-off');
+      if (assemblyBannerLabel) {
+        assemblyBannerLabel.textContent = isToday ? '今日早會' : '當日早會';
+      }
+      if (assemblyBannerTheme) {
+        assemblyBannerTheme.textContent = 'Day ' + day + ' · ' + entry.theme;
+      }
+      fillAssemblyBadges(assemblyBannerBadges, entry);
+    } else {
+      assemblyBanner.hidden = false;
+      assemblyBanner.classList.add('asm-off');
+      if (assemblyBannerLabel) {
+        assemblyBannerLabel.textContent = isToday ? '今日早會' : '當日早會';
+      }
+      if (assemblyBannerTheme) {
+        assemblyBannerTheme.textContent = '是日無早會／無循環日';
+      }
+      fillAssemblyBadges(assemblyBannerBadges, null);
+    }
+  }
+
+  function renderAssemblyPanel(ymd) {
+    ymd = ymd || state.browseDate || todayYmdHK();
+    var activeDay = cycleDayForYmd(ymd);
+    var isToday = ymd === todayYmdHK();
+    if (assemblyTodayCard) {
+      var entry = assemblyForDay(activeDay);
+      if (activeDay != null && entry) {
+        assemblyTodayCard.hidden = false;
+        if (assemblyTodayLabel) {
+          assemblyTodayLabel.textContent = isToday ? '今日早會（Day ' + activeDay + '）' : '當日早會（Day ' + activeDay + '）';
+        }
+        if (assemblyTodayTheme) assemblyTodayTheme.textContent = entry.theme;
+        fillAssemblyBadges(assemblyTodayBadges, entry);
+      } else {
+        assemblyTodayCard.hidden = true;
+      }
+    }
+    if (assemblyTableBody) {
+      assemblyTableBody.innerHTML = '';
+      if (!ASSEMBLY || !ASSEMBLY.days) {
+        var tr0 = document.createElement('tr');
+        var td0 = document.createElement('td');
+        td0.colSpan = 3;
+        td0.textContent = '未載入早會資料（assembly.js）。';
+        tr0.appendChild(td0);
+        assemblyTableBody.appendChild(tr0);
+      } else {
+        for (var d = 1; d <= 10; d++) {
+          var e = ASSEMBLY.days[String(d)];
+          if (!e) continue;
+          var tr = document.createElement('tr');
+          if (e.bf) tr.classList.add('asm-row-bf');
+          if (activeDay === d) tr.classList.add('asm-row-active');
+          var tdDay = document.createElement('td');
+          tdDay.className = 'asm-day-cell';
+          tdDay.textContent = 'Day ' + d;
+          var tdTheme = document.createElement('td');
+          tdTheme.textContent = e.theme;
+          var tdFlags = document.createElement('td');
+          var wrap = document.createElement('span');
+          wrap.className = 'asm-flags';
+          fillAssemblyBadges(wrap, e);
+          if (!wrap.childNodes.length) {
+            wrap.textContent = '—';
+            wrap.style.color = 'var(--muted)';
+            wrap.style.fontWeight = '600';
+          }
+          tdFlags.appendChild(wrap);
+          tr.appendChild(tdDay);
+          tr.appendChild(tdTheme);
+          tr.appendChild(tdFlags);
+          assemblyTableBody.appendChild(tr);
+        }
+      }
+    }
+    if (assemblyNotesList && ASSEMBLY && ASSEMBLY.notes) {
+      assemblyNotesList.innerHTML = '';
+      ASSEMBLY.notes.forEach(function (n) {
+        var li = document.createElement('li');
+        li.textContent = n;
+        assemblyNotesList.appendChild(li);
+      });
+    }
+  }
+
+  function refreshAssemblyDayHint(day) {
+    if (!dayAssemblyHint) return;
+    var entry = assemblyForDay(day);
+    if (!entry) {
+      dayAssemblyHint.hidden = true;
+      dayAssemblyHint.textContent = '';
+      return;
+    }
+    dayAssemblyHint.hidden = false;
+    dayAssemblyHint.textContent = '';
+    var lab = document.createElement('span');
+    lab.textContent = '早會：';
+    var th = document.createElement('span');
+    th.className = 'asm-theme';
+    th.textContent = entry.theme;
+    dayAssemblyHint.appendChild(lab);
+    dayAssemblyHint.appendChild(th);
+    var badgeWrap = document.createElement('span');
+    badgeWrap.className = 'asm-flags';
+    fillAssemblyBadges(badgeWrap, entry);
+    dayAssemblyHint.appendChild(badgeWrap);
+  }
+
   function updateDateResultUI(info) {
-    // Header is the single source of truth for date / cycle / events / duty.
+    // Header is the single source of truth for date / cycle / events / duty / assembly.
     refreshCalBanner(info.ymd);
     refreshDutyBanner(info.ymd);
     refreshDutyPanel(info.ymd);
+    refreshAssemblyBanner(info.ymd);
+    renderAssemblyPanel(info.ymd);
   }
 
   /** Apply a picked calendar date: update UI; if school day, jump cycle day. */
@@ -3317,6 +3653,7 @@
     var sched = scheduleForDay(d);
     // Day title is unique to this tab (which Day's lessons)
     dayTitle.textContent = 'Day ' + d + (sched && sched.label ? ' · ' + sched.label : '');
+    refreshAssemblyDayHint(d);
     var oldBell = document.getElementById('dayBellLabel');
     if (oldBell) oldBell.remove();
     Array.prototype.forEach.call(dayChips.querySelectorAll('.day-chip'), function (chip) {
@@ -3742,6 +4079,9 @@
     }
     if (name === 'formteachers' && typeof renderFormTeachers === 'function') {
       renderFormTeachers();
+    }
+    if (name === 'assembly') {
+      renderAssemblyPanel(state.browseDate || todayYmdHK());
     }
   }
 
