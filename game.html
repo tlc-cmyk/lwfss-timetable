@@ -1952,7 +1952,7 @@
 
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
-      可切換<strong>課室／教員室</strong>：上課前／小息／午膳見<strong>今日當值</strong>；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
+      可切換<strong>課室／教員室</strong>：上課前／午膳見<strong>今日當值</strong>；<strong>小息見全體老師</strong>（一般／BF）；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
       撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。可<strong>拖動同學入訓導室</strong>（約 5 秒後會走返出嚟）；老師唔入訓導室。教員室可<strong>拖動老師入校長室見校長</strong>（約 10 秒後會走返出嚟）。教員室：坐喺度＝下一堂有課；企／行＝下一堂都空（或已冇下一堂）。
       頂部「準時★」係準時到堂分數，同讚賞星分開。
       喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集準時 ★（每節每日一次）。
@@ -2003,12 +2003,12 @@
     <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn">關閉</button>
   </div>
 
-  <script src="data.js?v=staff-next-discipline-v1"></script>
-  <script src="bells.js?v=staff-next-discipline-v1"></script>
-  <script src="calendar.js?v=staff-next-discipline-v1"></script>
-  <script src="duty.js?v=staff-next-discipline-v1"></script>
-  <script src="form-teachers.js?v=staff-next-discipline-v1"></script>
-  <script src="students.js?v=staff-next-discipline-v1"></script>
+  <script src="data.js?v=staff-recess-all-v1"></script>
+  <script src="bells.js?v=staff-recess-all-v1"></script>
+  <script src="calendar.js?v=staff-recess-all-v1"></script>
+  <script src="duty.js?v=staff-recess-all-v1"></script>
+  <script src="form-teachers.js?v=staff-recess-all-v1"></script>
+  <script src="students.js?v=staff-recess-all-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -3321,9 +3321,11 @@
 
   /**
    * 教員室 who appears:
-   * - before / recess / lunch (+ other breaks): today's duty only
+   * - recess (小息, general + BF Day 5/10 bell): all teachers
+   * - before / lunch (+ other breaks): today's duty only
    * - lesson periods: 空堂 teachers
    * - after school: tomorrow's duty (next duty-roster school day)
+   * Sit vs wander is assigned later by next-period lesson/free.
    */
   function pickStaffTeachers(ctx, mood) {
     var day = ctx.cycle && ctx.cycle.day;
@@ -3351,14 +3353,21 @@
       labelHint = nextYmd ? ('放學後 · 明日當值\n' + nextYmd.slice(5)) : '放學後教員室';
       list = nextYmd ? dutyTeachersFor(nextYmd) : [];
     } else if (ctx.slot.kind === 'break') {
-      mode = 'duty-today';
       var bk = ctx.slot.key;
-      if (bk === 'lunch') labelHint = '午膳 · 今日當值';
-      else if (bk === 'recess' || bk === 'gap') labelHint = '小息 · 今日當值';
-      else if (bk === 'homeroom') labelHint = '早會 · 今日當值';
-      else if (bk === 'reading') labelHint = '閱讀 · 今日當值';
-      else labelHint = (ctx.slot.label || '休息') + ' · 今日當值';
-      list = dutyTeachersFor(ymd);
+      if (bk === 'recess') {
+        // 小息（一般／BF 鐘聲表）：全體老師返教員室；坐／行按下一堂
+        mode = 'all-recess';
+        labelHint = '小息 · 全體老師';
+        list = DATA.teachers || [];
+      } else {
+        mode = 'duty-today';
+        if (bk === 'lunch') labelHint = '午膳 · 今日當值';
+        else if (bk === 'gap') labelHint = '轉堂 · 今日當值';
+        else if (bk === 'homeroom') labelHint = '早會 · 今日當值';
+        else if (bk === 'reading') labelHint = '閱讀 · 今日當值';
+        else labelHint = (ctx.slot.label || '休息') + ' · 今日當值';
+        list = dutyTeachersFor(ymd);
+      }
     } else if (ctx.slot.kind === 'period') {
       mode = 'free-period';
       period = ctx.slot.period;
@@ -3878,6 +3887,7 @@
         if (ctx.holiday) empty.textContent = '假期教員室空空地～';
         else if (picked.mode === 'duty-tomorrow') empty.textContent = '未找到明日當值老師';
         else if (picked.mode === 'duty-today') empty.textContent = '今日未有當值資料';
+        else if (picked.mode === 'all-recess') empty.textContent = '小息教員室未載入老師';
         else if (picked.mode === 'free-period') empty.textContent = '今節冇老師空堂（或全部出晒堂）';
         else empty.textContent = '而家教員室靜靜地～';
       }
@@ -4016,6 +4026,8 @@
     var nShow = (picked.teachers && picked.teachers.length) ? picked.teachers.length : 0;
     if (picked.mode === 'free-period') {
       lines.push('空堂 ' + nShow + ' 位');
+    } else if (picked.mode === 'all-recess') {
+      lines.push('全體 ' + nShow + ' 位');
     } else if (picked.mode === 'duty-tomorrow' && picked.nextDutyYmd) {
       lines.push('明日當值 ' + nShow + ' 位');
     } else if (nShow) {
@@ -4033,7 +4045,10 @@
       else if (ctx.slot && ctx.slot.kind === 'period') badge.textContent = '教員室 · 空堂 P' + ctx.slot.period;
       else if (ctx.slot && ctx.slot.kind === 'break') {
         var bk = ctx.slot.key;
-        badge.textContent = bk === 'lunch' ? '教員室 · 午膳當值' : (bk === 'recess' || bk === 'gap' ? '教員室 · 小息當值' : '教員室 · 當值');
+        if (bk === 'recess') badge.textContent = '教員室 · 小息全體';
+        else if (bk === 'lunch') badge.textContent = '教員室 · 午膳當值';
+        else if (bk === 'gap') badge.textContent = '教員室 · 轉堂當值';
+        else badge.textContent = '教員室 · 當值';
       } else if (ctx.slot && ctx.slot.kind === 'after') badge.textContent = '教員室 · 明日當值';
       else if (!ctx.slot || ctx.slot.kind === 'before') badge.textContent = '教員室 · 今日當值';
       else badge.textContent = '教員室';
