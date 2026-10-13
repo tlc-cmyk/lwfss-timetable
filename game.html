@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="house-sex-groups-merge-v1" />
+  <meta name="game-build" content="timeline-scrubber-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -195,6 +195,141 @@
     }
     .lesson-line strong { color: var(--wood-deeper); }
     .lesson-line .muted { color: var(--muted); font-size: 0.8rem; }
+
+    /* ===== School-day timeline scrubber (課室 + 教員室) ===== */
+    .timeline-card {
+      background: var(--card);
+      border: 3px solid var(--wood-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px 12px 12px;
+      margin-bottom: 12px;
+    }
+    .timeline-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .timeline-mode {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #1e7a45;
+      letter-spacing: 0.02em;
+    }
+    .timeline-card.is-preview .timeline-mode {
+      color: #b35a00;
+    }
+    .timeline-live-btn {
+      appearance: none;
+      border: 2px solid var(--wood-deeper);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ffe9c8, #f0d0a0);
+      color: var(--wood-deeper);
+      box-shadow: 0 2px 0 var(--wood-deeper);
+      white-space: nowrap;
+    }
+    .timeline-live-btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+      box-shadow: none;
+      background: var(--cream-dark);
+      color: var(--muted);
+    }
+    .timeline-live-btn:not(:disabled):active { transform: translateY(1px); }
+    .timeline-period {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      min-height: 1.35em;
+    }
+    .timeline-period .tl-time {
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .timeline-scrubber {
+      width: 100%;
+      appearance: none;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #efe2ce, #d4b896);
+      border: 2px solid var(--wood);
+      outline: none;
+      cursor: pointer;
+      margin: 4px 0 2px;
+    }
+    .timeline-scrubber::-webkit-slider-thumb {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fff6e8, #f0c14b);
+      border: 3px solid var(--wood-deeper);
+      box-shadow: 0 2px 0 rgba(107,68,35,.25);
+      cursor: grab;
+    }
+    .timeline-scrubber::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fff6e8, #f0c14b);
+      border: 3px solid var(--wood-deeper);
+      box-shadow: 0 2px 0 rgba(107,68,35,.25);
+      cursor: grab;
+    }
+    .timeline-scrubber:active::-webkit-slider-thumb { cursor: grabbing; }
+    .timeline-marks {
+      display: flex;
+      justify-content: space-between;
+      gap: 2px;
+      margin-top: 4px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+    }
+    .timeline-mark {
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      padding: 2px 1px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+    }
+    .timeline-mark.is-active {
+      color: var(--wood-deeper);
+      background: #ffe9c8;
+      border-color: var(--wood);
+    }
+    .timeline-mark .tm-hm {
+      display: block;
+      font-weight: 600;
+      opacity: 0.85;
+      font-variant-numeric: tabular-nums;
+    }
+    .timeline-hint {
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
 
     /* ===== Pixel classroom scene ===== */
     .scene-frame {
@@ -2087,6 +2222,17 @@
       </div>
     </div>
 
+    <div class="timeline-card" id="timelineCard" aria-label="上學日時間線">
+      <div class="timeline-head">
+        <span class="timeline-mode" id="timelineModeLabel">● 實時</span>
+        <button type="button" class="timeline-live-btn" id="timelineLiveBtn" disabled title="返到而家香港時間">實時</button>
+      </div>
+      <div class="timeline-period" id="timelinePeriodLabel">讀取時間線…</div>
+      <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室／教員室" />
+      <div class="timeline-marks" id="timelineMarks" role="list"></div>
+      <div class="timeline-hint">拖曳時間線睇之前／之後狀態（課室同教員室一齊跟）；撳「實時」返到而家。</div>
+    </div>
+
     <div class="scene-tabs" role="tablist" aria-label="場景切換">
       <button type="button" class="scene-tab active" id="tabClassroom" role="tab" aria-selected="true" data-view="classroom">🏫 課室</button>
       <button type="button" class="scene-tab" id="tabStaff" role="tab" aria-selected="false" data-view="staff">☕ 教員室</button>
@@ -2154,7 +2300,7 @@
     </div>
 
     <div class="hint-card" id="hintCard">
-      <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
+      <strong>玩法：</strong>場景預設跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）；可用上方<strong>時間線</strong>拖曳預覽之前／之後課室同教員室狀態，撳「實時」返到而家。
       <strong>課室</strong>跟住你搜尋／揀嘅老師：有堂就見<strong>教授緊嘅老師</strong>（黑板前踱步）同<strong>嗰班／嗰組同學</strong>（大半坐喺 40 張書枱，偶爾 1–2 位行吓同講短句）；空堂就顯示「而家空堂」（唔會亂入全校同學）。
       可切換<strong>課室／教員室</strong>：教員室喺上課前／午膳見<strong>今日當值</strong>；<strong>小息見全體老師</strong>（一般／BF）；<strong>閱讀時間見非班主任</strong>（班主任喺課室；一般 13:45–14:05）；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
       撳「換／搜尋老師」用 ShortName 或中文名揀老師。撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>；可<strong>拖動同學入訓導室</strong>（約 5 秒後會走返出嚟）。教員室可<strong>拖動老師入校長室見校長</strong>。
@@ -2381,6 +2527,265 @@
     }
   }
 
+  /* ===== Timeline scrubber: live HKT vs preview minutes (課室 + 教員室) ===== */
+  var timelineState = {
+    live: true,
+    scrubMinutes: null, // minutes-from-midnight when !live
+    rangeMin: 7 * 60 + 40,  // ~07:40
+    rangeMax: 17 * 60,      // 17:00 fallback
+    marksKey: ''
+  };
+
+  function minutesToHm(mins) {
+    var m = Math.max(0, Math.min(24 * 60 - 1, mins | 0));
+    return pad2(Math.floor(m / 60)) + ':' + pad2(m % 60);
+  }
+
+  /** Effective "now" for scene/lesson/roster (scrubbed when preview). */
+  function getEffectiveNowParts() {
+    var real = nowHKTParts();
+    if (timelineState.live || timelineState.scrubMinutes == null) {
+      return {
+        ymd: real.ymd,
+        hour: real.hour,
+        minute: real.minute,
+        second: real.second,
+        hm: real.hm,
+        minutes: real.minutes,
+        scrubbed: false
+      };
+    }
+    var m = timelineState.scrubMinutes | 0;
+    var hh = Math.floor(m / 60);
+    var mm = m % 60;
+    return {
+      ymd: real.ymd,
+      hour: hh,
+      minute: mm,
+      second: 0,
+      hm: pad2(hh) + ':' + pad2(mm),
+      minutes: m,
+      scrubbed: true
+    };
+  }
+
+  function timelineRangeForDay(cycleDay) {
+    var sched = cycleDay != null ? scheduleForDay(cycleDay) : null;
+    if (!sched || !sched.slots || !sched.slots.length) {
+      return { min: 7 * 60 + 40, max: 17 * 60, slots: [] };
+    }
+    var first = hmToMinutes(sched.slots[0].start);
+    var last = hmToMinutes(sched.slots[sched.slots.length - 1].end);
+    if (first == null) first = 7 * 60 + 55;
+    if (last == null) last = 15 * 60 + 35;
+    return {
+      min: Math.max(0, first - 20),
+      max: Math.min(24 * 60 - 1, last + 30),
+      slots: sched.slots
+    };
+  }
+
+  function findSlotAtMinutes(cycleDay, mins) {
+    var sched = scheduleForDay(cycleDay);
+    if (!sched || !sched.slots || !sched.slots.length) return null;
+    var slots = sched.slots;
+    var firstStart = hmToMinutes(slots[0].start);
+    var lastEnd = hmToMinutes(slots[slots.length - 1].end);
+    if (firstStart != null && mins < firstStart) {
+      return { kind: 'before', period: null, key: null, label: '上課前', slot: null };
+    }
+    if (lastEnd != null && mins >= lastEnd) {
+      return { kind: 'after', period: null, key: null, label: '放學後', slot: null };
+    }
+    for (var i = 0; i < slots.length; i++) {
+      var s = slots[i];
+      var a = hmToMinutes(s.start);
+      var b = hmToMinutes(s.end);
+      if (a == null || b == null) continue;
+      if (mins >= a && mins < b) {
+        if (s.period != null) {
+          return { kind: 'period', period: s.period, key: s.key, label: s.label, slot: s };
+        }
+        var label = s.label || '';
+        if (s.key === 'recess') label = '小息中';
+        else if (s.key === 'lunch') label = '午飯中';
+        else if (s.key === 'homeroom') label = '班主任／早會中';
+        else if (s.key === 'reading') label = '閱讀時間中';
+        else label = label ? (label + '中') : '休息中';
+        return { kind: 'break', period: null, key: s.key, label: label, slot: s };
+      }
+      if (i + 1 < slots.length) {
+        var nextA = hmToMinutes(slots[i + 1].start);
+        if (nextA != null && mins >= b && mins < nextA) {
+          return { kind: 'break', period: null, key: 'gap', label: '轉堂中', slot: null };
+        }
+      }
+    }
+    return null;
+  }
+
+  function describeTimelineSlot(slot, hm) {
+    if (!slot) return '未能判斷時段 · <span class="tl-time">' + hm + '</span>';
+    var timeBit = '';
+    if (slot.slot && slot.slot.start && slot.slot.end) {
+      timeBit = ' · <span class="tl-time">' + slot.slot.start + '–' + slot.slot.end + '</span>';
+    } else {
+      timeBit = ' · <span class="tl-time">' + hm + '</span>';
+    }
+    if (slot.kind === 'period') {
+      return (slot.label || ('第' + slot.period + '節')) + timeBit;
+    }
+    if (slot.kind === 'before') return '上課前' + timeBit;
+    if (slot.kind === 'after') return '放學後' + timeBit;
+    if (slot.key === 'reading') return '閱讀時間' + timeBit;
+    return (slot.label || '休息') + timeBit;
+  }
+
+  function setTimelineLive(live, opts) {
+    opts = opts || {};
+    timelineState.live = !!live;
+    if (timelineState.live) {
+      timelineState.scrubMinutes = null;
+    } else if (timelineState.scrubMinutes == null) {
+      timelineState.scrubMinutes = nowHKTParts().minutes;
+    }
+    var card = document.getElementById('timelineCard');
+    var mode = document.getElementById('timelineModeLabel');
+    var btn = document.getElementById('timelineLiveBtn');
+    if (card) card.classList.toggle('is-preview', !timelineState.live);
+    if (mode) mode.textContent = timelineState.live ? '● 實時' : '◎ 預覽';
+    if (btn) btn.disabled = timelineState.live;
+    if (!opts.silent) {
+      // force NPC rebuild when jumping eras
+      try { npcState.key = ''; } catch (e1) {}
+      try { if (typeof staffNpcState !== 'undefined') staffNpcState.key = ''; } catch (e2) {}
+      render();
+    }
+  }
+
+  function applyTimelineScrub(mins, opts) {
+    opts = opts || {};
+    mins = mins | 0;
+    if (mins < timelineState.rangeMin) mins = timelineState.rangeMin;
+    if (mins > timelineState.rangeMax) mins = timelineState.rangeMax;
+    timelineState.scrubMinutes = mins;
+    if (timelineState.live) setTimelineLive(false, { silent: true });
+    else {
+      var card = document.getElementById('timelineCard');
+      var mode = document.getElementById('timelineModeLabel');
+      var btn = document.getElementById('timelineLiveBtn');
+      if (card) card.classList.add('is-preview');
+      if (mode) mode.textContent = '◎ 預覽';
+      if (btn) btn.disabled = false;
+    }
+    var scrub = document.getElementById('timelineScrubber');
+    if (scrub && (scrub.value | 0) !== mins) scrub.value = String(mins);
+    if (!opts.silent) {
+      try { npcState.key = ''; } catch (e1) {}
+      try { if (typeof staffNpcState !== 'undefined') staffNpcState.key = ''; } catch (e2) {}
+      render();
+    }
+  }
+
+  function syncTimelineChrome(ctx) {
+    var range = timelineRangeForDay(ctx && !ctx.holiday && ctx.cycle ? ctx.cycle.day : null);
+    timelineState.rangeMin = range.min;
+    timelineState.rangeMax = range.max;
+    var scrub = document.getElementById('timelineScrubber');
+    if (scrub) {
+      scrub.min = String(range.min);
+      scrub.max = String(range.max);
+      var val = timelineState.live
+        ? Math.max(range.min, Math.min(range.max, (ctx && ctx.minutes != null) ? ctx.minutes : nowHKTParts().minutes))
+        : Math.max(range.min, Math.min(range.max, timelineState.scrubMinutes != null ? timelineState.scrubMinutes : range.min));
+      // Avoid fighting the user mid-drag
+      if (!scrub.matches(':active') && document.activeElement !== scrub) {
+        scrub.value = String(val);
+      }
+    }
+    var marksKey = (ctx && ctx.schedId ? ctx.schedId : 'none') + '|' + range.min + '|' + range.max + '|' + range.slots.length;
+    if (marksKey !== timelineState.marksKey) {
+      timelineState.marksKey = marksKey;
+      var box = document.getElementById('timelineMarks');
+      if (box) {
+        box.innerHTML = '';
+        var slots = range.slots;
+        if (!slots.length) {
+          box.innerHTML = '<span class="timeline-mark">假期／無鐘聲</span>';
+        } else {
+          slots.forEach(function (s) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'timeline-mark';
+            btn.setAttribute('role', 'listitem');
+            var shortLabel = s.label || s.key || '';
+            if (s.period != null) shortLabel = 'P' + s.period;
+            else if (s.key === 'homeroom') shortLabel = '早會';
+            else if (s.key === 'recess') shortLabel = '小息';
+            else if (s.key === 'lunch') shortLabel = '午膳';
+            else if (s.key === 'reading') shortLabel = '閱讀';
+            btn.innerHTML = escapeHtml(shortLabel) + '<span class="tm-hm">' + escapeHtml(s.start || '') + '</span>';
+            btn.title = (s.label || '') + ' ' + (s.start || '') + '–' + (s.end || '');
+            var mid = hmToMinutes(s.start);
+            var endM = hmToMinutes(s.end);
+            if (mid != null && endM != null) mid = Math.floor((mid + endM) / 2);
+            if (mid == null) mid = range.min;
+            btn.addEventListener('click', function () {
+              applyTimelineScrub(mid);
+            });
+            box.appendChild(btn);
+          });
+        }
+      }
+    }
+    // highlight active mark
+    var box2 = document.getElementById('timelineMarks');
+    var curKey = ctx && ctx.slot ? (ctx.slot.key || (ctx.slot.kind === 'period' ? ('p' + ctx.slot.period) : ctx.slot.kind)) : '';
+    if (box2) {
+      Array.prototype.forEach.call(box2.querySelectorAll('.timeline-mark'), function (el, idx) {
+        var s = range.slots[idx];
+        var active = false;
+        if (s && ctx && ctx.slot) {
+          if (ctx.slot.kind === 'period' && s.period === ctx.slot.period) active = true;
+          else if (ctx.slot.key && s.key === ctx.slot.key) active = true;
+        }
+        el.classList.toggle('is-active', active);
+      });
+    }
+    var periodLabel = document.getElementById('timelinePeriodLabel');
+    if (periodLabel) {
+      if (ctx && ctx.holiday) {
+        periodLabel.innerHTML = '假期／無正規日課 · <span class="tl-time">' + escapeHtml((ctx && ctx.hm) || '') + '</span>';
+      } else {
+        periodLabel.innerHTML = describeTimelineSlot(ctx && ctx.slot, (ctx && ctx.hm) || '');
+      }
+    }
+    var card = document.getElementById('timelineCard');
+    var mode = document.getElementById('timelineModeLabel');
+    var liveBtn = document.getElementById('timelineLiveBtn');
+    if (card) card.classList.toggle('is-preview', !timelineState.live);
+    if (mode) mode.textContent = timelineState.live ? '● 實時' : '◎ 預覽';
+    if (liveBtn) liveBtn.disabled = timelineState.live;
+  }
+
+  function bindTimelineUI() {
+    var scrub = document.getElementById('timelineScrubber');
+    var liveBtn = document.getElementById('timelineLiveBtn');
+    if (scrub) {
+      var onScrub = function () {
+        applyTimelineScrub(scrub.value | 0);
+      };
+      scrub.addEventListener('input', onScrub);
+      scrub.addEventListener('change', onScrub);
+    }
+    if (liveBtn) {
+      liveBtn.addEventListener('click', function () {
+        setTimelineLive(true);
+        toast('已返到實時 · ' + nowHKTParts().hm + ' HKT');
+      });
+    }
+  }
+
   function hmToMinutes(hm) {
     if (!hm || hm.indexOf(':') < 0) return null;
     var p = hm.split(':');
@@ -2390,7 +2795,7 @@
   function minutesLeftUntilHm(endHm) {
     var endM = hmToMinutes(endHm);
     if (endM == null) return null;
-    var now = nowHKTParts();
+    var now = getEffectiveNowParts();
     var left = endM * 60 - (now.hour * 3600 + now.minute * 60 + (now.second || 0));
     if (left <= 0) return 0;
     return Math.ceil(left / 60);
@@ -2476,43 +2881,7 @@
   }
 
   function findCurrentSlot(cycleDay) {
-    var sched = scheduleForDay(cycleDay);
-    if (!sched || !sched.slots || !sched.slots.length) return null;
-    var mins = nowHKTParts().minutes;
-    var slots = sched.slots;
-    var firstStart = hmToMinutes(slots[0].start);
-    var lastEnd = hmToMinutes(slots[slots.length - 1].end);
-    if (firstStart != null && mins < firstStart) {
-      return { kind: 'before', period: null, key: null, label: '上課前', slot: null };
-    }
-    if (lastEnd != null && mins >= lastEnd) {
-      return { kind: 'after', period: null, key: null, label: '放學後', slot: null };
-    }
-    for (var i = 0; i < slots.length; i++) {
-      var s = slots[i];
-      var a = hmToMinutes(s.start);
-      var b = hmToMinutes(s.end);
-      if (a == null || b == null) continue;
-      if (mins >= a && mins < b) {
-        if (s.period != null) {
-          return { kind: 'period', period: s.period, key: s.key, label: s.label, slot: s };
-        }
-        var label = s.label || '';
-        if (s.key === 'recess') label = '小息中';
-        else if (s.key === 'lunch') label = '午飯中';
-        else if (s.key === 'homeroom') label = '班主任／早會中';
-        else if (s.key === 'reading') label = '閱讀時間中';
-        else label = label ? (label + '中') : '休息中';
-        return { kind: 'break', period: null, key: s.key, label: label, slot: s };
-      }
-      if (i + 1 < slots.length) {
-        var nextA = hmToMinutes(slots[i + 1].start);
-        if (nextA != null && mins >= b && mins < nextA) {
-          return { kind: 'break', period: null, key: 'gap', label: '轉堂中', slot: null };
-        }
-      }
-    }
-    return null;
+    return findSlotAtMinutes(cycleDay, getEffectiveNowParts().minutes);
   }
 
   function loadPoints() {
@@ -4589,7 +4958,7 @@
       var cur = slot.period | 0;
       return (cur >= 1 && cur < maxp) ? (cur + 1) : null;
     }
-    var mins = nowHKTParts().minutes;
+    var mins = getEffectiveNowParts().minutes;
     var sched = scheduleForDay(cycleDay);
     if (sched && sched.slots) {
       for (var i = 0; i < sched.slots.length; i++) {
@@ -4717,7 +5086,7 @@
   function finishedLessonsTodayFor(teacher, cycleDay) {
     if (!teacher || cycleDay == null) return 0;
     var daySched = (teacher.schedule && teacher.schedule[String(cycleDay)]) || {};
-    var nowM = nowHKTParts().minutes;
+    var nowM = getEffectiveNowParts().minutes;
     var maxp = periodsForDay(cycleDay);
     var n = 0;
     for (var p = 1; p <= maxp; p++) {
@@ -5323,11 +5692,12 @@
 
   function canCheckIn(ctx) {
     if (!ctx || ctx.holiday || !ctx.slot || ctx.slot.kind !== 'period') return false;
+    if (!timelineState.live) return false; // 簽到只喺實時模式
     if (!ctx.lesson) return false; // only when you have a real lesson
     var slot = ctx.slot.slot;
     if (!slot || !slot.start) return false;
     var startM = hmToMinutes(slot.start);
-    var nowM = nowHKTParts().minutes;
+    var nowM = nowHKTParts().minutes; // always wall-clock HKT
     if (startM == null) return false;
     var elapsed = nowM - startM;
     if (elapsed < 0 || elapsed > ONTIME_WINDOW_MIN) return false;
@@ -5377,7 +5747,7 @@
   }
 
   function getContext() {
-    var now = nowHKTParts();
+    var now = getEffectiveNowParts();
     var r = resolveTodayCycle();
     var holiday = (r.day == null);
     var slot = (!holiday && r.day != null) ? findCurrentSlot(r.day) : null;
@@ -5388,6 +5758,8 @@
     return {
       ymd: now.ymd,
       hm: now.hm,
+      minutes: now.minutes,
+      scrubbed: !!now.scrubbed,
       cycle: r,
       holiday: holiday,
       slot: slot,
@@ -5398,7 +5770,7 @@
 
   function render() {
     var ctx = getContext();
-    document.getElementById('clockHm').textContent = ctx.hm;
+    document.getElementById('clockHm').textContent = ctx.hm + (ctx.scrubbed ? ' 預覽' : '');
 
     var pill = document.getElementById('dayPill');
     pill.classList.remove('bf', 'holiday');
@@ -5426,11 +5798,16 @@
       cd.className = 'countdown relaxed';
       lessonLine.innerHTML = '<strong>Day ' + ctx.cycle.day + '</strong>';
     } else if (ctx.slot.kind === 'period') {
-      slotLabel.textContent = '現正：' + (ctx.slot.label || ('第' + ctx.slot.period + '節'));
+      slotLabel.textContent = (ctx.scrubbed ? '預覽：' : '現正：') + (ctx.slot.label || ('第' + ctx.slot.period + '節'));
       var endHm = ctx.slot.slot && ctx.slot.slot.end;
       var left = endHm ? minutesLeftUntilHm(endHm) : null;
-      cd.textContent = formatCountdownZh(left) + (endHm ? ('（至 ' + endHm + '）') : '');
-      cd.className = 'countdown';
+      if (ctx.scrubbed) {
+        cd.textContent = (endHm ? (ctx.slot.slot.start + '–' + endHm) : '') + ' · 預覽模式';
+        cd.className = 'countdown relaxed';
+      } else {
+        cd.textContent = formatCountdownZh(left) + (endHm ? ('（至 ' + endHm + '）') : '');
+        cd.className = 'countdown';
+      }
       if (ctx.lesson) {
         lessonLine.innerHTML =
           '<strong>' + (ctx.lesson.subjectShort || ctx.lesson.subject) + '</strong> · ' +
@@ -5444,9 +5821,16 @@
           '<span class="muted">' + (ctx.slot.slot.start || '') + '–' + (ctx.slot.slot.end || '') + ' · 休息／備課</span>';
       }
     } else {
-      slotLabel.textContent = ctx.slot.label;
+      slotLabel.textContent = (ctx.scrubbed ? '預覽：' : '') + ctx.slot.label;
       var end2 = ctx.slot.slot && ctx.slot.slot.end;
-      if (end2) {
+      if (ctx.scrubbed) {
+        if (end2 && ctx.slot.slot.start) {
+          cd.textContent = ctx.slot.slot.start + '–' + end2 + ' · 預覽模式';
+        } else {
+          cd.textContent = (ctx.slot.kind === 'before' ? '上課前' : (ctx.slot.kind === 'after' ? '放學後' : '休息')) + ' · 預覽模式';
+        }
+        cd.className = 'countdown relaxed';
+      } else if (end2) {
         cd.textContent = formatCountdownZh(minutesLeftUntilHm(end2)) + '（至 ' + end2 + '）';
         cd.className = 'countdown';
       } else {
@@ -5458,7 +5842,7 @@
       if (ctx.slot.kind === 'break' && ctx.cycle.day != null) {
         var sched = scheduleForDay(ctx.cycle.day);
         if (sched && sched.slots) {
-          var nowM = nowHKTParts().minutes;
+          var nowM = getEffectiveNowParts().minutes;
           for (var i = 0; i < sched.slots.length; i++) {
             var s = sched.slots[i];
             if (s.period != null && hmToMinutes(s.start) > nowM) {
@@ -5493,6 +5877,7 @@
 
     paintScene(ctx);
     buildTodayList(ctx.holiday ? null : ctx.cycle.day);
+    syncTimelineChrome(ctx);
 
     var btn = document.getElementById('checkInBtn');
     if (canCheckIn(ctx)) {
@@ -5519,8 +5904,13 @@
     doCheckIn(getContext());
   });
   document.getElementById('refreshBtn').addEventListener('click', function () {
-    render();
-    toast('已更新 · ' + nowHKTParts().hm + ' HKT');
+    if (timelineState.live) {
+      render();
+      toast('已更新 · ' + nowHKTParts().hm + ' HKT');
+    } else {
+      render();
+      toast('預覽 · ' + (timelineState.scrubMinutes != null ? minutesToHm(timelineState.scrubMinutes) : '--:--'));
+    }
   });
   function findTeachersByQuery(q) {
     q = String(q || '').trim().toUpperCase();
@@ -5652,6 +6042,10 @@
   })();
 
   function tick() {
+    if (!timelineState.live) {
+      // preview: keep scrubbed scene; only refresh live clock badge if we add one later
+      return;
+    }
     render();
   }
 
@@ -5664,6 +6058,9 @@
       setInterval(tick, 30 * 1000);
     }, msToNext);
   }
+
+  bindTimelineUI();
+  setTimelineLive(true, { silent: true });
 
   loadPoints();
   loadPraiseMonth(monthKeyHK());
