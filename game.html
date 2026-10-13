@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="tuesday-flag-playground-v1" />
+  <meta name="game-build" content="playground-weather-tkt-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -2451,6 +2451,56 @@
     .scene.playground .pg-china-flag .star-sm.s2 { left: 17px; top: 6px; }
     .scene.playground .pg-china-flag .star-sm.s3 { left: 17px; top: 11px; }
     .scene.playground .pg-china-flag .star-sm.s4 { left: 14px; top: 15px; }
+    /* Live Tai Kok Tsui weather (Open-Meteo) */
+    .scene.playground .pg-weather {
+      position: absolute;
+      top: 5%;
+      left: 4%;
+      z-index: 6;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: min(58%, 220px);
+      padding: 5px 9px;
+      background: rgba(255, 250, 242, 0.92);
+      border: 3px solid #1a4a6e;
+      border-radius: 10px;
+      box-shadow: 2px 3px 0 rgba(0,0,0,.16);
+      color: #1a3a4a;
+      font-size: clamp(0.62rem, 2.6vw, 0.78rem);
+      font-weight: 800;
+      line-height: 1.2;
+      pointer-events: none;
+      image-rendering: pixelated;
+    }
+    .scene.playground .pg-weather .pg-weather-icon {
+      font-size: 1.05rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .scene.playground .pg-weather .pg-weather-text {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .scene.playground .pg-weather .pg-weather-place {
+      display: block;
+      font-size: 0.85em;
+      opacity: 0.85;
+      font-weight: 700;
+    }
+    .scene.playground .pg-weather .pg-weather-main {
+      display: block;
+    }
+    .scene.playground .pg-weather.is-stale {
+      border-color: #7a5c45;
+      opacity: 0.92;
+    }
+    .scene.playground .pg-weather.is-offline {
+      border-color: #8b5e3c;
+      background: rgba(255, 250, 242, 0.85);
+    }
     .scene.playground .playground-empty {
       position: absolute;
       left: 50%; top: 58%;
@@ -2688,6 +2738,13 @@
             <span class="star-sm s3"></span>
             <span class="star-sm s4"></span>
           </div>
+        </div>
+        <div class="pg-weather" id="playgroundWeather" role="status" aria-live="polite" title="大角咀即時天氣">
+          <span class="pg-weather-icon" id="playgroundWeatherIcon" aria-hidden="true">🌡️</span>
+          <span class="pg-weather-text">
+            <span class="pg-weather-place">大角咀</span>
+            <span class="pg-weather-main" id="playgroundWeatherMain">載入中…</span>
+          </span>
         </div>
         <div class="pg-fence" aria-hidden="true"></div>
         <div class="pg-grass" aria-hidden="true"></div>
@@ -5506,6 +5563,175 @@
     el.setAttribute('aria-hidden', show ? 'false' : 'true');
   }
 
+  /* ===== Live Tai Kok Tsui weather (Open-Meteo, no API key) ===== */
+  var PG_WEATHER_LS = 'tt_pg_weather_tkt_v1';
+  var PG_WEATHER_CACHE_MS = 12 * 60 * 1000; // refresh every ~12 min
+  var PG_WEATHER_LAT = 22.321;
+  var PG_WEATHER_LON = 114.162;
+  var PG_WEATHER_URL =
+    'https://api.open-meteo.com/v1/forecast' +
+    '?latitude=' + PG_WEATHER_LAT +
+    '&longitude=' + PG_WEATHER_LON +
+    '&current=temperature_2m,weather_code' +
+    '&timezone=Asia%2FHong_Kong';
+  var pgWeatherState = { temp: null, code: null, label: '', icon: '🌡️', fetchedAt: 0, source: 'init' };
+  var pgWeatherFetchInflight = null;
+  var pgWeatherTimer = null;
+
+  function wmoCodeToZhHk(code) {
+    var c = Number(code);
+    if (!isFinite(c)) return { label: '—', icon: '🌡️' };
+    if (c === 0) return { label: '晴', icon: '☀️' };
+    if (c === 1) return { label: '大致天晴', icon: '🌤️' };
+    if (c === 2) return { label: '間有雲', icon: '⛅' };
+    if (c === 3) return { label: '多雲', icon: '☁️' };
+    if (c === 45 || c === 48) return { label: '有霧', icon: '🌫️' };
+    if (c === 51 || c === 53 || c === 55) return { label: '微雨', icon: '🌦️' };
+    if (c === 56 || c === 57) return { label: '凍毛毛雨', icon: '🌧️' };
+    if (c === 61) return { label: '雨', icon: '🌧️' };
+    if (c === 63) return { label: '中雨', icon: '🌧️' };
+    if (c === 65) return { label: '大雨', icon: '🌧️' };
+    if (c === 66 || c === 67) return { label: '凍雨', icon: '🌧️' };
+    if (c === 71 || c === 73 || c === 75 || c === 77) return { label: '雪', icon: '🌨️' };
+    if (c === 80 || c === 81 || c === 82) return { label: '驟雨', icon: '🌦️' };
+    if (c === 85 || c === 86) return { label: '雪驟', icon: '🌨️' };
+    if (c === 95) return { label: '雷暴', icon: '⛈️' };
+    if (c === 96 || c === 99) return { label: '雷暴冰雹', icon: '⛈️' };
+    return { label: '天氣', icon: '🌡️' };
+  }
+
+  function loadPgWeatherCache() {
+    try {
+      var raw = localStorage.getItem(PG_WEATHER_LS);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || typeof o !== 'object') return null;
+      if (o.temp == null || o.fetchedAt == null) return null;
+      return o;
+    } catch (e) { return null; }
+  }
+
+  function savePgWeatherCache(data) {
+    try {
+      localStorage.setItem(PG_WEATHER_LS, JSON.stringify({
+        temp: data.temp,
+        code: data.code,
+        label: data.label,
+        icon: data.icon,
+        fetchedAt: data.fetchedAt
+      }));
+    } catch (e) {}
+  }
+
+  function paintPlaygroundWeather() {
+    var wrap = document.getElementById('playgroundWeather');
+    var iconEl = document.getElementById('playgroundWeatherIcon');
+    var mainEl = document.getElementById('playgroundWeatherMain');
+    if (!wrap || !mainEl) return;
+    var s = pgWeatherState;
+    wrap.classList.toggle('is-stale', s.source === 'stale');
+    wrap.classList.toggle('is-offline', s.source === 'offline' || s.source === 'error');
+    if (iconEl) iconEl.textContent = s.icon || '🌡️';
+    if (s.temp == null) {
+      if (s.source === 'init' || s.source === 'loading') {
+        mainEl.textContent = '載入中…';
+        wrap.title = '大角咀即時天氣 · 載入中';
+      } else {
+        mainEl.textContent = '暫時未能取得';
+        wrap.title = '大角咀天氣 · 離線／無法更新';
+      }
+      return;
+    }
+    var tempStr = (Math.round(Number(s.temp) * 10) / 10).toFixed(1).replace(/\.0$/, '');
+    var cond = s.label || '—';
+    var suffix = '';
+    if (s.source === 'stale') suffix = ' · 暫存';
+    else if (s.source === 'offline' || s.source === 'error') suffix = ' · 離線';
+    mainEl.textContent = tempStr + '°C · ' + cond + suffix;
+    wrap.title = '大角咀 · ' + tempStr + '°C · ' + cond +
+      (s.fetchedAt ? (' · 更新 ' + new Date(s.fetchedAt).toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' })) : '');
+  }
+
+  function applyPgWeatherData(temp, code, fetchedAt, source) {
+    var mapped = wmoCodeToZhHk(code);
+    pgWeatherState = {
+      temp: temp,
+      code: code,
+      label: mapped.label,
+      icon: mapped.icon,
+      fetchedAt: fetchedAt || Date.now(),
+      source: source || 'live'
+    };
+    if (source === 'live') savePgWeatherCache(pgWeatherState);
+    paintPlaygroundWeather();
+  }
+
+  function ensurePlaygroundWeather(force) {
+    var cached = loadPgWeatherCache();
+    var now = Date.now();
+    if (cached && pgWeatherState.temp == null) {
+      applyPgWeatherData(cached.temp, cached.code, cached.fetchedAt, 'cache');
+    }
+    var age = pgWeatherState.fetchedAt ? (now - pgWeatherState.fetchedAt) : Infinity;
+    if (!force && age < PG_WEATHER_CACHE_MS && pgWeatherState.temp != null && pgWeatherState.source === 'live') {
+      paintPlaygroundWeather();
+      schedulePlaygroundWeatherRefresh();
+      return;
+    }
+    if (!force && age < PG_WEATHER_CACHE_MS && cached && pgWeatherState.source === 'cache') {
+      // Still within TTL from disk cache — schedule a soft refresh later, no network yet
+      paintPlaygroundWeather();
+      schedulePlaygroundWeatherRefresh();
+      return;
+    }
+    if (pgWeatherFetchInflight) return pgWeatherFetchInflight;
+
+    if (pgWeatherState.temp == null) {
+      pgWeatherState.source = 'loading';
+      paintPlaygroundWeather();
+    }
+
+    pgWeatherFetchInflight = fetch(PG_WEATHER_URL, { cache: 'no-store' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('weather http ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var cur = data && data.current;
+        if (!cur || cur.temperature_2m == null) throw new Error('weather missing current');
+        applyPgWeatherData(cur.temperature_2m, cur.weather_code, Date.now(), 'live');
+      })
+      .catch(function () {
+        if (cached && cached.temp != null) {
+          applyPgWeatherData(cached.temp, cached.code, cached.fetchedAt, 'stale');
+        } else if (pgWeatherState.temp != null) {
+          pgWeatherState.source = 'offline';
+          paintPlaygroundWeather();
+        } else {
+          pgWeatherState.source = 'error';
+          paintPlaygroundWeather();
+        }
+      })
+      .then(function () {
+        pgWeatherFetchInflight = null;
+        schedulePlaygroundWeatherRefresh();
+      });
+    return pgWeatherFetchInflight;
+  }
+
+  function schedulePlaygroundWeatherRefresh() {
+    if (pgWeatherTimer) {
+      try { clearTimeout(pgWeatherTimer); } catch (e) {}
+      pgWeatherTimer = null;
+    }
+    var age = pgWeatherState.fetchedAt ? (Date.now() - pgWeatherState.fetchedAt) : PG_WEATHER_CACHE_MS;
+    var wait = Math.max(30 * 1000, PG_WEATHER_CACHE_MS - age);
+    pgWeatherTimer = setTimeout(function () {
+      pgWeatherTimer = null;
+      try { ensurePlaygroundWeather(true); } catch (e2) {}
+    }, wait);
+  }
+
   /** Deterministic sample of whole-school roster (one block per class). */
   function sampleAssemblyStudents(rng, maxN) {
     maxN = maxN || ASSEMBLY_CROWD_MAX;
@@ -5706,6 +5932,9 @@
       stopStaffBubbles();
       startClassAmbience();
       closeTeacherHpSheet();
+    }
+    if (viewMode === 'playground') {
+      try { ensurePlaygroundWeather(false); } catch (eWx) {}
     }
     if (tabC) {
       tabC.classList.toggle('active', viewMode === 'classroom');
@@ -6701,6 +6930,7 @@
     }
 
     syncPlaygroundChinaFlag(ctx);
+    try { ensurePlaygroundWeather(false); } catch (ePgWx) {}
 
     syncNpcs(mood, ctx);
     startNpcLoop();
@@ -7140,6 +7370,7 @@
     setViewMode('playground');
     afterViewTab();
   });
+  try { ensurePlaygroundWeather(false); } catch (eBootWx) {}
   if (tabS) tabS.addEventListener('click', function () {
     setViewMode('staff');
     afterViewTab();
