@@ -5,7 +5,8 @@ Each subject sheet has one or more blocks:
   Teacher : SHORTNAME
   Group|Subj | CL | No | English Name | | 中文姓名 | ...
 
-Public output: Chinese display name + class + class number only (no emails).
+Public output: Chinese display name + class + class number + Sex + House
+(Sex/House merged from students.js / class register; no emails).
 
 Keys: "{TEACHER}|{form}|{sheetSubject}" e.g. "TLC|4|ICT", "LPL|4|中文"
 Also indexes byTeacherForm for lookup when a teacher has multiple subjects.
@@ -13,6 +14,7 @@ Also indexes byTeacherForm for lookup when a teacher has multiple subjects.
 Usage:
   source /tmp/xlsvenv/bin/activate
   python3 scripts/build_groups.py path/to/s4.xls path/to/s5.xls path/to/s6.xls
+  python3 scripts/build_groups.py --enrich-from-students   # re-merge Sex/House only
 """
 from __future__ import annotations
 
@@ -165,6 +167,62 @@ def parse_workbook(path: Path, form_hint: int | None = None) -> list[dict]:
     return blocks
 
 
+
+def load_register_lookup() -> dict[tuple[str, str], dict]:
+    """Map (class, no) -> student record from students.json (Sex/House)."""
+    path = ROOT / "students.json"
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    students = data.get("students") or []
+    return {(s["class"], s["no"]): s for s in students if s.get("class") and s.get("no")}
+
+
+def enrich_students_with_register(students: list[dict], lookup: dict[tuple[str, str], dict]) -> list[dict]:
+    """Attach sex/house from class register; keep group class/no/chi."""
+    out: list[dict] = []
+    for s in students:
+        rec = {"class": s["class"], "no": s["no"], "chi": s["chi"]}
+        reg = lookup.get((s["class"], s["no"]))
+        sex = (reg or {}).get("sex") or s.get("sex") or ""
+        house = (reg or {}).get("house") or s.get("house") or ""
+        sex = str(sex).upper()[:1]
+        house = str(house).upper()[:1]
+        if sex in ("M", "F"):
+            rec["sex"] = sex
+        if house in ("S", "W", "E", "N"):
+            rec["house"] = house
+        out.append(rec)
+    return out
+
+
+def enrich_payload_from_students(payload: dict) -> dict:
+    """Merge Sex/House from students.json into every group student row."""
+    lookup = load_register_lookup()
+    if not lookup:
+        print("warn: students.json missing; Sex/House not merged", file=sys.stderr)
+        return payload
+    matched = 0
+    for key, slist in list(payload.get("groups", {}).items()):
+        enriched = enrich_students_with_register(slist, lookup)
+        matched += sum(1 for s in enriched if s.get("sex") or s.get("house"))
+        payload["groups"][key] = enriched
+    meta = payload.setdefault("meta", {})
+    meta["privacy"] = "Chinese display name + class + class number + Sex + House; no emails"
+    meta["sexHouseSource"] = "students.js / class register"
+    note = meta.get("note") or ""
+    if "Sex/House" not in note:
+        meta["note"] = (
+            (note + " " if note else "")
+            + "Sex/House merged from students.js (class register)."
+        ).strip()
+    meta["generatedAt"] = datetime.datetime.now(
+        datetime.timezone(datetime.timedelta(hours=8))
+    ).strftime("%Y-%m-%dT%H:%M:%S+08:00")
+    print(f"Enriched group rows with Sex/House ({matched} rows with at least one field)", file=sys.stderr)
+    return payload
+
+
 def build_payload(blocks: list[dict], sources: list[Path]) -> dict:
     groups: dict[str, dict] = {}
     by_tf: dict[str, list[str]] = defaultdict(list)
@@ -194,6 +252,11 @@ def build_payload(blocks: list[dict], sources: list[Path]) -> dict:
             by_tf[tf].append(key)
         student_rows += len(b["students"])
 
+    # Merge Sex/House from class register (students.js)
+    lookup = load_register_lookup()
+    for g in groups.values():
+        g["students"] = enrich_students_with_register(g["students"], lookup)
+
     # flat map for game: key -> student list (compat) plus rich entries
     flat = {k: v["students"] for k, v in groups.items()}
 
@@ -206,12 +269,14 @@ def build_payload(blocks: list[dict], sources: list[Path]) -> dict:
             "timezone": "Asia/Hong_Kong",
             "groupCount": len(groups),
             "studentRows": student_rows,
-            "privacy": "Chinese display name + class + class number only; no emails",
+            "privacy": "Chinese display name + class + class number + Sex + House; no emails",
             "note": (
                 "S4/S5/S6 subject-group Excels; key = TEACHER|form|sheetSubject "
-                "(e.g. TLC|4|ICT). Classroom prefers teacher+form+subject match "
+                "(e.g. TLC|4|ICT). Sex/House merged from students.js (class register). "
+                "Classroom prefers teacher+form+subject match "
                 "over whole-class register for senior lessons."
             ),
+            "sexHouseSource": "students.js / class register",
             "sources": [p.name for p in sources],
             "keyFormat": "TEACHER|form|sheetSubject",
         },
@@ -238,7 +303,8 @@ def write_outputs(payload: dict) -> None:
     (ROOT / "groups.js").write_text(
         "// Auto-generated subject-group roster for 模擬遊戲 — do not edit by hand.\n"
         "// Rebuild: python3 scripts/build_groups.py s4.xls s5.xls s6.xls\n"
-        "// Privacy: Chinese names + class only (no emails).\n"
+        "// Enrich Sex/House: python3 scripts/build_groups.py --enrich-from-students\n"
+        "// Privacy: Chinese names + class + Sex + House (no emails).\n"
         "// Key: TEACHER|form|sheetSubject (e.g. TLC|4|ICT, LPL|5|中文)\n"
         "window.GROUPS_DATA = "
         + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
@@ -250,10 +316,27 @@ def write_outputs(payload: dict) -> None:
 def main() -> int:
     if len(sys.argv) < 2:
         print(
-            "Usage: python3 scripts/build_groups.py s4.xls [s5.xls s6.xls ...]",
+            "Usage: python3 scripts/build_groups.py s4.xls [s5.xls s6.xls ...]\n"
+            "       python3 scripts/build_groups.py --enrich-from-students",
             file=sys.stderr,
         )
         return 1
+
+    if sys.argv[1] in ("--enrich-from-students", "--enrich"):
+        groups_path = ROOT / "groups.json"
+        if not groups_path.is_file():
+            print("Missing groups.json — build from Excels first", file=sys.stderr)
+            return 1
+        payload = json.loads(groups_path.read_text(encoding="utf-8"))
+        payload = enrich_payload_from_students(payload)
+        write_outputs(payload)
+        m = payload["meta"]
+        print(
+            f"Re-enriched groups.js / groups.json — {m.get('groupCount')} groups, "
+            f"{m.get('studentRows')} student-rows"
+        )
+        return 0
+
     sources = [Path(p) for p in sys.argv[1:]]
     missing = [str(p) for p in sources if not p.is_file()]
     if missing:

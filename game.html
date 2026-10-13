@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="house-sex-sprites-v1" />
+  <meta name="game-build" content="house-sex-groups-merge-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -2226,7 +2226,7 @@
   <script src="duty.js?v=staff-recess-all-v1"></script>
   <script src="form-teachers.js?v=staff-recess-all-v1"></script>
   <script src="students.js?v=house-sex-v1"></script>
-  <script src="groups.js?v=subject-groups-s456-v1"></script>
+  <script src="groups.js?v=house-sex-groups-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -2837,10 +2837,39 @@
   /* ===== NPC roster + walking ===== */
   var STUDENTS = (window.STUDENTS_DATA && window.STUDENTS_DATA.students) || [];
   var studentsByClass = {};
+  var studentsByClassNo = {};
   STUDENTS.forEach(function (s) {
     if (!studentsByClass[s.class]) studentsByClass[s.class] = [];
     studentsByClass[s.class].push(s);
+    if (s.class && s.no) studentsByClassNo[String(s.class).toUpperCase() + '|' + String(s.no)] = s;
   });
+
+  /** Merge Sex/House from class register onto group (or any) student rows. */
+  function enrichStudentFields(s) {
+    if (!s) return s;
+    var key = String(s.class || '').toUpperCase() + '|' + String(s.no || '');
+    var reg = studentsByClassNo[key];
+    var sex = (s.sex || (reg && reg.sex) || '').toString().toUpperCase().slice(0, 1);
+    var house = (s.house || (reg && reg.house) || '').toString().toUpperCase().slice(0, 1);
+    if (sex !== 'M' && sex !== 'F') sex = '';
+    if (house !== 'S' && house !== 'W' && house !== 'E' && house !== 'N') house = '';
+    if ((!sex && !house) || (s.sex === sex && s.house === house)) {
+      // still normalize empty fields for roster
+      if (sex === (s.sex || '') && house === (s.house || '')) return s;
+    }
+    return {
+      class: s.class,
+      no: s.no,
+      chi: s.chi || (reg && reg.chi) || '',
+      sex: sex || undefined,
+      house: house || undefined
+    };
+  }
+
+  function enrichStudentList(list) {
+    if (!list || !list.length) return list || [];
+    return list.map(enrichStudentFields);
+  }
   var DUTY = window.DUTY_DATA || null;
   var PALETTES = ['o', 'g', 'p', 'b', 'r', 'y'];
 
@@ -2980,7 +3009,7 @@
     var key = String(raw).trim();
     var list = GROUPS[key] || GROUPS[key.toUpperCase()] || GROUPS[key.toLowerCase()];
     if (!list || !list.length) return [];
-    return pickFromPool(list, n, rng);
+    return pickFromPool(enrichStudentList(list), n, rng);
   }
 
   /** Forms 4–6 present in a class list (senior streaming / subject groups). */
@@ -3177,7 +3206,7 @@
       var hit = lookupTeacherSubjectGroup(teacherCode, form, lessonSubject);
       if (hit) {
         result.groupCode = hit.key;
-        result.students = pickFromPool(hit.students, n, rng);
+        result.students = pickFromPool(enrichStudentList(hit.students), n, rng);
         result.mode = 'subject-group';
         result.note = '';
         return result;
@@ -3517,6 +3546,7 @@
 
     function addStudent(s, opts) {
       opts = opts || {};
+      s = enrichStudentFields(s) || s;
       var label = s.chi;
       var house = (s.house || '').toUpperCase();
       if (house !== 'S' && house !== 'W' && house !== 'E' && house !== 'N') house = '';
