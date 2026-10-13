@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="classroom-trash-v1" />
+  <meta name="game-build" content="staff-principal-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>模擬遊戲 · 準時到堂 · 劉皇發中學</title>
@@ -820,6 +820,128 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
+    /* ===== Staff room principal office door (pixel cozy) ===== */
+    .principal-door {
+      position: absolute;
+      left: 2.5%;
+      top: 20%;
+      width: 42px;
+      height: 72px;
+      z-index: 9;
+      cursor: default;
+      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .principal-door .door-frame {
+      position: absolute;
+      inset: 0;
+      background: #6b5344;
+      border: 2px solid #3e2a1a;
+      border-radius: 4px 4px 2px 2px;
+      box-sizing: border-box;
+    }
+    .principal-door .door-panel {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      top: 4px;
+      bottom: 2px;
+      background: linear-gradient(180deg, #c49a6c 0%, #a67c52 55%, #8b5e3c 100%);
+      border: 2px solid #5c3a22;
+      border-radius: 2px;
+      box-sizing: border-box;
+    }
+    .principal-door .door-panel::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 6px;
+      height: 22px;
+      border: 2px solid rgba(62,42,26,0.45);
+      border-radius: 2px;
+      box-sizing: border-box;
+    }
+    .principal-door .door-panel::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 34px;
+      bottom: 8px;
+      border: 2px solid rgba(62,42,26,0.45);
+      border-radius: 2px;
+      box-sizing: border-box;
+    }
+    .principal-door .door-knob {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      margin-top: -3px;
+      background: #f0c14b;
+      border: 1.5px solid #6b4423;
+      border-radius: 50%;
+      box-sizing: border-box;
+      z-index: 2;
+    }
+    .principal-door .door-sign {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-size: 0.48rem;
+      font-weight: 900;
+      color: #fffaf2;
+      background: #8b5e3c;
+      border: 1.5px solid #3e2a1a;
+      border-radius: 3px;
+      padding: 1px 4px;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      box-shadow: 0 1px 0 rgba(0,0,0,.15);
+      pointer-events: none;
+    }
+    .principal-door .door-hint {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #3e2a1a;
+      background: rgba(255,250,242,0.95);
+      border: 1.5px solid #3e2a1a;
+      border-radius: 999px;
+      padding: 2px 7px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      box-shadow: 0 1px 0 rgba(0,0,0,.1);
+    }
+    .principal-door.hot {
+      filter: drop-shadow(0 0 6px rgba(240,193,75,0.65)) drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      transform: scale(1.06);
+    }
+    .principal-door.hot .door-panel {
+      filter: brightness(1.08);
+    }
+    .principal-door.hot .door-hint,
+    .principal-door.show-hint .door-hint {
+      opacity: 1;
+    }
+    .principal-door.flash .door-panel {
+      animation: principalFlash 0.45s ease;
+    }
+    @keyframes principalFlash {
+      0%, 100% { filter: none; }
+      40% { filter: brightness(1.4); }
+    }
+
     .scene-badge {
       position: absolute;
       top: 8px; left: 8px;
@@ -1517,6 +1639,13 @@
         <div class="npc-layer" id="staffNpcLayer" aria-label="教員室老師"></div>
         <div class="staff-empty" id="staffEmpty" hidden>而家教員室靜靜地～</div>
         <span class="prop plant" style="bottom:44%;left:36%;filter:grayscale(0.2);">🪴</span>
+        <div class="principal-door" id="principalDoor" title="見校長" aria-label="校長室，可將老師拖入見校長">
+          <span class="door-hint">見校長</span>
+          <div class="door-frame" aria-hidden="true"></div>
+          <div class="door-panel" aria-hidden="true"></div>
+          <span class="door-knob" aria-hidden="true"></span>
+          <span class="door-sign">校長室</span>
+        </div>
         <span class="scene-badge" id="staffBadge" style="background:#fff;border-color:#9aa3b2;color:#2c3e50;">教員室</span>
       </div>
     </div>
@@ -1530,7 +1659,7 @@
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
       可切換<strong>課室／教員室</strong>：上課前／小息／午膳見<strong>今日當值</strong>；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐＋行）。
-      撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。可<strong>拖動同學掉入垃圾桶</strong>（約 5 秒後會走返出嚟）；老師唔入垃圾桶。
+      撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。可<strong>拖動同學掉入垃圾桶</strong>（約 5 秒後會走返出嚟）；老師唔入垃圾桶。教員室可<strong>拖動老師入校長室見校長</strong>（約 10 秒後會走返出嚟）。
       頂部「準時★」係準時到堂分數，同讚賞星分開。
       喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集準時 ★（每節每日一次）。
     </div>
@@ -2665,7 +2794,7 @@
     function stepWalkers(list, yMax) {
       for (var i = 0; i < list.length; i++) {
         var n = list[i];
-        if (!n.spec || !n.spec.wander || !n.vx || n.inBin || n.dragging) continue;
+        if (!n.spec || !n.spec.wander || !n.vx || n.inBin || n.inPrincipal || n.dragging) continue;
         n.x += n.vx * dt;
         n.y = n.baseY + Math.sin((ts / 900) + n.phase) * 1.2;
         if (n.x < 6) { n.x = 6; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
@@ -2697,7 +2826,7 @@
 
   /* ===== Staff room (教員室) ===== */
   var viewMode = 'classroom'; // classroom | staff
-  var staffNpcState = { key: '', seated: [], walkers: [], bubbleTimer: 0, bubbleHide: 0 };
+  var staffNpcState = { key: '', seated: [], walkers: [], bubbleTimer: 0, bubbleHide: 0, principalTimers: [], drag: null };
   var FORM_TEACHER_CODES = (function () {
     var set = {};
     var FT = window.FORM_TEACHERS_DATA;
@@ -2891,6 +3020,11 @@
   }
 
   function clearStaffSeats() {
+    clearPrincipalTimers();
+    staffNpcState.drag = null;
+    setPrincipalHot(false);
+    var doorHint = principalEl();
+    if (doorHint) doorHint.classList.remove('show-hint', 'flash', 'hot');
     var layer = document.getElementById('staffNpcLayer');
     if (layer) layer.innerHTML = '';
     for (var i = 0; i < 12; i++) {
@@ -2920,6 +3054,240 @@
       nearBoard: false,
       sleep: false
     };
+  }
+
+  /* ===== Staff principal office: drag teacher in, return after 10s ===== */
+  var PRINCIPAL_RETURN_MS = 10000;
+
+  function clearPrincipalTimers() {
+    (staffNpcState.principalTimers || []).forEach(function (t) { clearTimeout(t); });
+    staffNpcState.principalTimers = [];
+  }
+
+  function principalEl() {
+    return document.getElementById('principalDoor');
+  }
+
+  function pointOverPrincipal(clientX, clientY) {
+    var door = principalEl();
+    if (!door) return false;
+    var r = door.getBoundingClientRect();
+    var pad = 12;
+    return clientX >= r.left - pad && clientX <= r.right + pad &&
+      clientY >= r.top - pad && clientY <= r.bottom + pad;
+  }
+
+  function setPrincipalHot(on) {
+    var door = principalEl();
+    if (!door) return;
+    door.classList.toggle('hot', !!on);
+  }
+
+  function flashPrincipal() {
+    var door = principalEl();
+    if (!door) return;
+    door.classList.remove('flash');
+    void door.offsetWidth;
+    door.classList.add('flash');
+    setTimeout(function () { door.classList.remove('flash'); }, 480);
+  }
+
+  function findStaffNpcEntry(el) {
+    var lists = [staffNpcState.seated || [], staffNpcState.walkers || []];
+    for (var li = 0; li < lists.length; li++) {
+      var list = lists[li];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].el === el) return list[i];
+      }
+    }
+    return null;
+  }
+
+  function clientToStaffPercent(clientX, clientY) {
+    var sceneEl = document.getElementById('sceneStaff');
+    if (!sceneEl) return null;
+    var r = sceneEl.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    var left = ((clientX - r.left) / r.width) * 100;
+    var bottom = ((r.bottom - clientY) / r.height) * 100;
+    return {
+      x: Math.max(2, Math.min(94, left)),
+      y: Math.max(2, Math.min(48, bottom))
+    };
+  }
+
+  function ensureStaffWalker(n) {
+    if (!n || !n.el) return;
+    if (n.desk == null && staffNpcState.walkers.indexOf(n) >= 0) return;
+    var layer = document.getElementById('staffNpcLayer');
+    if (!layer) return;
+    var rect = n.el.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height * 0.7;
+    var pos = clientToStaffPercent(cx, cy);
+    n.el.classList.remove('sitting', 'idle-bob');
+    var legs = n.el.querySelector('.npc-legs');
+    if (legs) legs.remove();
+    if (n.spec) {
+      n.spec.sitting = false;
+      n.spec.wander = true;
+      n.spec.bounce = true;
+    }
+    if (n.el.parentNode !== layer) layer.appendChild(n.el);
+    staffNpcState.seated = (staffNpcState.seated || []).filter(function (x) { return x !== n; });
+    n.desk = null;
+    if (pos) {
+      n.x = pos.x;
+      n.y = pos.y;
+      n.baseY = pos.y;
+    } else if (n.x == null) {
+      n.x = 18;
+      n.y = 14;
+      n.baseY = 14;
+    }
+    n.el.style.left = n.x.toFixed(2) + '%';
+    n.el.style.bottom = n.y.toFixed(2) + '%';
+    n.el.style.transform = '';
+    if (staffNpcState.walkers.indexOf(n) < 0) {
+      staffNpcState.walkers.push(n);
+    }
+  }
+
+  function dropTeacherInPrincipal(n) {
+    if (!n || !n.spec || n.spec.role !== 'teacher' || n.inPrincipal) return;
+    ensureStaffWalker(n);
+    n.inPrincipal = true;
+    n.dragging = false;
+    n.savedVx = n.vx;
+    n.vx = 0;
+    n.el.classList.remove('dragging', 'wander-bounce');
+    n.el.classList.add('bin-poof');
+    setPrincipalHot(false);
+    flashPrincipal();
+    var name = n.spec.chi || n.spec.label || n.spec.name || '老師';
+    toast(name + ' 去咗見校長… 🚪');
+    setTimeout(function () {
+      if (!n.el || !n.el.isConnected) return;
+      n.el.classList.add('in-bin');
+      n.el.classList.remove('bin-poof');
+    }, 320);
+    var tid = setTimeout(function () {
+      staffNpcState.principalTimers = (staffNpcState.principalTimers || []).filter(function (x) { return x !== tid; });
+      restoreTeacherFromPrincipal(n);
+    }, PRINCIPAL_RETURN_MS);
+    staffNpcState.principalTimers.push(tid);
+  }
+
+  function restoreTeacherFromPrincipal(n) {
+    if (!n || !n.el || !n.el.isConnected) return;
+    n.inPrincipal = false;
+    n.el.classList.remove('in-bin', 'bin-poof');
+    // reappear near the principal door, then wander again
+    var x = 10 + Math.random() * 14;
+    var y = 10 + Math.random() * 16;
+    n.x = x;
+    n.y = y;
+    n.baseY = y;
+    n.vx = (n.savedVx != null && n.savedVx !== 0)
+      ? Math.abs(n.savedVx)
+      : (0.004 + Math.random() * 0.008);
+    n.el.style.left = n.x.toFixed(2) + '%';
+    n.el.style.bottom = n.y.toFixed(2) + '%';
+    n.el.classList.remove('facing-left');
+    n.el.classList.add('bin-return', 'wander-bounce');
+    if (n.spec) {
+      n.spec.wander = true;
+      n.spec.bounce = true;
+      n.spec.sitting = false;
+    }
+    var name = n.spec.chi || n.spec.label || n.spec.name || '老師';
+    toast(name + ' 見完校長走返出嚟啦！');
+    setTimeout(function () {
+      if (n.el) n.el.classList.remove('bin-return');
+    }, 500);
+  }
+
+  function bindTeacherPrincipalDrag(el, spec) {
+    if (!spec || spec.role !== 'teacher') return;
+    el.style.touchAction = 'none';
+    el.addEventListener('pointerdown', function (ev) {
+      if (ev.button != null && ev.button !== 0) return;
+      if (viewMode !== 'staff') return;
+      var n = findStaffNpcEntry(el);
+      if (!n || n.inPrincipal) return;
+      ev.preventDefault();
+      try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+      staffNpcState.drag = {
+        n: n,
+        pointerId: ev.pointerId,
+        startX: ev.clientX,
+        startY: ev.clientY,
+        moved: false,
+        originX: n.x,
+        originY: n.y,
+        suppressClick: false
+      };
+      n.dragging = false;
+    });
+    el.addEventListener('pointermove', function (ev) {
+      var d = staffNpcState.drag;
+      if (!d || d.n.el !== el || d.pointerId !== ev.pointerId) return;
+      var dx = ev.clientX - d.startX;
+      var dy = ev.clientY - d.startY;
+      if (!d.moved && (dx * dx + dy * dy) < DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX) return;
+      if (!d.moved) {
+        d.moved = true;
+        d.suppressClick = true;
+        ensureStaffWalker(d.n);
+        d.n.dragging = true;
+        d.n.vx = 0;
+        el.classList.add('dragging');
+        el.classList.remove('wander-bounce');
+        var door = principalEl();
+        if (door) door.classList.add('show-hint');
+      }
+      var pos = clientToStaffPercent(ev.clientX, ev.clientY);
+      if (pos) {
+        d.n.x = pos.x;
+        d.n.y = pos.y;
+        d.n.baseY = pos.y;
+        el.style.left = pos.x.toFixed(2) + '%';
+        el.style.bottom = pos.y.toFixed(2) + '%';
+        el.style.zIndex = '40';
+      }
+      setPrincipalHot(pointOverPrincipal(ev.clientX, ev.clientY));
+    });
+    function endDrag(ev) {
+      var d = staffNpcState.drag;
+      if (!d || d.n.el !== el) return;
+      if (ev && d.pointerId !== ev.pointerId) return;
+      var over = ev ? pointOverPrincipal(ev.clientX, ev.clientY) : false;
+      var door = principalEl();
+      if (door) door.classList.remove('show-hint');
+      setPrincipalHot(false);
+      el.classList.remove('dragging');
+      d.n.dragging = false;
+      staffNpcState.drag = null;
+      try { el.releasePointerCapture(d.pointerId); } catch (e2) {}
+      if (d.suppressClick) el._binSuppressClick = true;
+      if (d.moved && over) {
+        dropTeacherInPrincipal(d.n);
+        return;
+      }
+      if (d.moved) {
+        if (d.n.spec && d.n.spec.wander) {
+          d.n.vx = (Math.random() > 0.5 ? 1 : -1) * (0.004 + Math.random() * 0.008);
+          if (d.n.vx < 0) el.classList.add('facing-left');
+          else el.classList.remove('facing-left');
+        }
+        if (d.n.spec && d.n.spec.bounce) el.classList.add('wander-bounce');
+        return;
+      }
+      el._binSuppressClick = true;
+      onNpcTap(spec, el);
+    }
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
   }
 
   function syncStaffNpcs(mood, ctx) {
@@ -2966,6 +3334,7 @@
       if (!desk) return;
       var spec = makeStaffTeacherSpec(t, { sitting: true, wander: false }, rng);
       var el = makeNpcEl(spec);
+      bindTeacherPrincipalDrag(el, spec);
       desk.appendChild(el);
       staffNpcState.seated.push({ el: el, spec: spec, desk: idx });
     });
@@ -2975,6 +3344,7 @@
       if (!layer) return;
       var spec = makeStaffTeacherSpec(t, { sitting: false, wander: true }, rng);
       var el = makeNpcEl(spec);
+      bindTeacherPrincipalDrag(el, spec);
       el.classList.add('wander-bounce');
       var x = 10 + rng() * 75;
       var y = 8 + rng() * 28;
@@ -3028,7 +3398,10 @@
   function showStaffBubble() {
     if (document.hidden) return;
     if (viewMode !== 'staff') return;
-    var els = allStaffNpcEls();
+    var els = allStaffNpcEls().filter(function (el) {
+      var n = findStaffNpcEntry(el);
+      return n && !n.inPrincipal;
+    });
     if (!els.length) return;
     clearStaffBubbles();
     var el = els[Math.floor(Math.random() * els.length)];
