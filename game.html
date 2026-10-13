@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="classroom-teacher-lesson-v1" />
+  <meta name="game-build" content="classroom-subject-groups-s456-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -2097,7 +2097,7 @@
   <script src="duty.js?v=staff-recess-all-v1"></script>
   <script src="form-teachers.js?v=staff-recess-all-v1"></script>
   <script src="students.js?v=class-register-2020-v1"></script>
-  <script src="groups.js?v=optional-v1"></script>
+  <script src="groups.js?v=subject-groups-s456-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -2831,8 +2831,17 @@
     return pickFromPool(keys, n, rng);
   }
 
-  /* Optional subject-group map: window.GROUPS_DATA = { groups: { "4M1": [{class,no,chi}, ...] } } */
-  var GROUPS = (window.GROUPS_DATA && window.GROUPS_DATA.groups) || {};
+  /* Subject-group map from S4/S5/S6 Excels:
+   * window.GROUPS_DATA = {
+   *   groups: { "TLC|4|ICT": [{class,no,chi}, ...] },
+   *   byTeacherForm: { "TLC|4": ["TLC|4|ICT"], ... },
+   *   entries: { "TLC|4|ICT": { teacher, form, subject, sheet, group, count } }
+   * }
+   */
+  var GROUPS_DATA = window.GROUPS_DATA || {};
+  var GROUPS = GROUPS_DATA.groups || {};
+  var GROUPS_BY_TF = GROUPS_DATA.byTeacherForm || {};
+  var GROUPS_ENTRIES = GROUPS_DATA.entries || {};
 
   function studentsForGroupCode(raw, n, rng) {
     if (!raw) return [];
@@ -2842,10 +2851,171 @@
     return pickFromPool(list, n, rng);
   }
 
+  /** Forms 4–6 present in a class list (senior streaming / subject groups). */
+  function seniorFormsFromClasses(classes) {
+    var forms = [];
+    var seen = {};
+    (classes || []).forEach(function (c) {
+      var m = String(c).match(/^([4-6])/);
+      if (!m) return;
+      var f = m[1];
+      if (seen[f]) return;
+      seen[f] = true;
+      forms.push(Number(f));
+    });
+    return forms;
+  }
+
+  /**
+   * Score how well an Excel sheet subject matches a timetable subject string.
+   * Higher = better. Used to pick among a teacher's groups at the same form
+   * (e.g. KWY has both MATH and M2 at S4).
+   */
+  function scoreSubjectMatch(sheetSubject, lessonSubject) {
+    var sheet = String(sheetSubject || '').trim();
+    var raw = String(lessonSubject || '').trim();
+    if (!sheet || !raw) return 0;
+    var sub = raw.toUpperCase();
+    var sheetU = sheet.toUpperCase();
+    var score = 0;
+
+    // Direct / contained matches
+    if (sheetU === sub || sub === sheetU) score += 100;
+    if (sub.indexOf(sheetU) >= 0 || sheetU.indexOf(sub) >= 0) score += 40;
+
+    // Core subjects
+    if (/^CHIN/i.test(raw) || sub === 'CHIN') {
+      if (sheet === '中文') score += 80;
+    }
+    if (/^ENG/i.test(raw) || sub === 'ENG') {
+      if (sheetU === 'ENG') score += 80;
+    }
+    if (/^MATH/i.test(raw) || sub === 'MATH') {
+      if (sheetU === 'MATH') score += 80;
+      if (sheetU === 'M2') score -= 20; // prefer MATH over M2 for plain MATH
+    }
+    if (/M2|MAM2/i.test(raw)) {
+      if (sheetU === 'M2') score += 90;
+      if (sheetU === 'MATH') score -= 30;
+    }
+    if (/\bICT\b|^ICT/i.test(raw)) {
+      if (sheetU === 'ICT') score += 80;
+    }
+    if (/CHEM|CHE\d/i.test(raw)) {
+      if (sheetU === 'CHEM') score += 80;
+    }
+
+    // Physics: English sheet "PHY" vs Chinese "物理"
+    if (/PHY|物理/i.test(raw)) {
+      var phyChi = /_\d*C\b|Phy_\d*C|物理/i.test(raw) && !/_\d*E\b|Phy_\d*E/i.test(raw);
+      var phyEng = /_\d*E\b|Phy_\d*E/i.test(raw);
+      if (sheet === '物理') score += phyChi ? 90 : (phyEng ? 10 : 50);
+      if (sheetU === 'PHY') score += phyEng ? 90 : (phyChi ? 10 : 50);
+    }
+
+    // Biology: "BIO" (E) vs "生物" (C)
+    if (/BIO|生物/i.test(raw)) {
+      var bioChi = /BIOc|_\d*C\b|Bio_\d*C|生物/i.test(raw) && !/BIOe|_\d*E\b|Bio_\d*E/i.test(raw);
+      var bioEng = /BIOe|_\d*E\b|Bio_\d*E/i.test(raw);
+      if (sheet === '生物') score += bioChi ? 90 : (bioEng ? 10 : 50);
+      if (sheetU === 'BIO') score += bioEng ? 90 : (bioChi ? 10 : 50);
+    }
+
+    // Geography G1 / G2
+    if (/GEO|地理/i.test(raw)) {
+      if (/G1|地理\s*G1/i.test(raw) || /Geog_\d+CG1/i.test(raw)) {
+        if (/地理\s*G1/i.test(sheet)) score += 95;
+        if (/地理\s*G2/i.test(sheet)) score -= 40;
+      } else if (/G2|地理\s*G2/i.test(raw) || /Geog_\d+CG2/i.test(raw)) {
+        if (/地理\s*G2/i.test(sheet)) score += 95;
+        if (/地理\s*G1/i.test(sheet)) score -= 40;
+      } else if (/地理/.test(sheet)) {
+        score += 50;
+      }
+    }
+
+    if (/CHIS|CHist|中史/i.test(raw)) {
+      if (sheet === '中史') score += 80;
+    }
+    if (/HIST|Hist|歷史/i.test(raw) && !/CHIS|CHist|中史/i.test(raw)) {
+      if (sheet === '歷史') score += 80;
+    }
+    if (/BAF|BAFS/i.test(raw)) {
+      if (/BAFS/i.test(sheet)) score += 80;
+    }
+    if (/ECO|ECON|經濟/i.test(raw)) {
+      if (/ECON/i.test(sheet) || sheet === '經濟') score += 80;
+    }
+    if (/THS|旅款/i.test(raw)) {
+      if (sheet === '旅款') score += 80;
+    }
+    if (/\bVA\b|視藝|VA-/i.test(raw)) {
+      if (sheet === '視藝') score += 80;
+    }
+    if (/HMS|健社|Hmsc/i.test(raw)) {
+      if (sheet === '健社') score += 80;
+    }
+    if (/ApL|APL|中醫|心理|市場學|Prof\s*Eng|專業英語|英文傳意/i.test(raw)) {
+      if (/^ApL/i.test(sheet) || /中醫|心理|市場學|Prof|專業|英文傳意/.test(sheet)) score += 40;
+      // token overlap
+      var tokens = sheet.replace(/^ApL\s*/i, '').split(/\s+/);
+      tokens.forEach(function (t) {
+        if (t && raw.indexOf(t) >= 0) score += 25;
+      });
+    }
+
+    return score;
+  }
+
+  /**
+   * Find students for this teacher's subject group at a senior form.
+   * Returns { key, students, subject, group } or null.
+   */
+  function lookupTeacherSubjectGroup(teacherCode, form, lessonSubject) {
+    if (!teacherCode || !form) return null;
+    var tf = String(teacherCode).toUpperCase() + '|' + form;
+    var keys = GROUPS_BY_TF[tf] || [];
+    if (!keys.length) {
+      // fallback: scan entries
+      Object.keys(GROUPS_ENTRIES).forEach(function (k) {
+        var e = GROUPS_ENTRIES[k];
+        if (e && String(e.teacher).toUpperCase() === String(teacherCode).toUpperCase() && Number(e.form) === Number(form)) {
+          keys.push(k);
+        }
+      });
+    }
+    if (!keys.length) return null;
+
+    var best = null;
+    var bestScore = -1;
+    keys.forEach(function (k) {
+      var entry = GROUPS_ENTRIES[k] || {};
+      var subj = entry.subject || (k.split('|')[2] || '');
+      var sc = scoreSubjectMatch(subj, lessonSubject);
+      // If only one group for this teacher+form, accept even with weak subject score
+      if (keys.length === 1 && sc < 1) sc = 1;
+      if (sc > bestScore) {
+        bestScore = sc;
+        best = k;
+      }
+    });
+    if (!best || bestScore <= 0) return null;
+    var list = GROUPS[best];
+    if (!list || !list.length) return null;
+    var ent = GROUPS_ENTRIES[best] || {};
+    return {
+      key: best,
+      students: list,
+      subject: ent.subject || '',
+      group: ent.group || '',
+      sheet: ent.sheet || ''
+    };
+  }
+
   /**
    * Resolve students for a timetable lesson cell.
-   * Prefer class codes (1A, 5C, 2A,2B…). If cell looks group-coded and GROUPS_DATA
-   * has that group, use it; else fall back to parsed classes or teacher-only.
+   * Senior (S4–S6): prefer subject-group Excel for THIS teacher + form + subject
+   * (not the whole class register). Junior (1–3): class-based students.js.
    */
   function resolveLessonStudents(lesson, n, rng) {
     var result = { students: [], classes: [], groupCode: '', note: '', mode: 'none' };
@@ -2854,7 +3024,35 @@
     var classShort = lesson.classShort || '';
     var classes = parseClassList(classField, classShort);
     result.classes = classes;
+    var teacherCode = (state.teacher && state.teacher.code) || lesson.teacher || '';
+    var lessonSubject = lesson.subject || lesson.subjectShort || '';
+    var seniorForms = seniorFormsFromClasses(classes);
 
+    // Senior streaming: match teacher + form + subject → Excel group
+    if (seniorForms.length && teacherCode) {
+      var form = seniorForms[0];
+      if (seniorForms.length > 1) {
+        // rare: pick form that appears most in class list
+        var counts = {};
+        classes.forEach(function (c) {
+          var m = String(c).match(/^([4-6])/);
+          if (m) counts[m[1]] = (counts[m[1]] || 0) + 1;
+        });
+        form = Number(Object.keys(counts).sort(function (a, b) {
+          return counts[b] - counts[a];
+        })[0]);
+      }
+      var hit = lookupTeacherSubjectGroup(teacherCode, form, lessonSubject);
+      if (hit) {
+        result.groupCode = hit.key;
+        result.students = pickFromPool(hit.students, n, rng);
+        result.mode = 'subject-group';
+        result.note = '';
+        return result;
+      }
+    }
+
+    // Junior (or senior with no group file): class register
     if (classes.length) {
       result.students = studentsForClasses(classes, n, rng);
       result.mode = result.students.length ? 'class' : 'class-empty';
