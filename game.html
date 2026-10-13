@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="morning-assembly-playground-v1" />
+  <meta name="game-build" content="tuesday-flag-playground-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -2246,7 +2246,7 @@
     .scene.playground .pg-sky {
       position: absolute; top: 0; left: 0; right: 0; height: 28%;
       background:
-        radial-gradient(circle at 82% 35%, #fff8c8 0 10%, transparent 11%),
+        radial-gradient(circle at 86% 28%, rgba(255,248,200,0.55) 0 8%, transparent 12%),
         linear-gradient(180deg, #5eb0e8, #9ad0f0);
       z-index: 0;
     }
@@ -2382,6 +2382,75 @@
     }
     .scene.playground .pg-tree.left { left: 3%; }
     .scene.playground .pg-tree.right { right: 3%; }
+    /* Tuesday 升國旗：中國國旗 beside sun in sky */
+    .scene.playground .pg-sun {
+      position: absolute;
+      top: 6%;
+      right: 10%;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 38% 35%, #fff8d0 0 28%, #ffd54a 40%, #f0a020 72%, #e08810 100%);
+      box-shadow: 0 0 0 3px rgba(255, 220, 120, 0.45), 0 0 14px rgba(255, 200, 80, 0.55);
+      z-index: 3;
+      image-rendering: pixelated;
+      pointer-events: none;
+    }
+    .scene.playground .pg-china-flag {
+      position: absolute;
+      top: 7%;
+      right: 21%;
+      width: 34px;
+      height: 22px;
+      z-index: 4;
+      image-rendering: pixelated;
+      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.22));
+      pointer-events: none;
+    }
+    .scene.playground .pg-china-flag[hidden] { display: none !important; }
+    .scene.playground .pg-china-flag .flag-cloth {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #de2910;
+      border: 2px solid #8b1a0a;
+      border-radius: 2px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+      overflow: hidden;
+    }
+    .scene.playground .pg-china-flag .flag-pole {
+      position: absolute;
+      left: -3px;
+      top: -2px;
+      bottom: -6px;
+      width: 3px;
+      background: linear-gradient(180deg, #c0c4c8, #7a8088);
+      border-radius: 1px;
+      box-shadow: 1px 0 0 rgba(0,0,0,.15);
+    }
+    /* Large star (approx canton) */
+    .scene.playground .pg-china-flag .star-lg {
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 9px;
+      height: 9px;
+      background: #ffde00;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+    /* Four smaller stars arc */
+    .scene.playground .pg-china-flag .star-sm {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #ffde00;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+    .scene.playground .pg-china-flag .star-sm.s1 { left: 14px; top: 2px; }
+    .scene.playground .pg-china-flag .star-sm.s2 { left: 17px; top: 6px; }
+    .scene.playground .pg-china-flag .star-sm.s3 { left: 17px; top: 11px; }
+    .scene.playground .pg-china-flag .star-sm.s4 { left: 14px; top: 15px; }
     .scene.playground .playground-empty {
       position: absolute;
       left: 50%; top: 58%;
@@ -2609,6 +2678,17 @@
 
       <div class="scene playground" id="scenePlayground" data-mood="before" aria-label="學校操場籃球場 PLAYGROUND1">
         <div class="pg-sky" aria-hidden="true"></div>
+        <span class="pg-sun" id="playgroundSun" title="太陽" aria-hidden="true"></span>
+        <div class="pg-china-flag" id="playgroundChinaFlag" hidden title="中國國旗 · 逢星期二升國旗" aria-label="中國國旗（逢星期二升國旗）">
+          <span class="flag-pole" aria-hidden="true"></span>
+          <div class="flag-cloth" aria-hidden="true">
+            <span class="star-lg"></span>
+            <span class="star-sm s1"></span>
+            <span class="star-sm s2"></span>
+            <span class="star-sm s3"></span>
+            <span class="star-sm s4"></span>
+          </div>
+        </div>
         <div class="pg-fence" aria-hidden="true"></div>
         <div class="pg-grass" aria-hidden="true"></div>
         <span class="pg-tree left" aria-hidden="true">🌳</span>
@@ -5402,6 +5482,30 @@
     return bits.join(' · ');
   }
 
+  /** Weekday index for a YYYY-MM-DD calendar date in Asia/Hong_Kong (0=Sun … 6=Sat). */
+  function weekdayIndexSun0HK(ymd) {
+    if (!ymd || String(ymd).length < 10) return -1;
+    var parts = String(ymd).slice(0, 10).split('-').map(function (x) { return parseInt(x, 10); });
+    if (parts.length !== 3 || !isFinite(parts[0]) || !isFinite(parts[1]) || !isFinite(parts[2])) return -1;
+    // noon HKT ≈ 04:00 UTC — HK has no DST; avoids midnight edge cases
+    var dt = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 4, 0, 0));
+    return dt.getUTCDay();
+  }
+
+  /** 逢星期二升國旗：use Hong Kong calendar date of the effective day (live or scrubbed timeline). */
+  function isFlagRaisingTuesday(ctx) {
+    var ymd = (ctx && ctx.ymd) || todayYmdHK();
+    return weekdayIndexSun0HK(ymd) === 2; // Tuesday
+  }
+
+  function syncPlaygroundChinaFlag(ctx) {
+    var el = document.getElementById('playgroundChinaFlag');
+    if (!el) return;
+    var show = isFlagRaisingTuesday(ctx);
+    el.hidden = !show;
+    el.setAttribute('aria-hidden', show ? 'false' : 'true');
+  }
+
   /** Deterministic sample of whole-school roster (one block per class). */
   function sampleAssemblyStudents(rng, maxN) {
     maxN = maxN || ASSEMBLY_CROWD_MAX;
@@ -6595,6 +6699,8 @@
       }
       pgBadge.textContent = pgBadgeMsg;
     }
+
+    syncPlaygroundChinaFlag(ctx);
 
     syncNpcs(mood, ctx);
     startNpcLoop();
