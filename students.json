@@ -1,10 +1,10 @@
 {
   "meta": {
     "school": "世界龍岡學校劉皇發中學",
-    "source": "學生Gmail LIST",
-    "generatedAt": "2026-10-12T18:11:56+08:00",
+    "source": "Class Register Excel (sheets 1A–6D)",
+    "generatedAt": "2026-10-13T10:44:43+08:00",
     "timezone": "Asia/Hong_Kong",
-    "studentCount": 756,
+    "studentCount": 754,
     "classCount": 24,
     "classes": {
       "1A": 32,
@@ -15,7 +15,7 @@
       "2B": 32,
       "2C": 32,
       "2D": 33,
-      "3A": 33,
+      "3A": 32,
       "3B": 34,
       "3C": 31,
       "3D": 32,
@@ -29,7 +29,7 @@
       "5D": 32,
       "6A": 32,
       "6B": 23,
-      "6C": 25,
+      "6C": 24,
       "6D": 35
     },
     "fields": [
@@ -38,7 +38,7 @@
       "chi"
     ],
     "privacy": "Chinese display name + class + class number only; no emails",
-    "note": "CLASS(NO) like 1A01 → class 1A, no 01; chi taken before first Latin letter in Name"
+    "note": "From class register: No + 中文姓名; English Name used as display only when 中文姓名 blank (4 fallbacks)"
   },
   "students": [
     {
@@ -269,7 +269,7 @@
     {
       "class": "1B",
       "no": "14",
-      "chi": "BAPPI RAIHAN ARDIANSYAH ABDUS"
+      "chi": "Bappi Raihan Ardiansyah Abdus"
     },
     {
       "class": "1B",
@@ -399,7 +399,7 @@
     {
       "class": "1C",
       "no": "09",
-      "chi": "MUSKAAN SONAWISH"
+      "chi": "Muskaan Sonawish"
     },
     {
       "class": "1C",
@@ -929,7 +929,7 @@
     {
       "class": "2B",
       "no": "17",
-      "chi": "吳棱暄"
+      "chi": "吴棱暄"
     },
     {
       "class": "2B",
@@ -1413,11 +1413,6 @@
     },
     {
       "class": "3A",
-      "no": "17",
-      "chi": "陳豊智"
-    },
-    {
-      "class": "3A",
       "no": "18",
       "chi": "陳壯国"
     },
@@ -1499,7 +1494,7 @@
     {
       "class": "3B",
       "no": "01",
-      "chi": "BERNARDINO ANYA DENISE"
+      "chi": "Bernardino Anya Denise"
     },
     {
       "class": "3B",
@@ -3164,7 +3159,7 @@
     {
       "class": "5D",
       "no": "16",
-      "chi": "AWAN GHANI GUL"
+      "chi": "Awan Ghani Gul"
     },
     {
       "class": "5D",
@@ -3568,11 +3563,6 @@
     },
     {
       "class": "6C",
-      "no": "10",
-      "chi": "陳俊衡"
-    },
-    {
-      "class": "6C",
       "no": "11",
       "chi": "陳宇生"
     },
@@ -3809,7 +3799,7 @@
     {
       "class": "6D",
       "no": "33",
-      "chi": "劉富邦"
+      "chi": "葉富邦"
     },
     {
       "class": "6D",

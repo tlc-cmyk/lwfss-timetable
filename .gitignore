@@ -1,3 +1,5 @@
 # Source CSV with student emails — do not publish
 scripts/students-gmail-list.csv
 scripts/students-gmail-list.decoded.txt
+# Full class register (English names, sex, house) — do not publish
+scripts/class-register.xlsx

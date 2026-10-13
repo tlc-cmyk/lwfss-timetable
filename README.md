@@ -23,7 +23,7 @@
    - **會員付費**（`game.html`，密碼閘 `111`；`sessionStorage` 本分頁解鎖）：溫馨像素風課室小遊戲；跟住真實香港時間、校曆循環日、一般／BF 鐘聲同教師課表轉場（上課／小息／午飯／放學／假期），顯示現正課堂同倒數，可收集「準時到堂」★ 分數。課室內有真實中文姓名嘅像素同學／老師緩慢走動（上課按現節班別抽樣；小息／午飯／空堂較鬆散；放學前後可出現當值老師）；撳同學送讚賞星／心心（每月「今個月最多星」排行榜，本機 `localStorage`）；撳老師打招呼；可拖動同學入課室「訓導室」（約 5 秒後返嚟）。教師代碼預設讀取本機上次查詢（`localStorage`），否則 TLC；可切換「課室｜教員室」，教員室固定 65 個座位／書檯；小息（一般／BF）見**全體老師**，其餘按當值／空堂規則；坐＝下一堂有課、行＝下一堂都空（或已冇下一堂）；可拖老師入校長室（約 10 秒）。
    - **教師進修申請**：填寫老師姓名（可選 ShortName 從 `data.js` 帶出）、進修日期、時間、地點、活動名稱、進修類型；可**拍照／揀通告相**後用 **「用 AI 分析（傳畀助手）」**：複製提示句、下載圖片、`mailto:` 畀助手（`tlc@mail.grokbot.com`），或（若裝置支援）系統分享；最穩妥係喺 Grok Bot「**學校時間表助手**」對話直接上載相片並貼提示句。次選 **「離線辨識」**（瀏覽器 **Tesseract.js** CDN OCR）可預覽後套用。完成後可預覽並以瀏覽器「另存為 PDF」匯出校長審批用表格。
 
-不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`，鐘聲時間內嵌於 `bells.js`，班主任名單內嵌於 `form-teachers.js`，早會日程內嵌於 `assembly.js`，學生名單（班別＋中文姓名）內嵌於 `students.js`。`students.js` contains Chinese names + class only (no emails); sourced from school Gmail list for the sim game。
+不需登入、不需 Google API key；時間表內嵌於 `data.js`，校曆內嵌於 `calendar.js`，鐘聲時間內嵌於 `bells.js`，班主任名單內嵌於 `form-teachers.js`，早會日程內嵌於 `assembly.js`，學生名單（班別＋中文姓名）內嵌於 `students.js`。`students.js` contains Chinese names + class only (no emails); sourced from class register Excel (sheets 1A–6D) for the sim game。
 
 
 ## 鐘聲時間（上課時間表）
@@ -137,8 +137,9 @@ fileId：`14UPpVtyrCCzM_uExw7hsfKxKk-5F_kzZMy00j1RYFoM`
 ```bash
 cd timetable-app
 python3 scripts/build_data.py /path/to/timetable.csv
-# 學生名單（班別＋中文姓名；來源：學生Gmail LIST CSV）
-python3 scripts/build_students.py scripts/students-gmail-list.csv
+# 學生名單（班別＋中文姓名；來源：class register Excel 1A–6D）
+# Needs openpyxl (e.g. source /tmp/xlsvenv/bin/activate)
+python3 scripts/build_students.py scripts/class-register.xlsx
 ```
 
 會覆寫 `data.js` 與 `data.json`；學生腳本會覆寫 `students.js` 與 `students.json`（不含電郵）。
