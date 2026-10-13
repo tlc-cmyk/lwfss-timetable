@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-next-discipline-v1" />
+  <meta name="game-build" content="staff-65-desks-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -3440,6 +3440,9 @@
     return { sit: sit, walk: walk };
   }
 
+  /** Fixed faculty seats (= teacher count in data.json). */
+  var STAFF_DESK_COUNT = 65;
+
   function staffDeskTemplate(drinkEmoji) {
     var drink = drinkEmoji
       ? ('<span class="desk-drink" aria-hidden="true">' + drinkEmoji + '</span>')
@@ -3866,6 +3869,8 @@
     clearStaffSeats();
     updateStaffChrome(mood, ctx, picked);
 
+    ensureStaffDesks(STAFF_DESK_COUNT);
+
     var empty = document.getElementById('staffEmpty');
     if (!picked.teachers.length) {
       if (empty) {
@@ -3883,9 +3888,12 @@
 
     var rng = picked.rng || mulberry32(picked.seed || 1);
     var parts = splitSitWalk(picked.teachers, day, nextP);
-    ensureStaffDesks(parts.sit.length);
+    // Sit = next period has a lesson; wander = next free / no next. Desks stay fixed at 65.
+    var sitters = parts.sit.slice(0, STAFF_DESK_COUNT);
+    var overflow = parts.sit.slice(STAFF_DESK_COUNT);
+    if (overflow.length) parts.walk = parts.walk.concat(overflow);
 
-    parts.sit.forEach(function (t, idx) {
+    sitters.forEach(function (t, idx) {
       var desk = document.getElementById('staffDesk' + idx);
       if (!desk) return;
       var spec = makeStaffTeacherSpec(t, { sitting: true, wander: false }, rng);
