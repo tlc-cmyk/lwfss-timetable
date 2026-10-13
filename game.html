@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="tod-sky-lighting-v1" />
+  <meta name="game-build" content="tod-pg-basketball-flick-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -2470,6 +2470,7 @@
       box-shadow: 0 4px 0 rgba(0,0,0,.18);
       z-index: 2;
       overflow: hidden;
+      pointer-events: none;
     }
     .scene.playground .pg-court::before {
       /* outer lane + center line */
@@ -2539,16 +2540,58 @@
     .scene.playground .pg-hoop.bottom .pg-net { bottom: 52%; }
     .scene.playground .pg-ball {
       position: absolute;
-      right: 14%;
-      bottom: 18%;
-      font-size: 1.35rem;
-      z-index: 4;
-      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.2));
+      /* Home ≈ court bottom-right (court sits at top:40% / left:6%) */
+      left: 78%;
+      top: 82%;
+      font-size: 1.55rem;
+      line-height: 1;
+      z-index: 10;
+      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.25));
       animation: pg-ball-bob 2.4s ease-in-out infinite;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: auto;
+      transform: translate(-50%, -50%);
+      will-change: left, top, transform;
+    }
+    .scene.playground .pg-ball:active,
+    .scene.playground .pg-ball.is-aiming { cursor: grabbing; }
+    .scene.playground .pg-ball.is-aiming,
+    .scene.playground .pg-ball.is-flying,
+    .scene.playground .pg-ball.is-resetting {
+      animation: none;
+    }
+    .scene.playground .pg-ball.is-flying {
+      z-index: 12;
+    }
+    .scene.playground .pg-ball.is-scored {
+      filter: drop-shadow(0 0 8px rgba(255, 215, 80, 0.9));
     }
     @keyframes pg-ball-bob {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
+      0%, 100% { transform: translate(-50%, -50%); }
+      50% { transform: translate(-50%, calc(-50% - 6px)); }
+    }
+    .scene.playground .pg-score-pop {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%) scale(0.6);
+      font-size: clamp(1.1rem, 5vw, 1.6rem);
+      font-weight: 900;
+      color: #fff8e0;
+      text-shadow: 0 2px 0 #c0392b, 0 0 12px rgba(230, 126, 34, 0.8);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 14;
+      transition: opacity .15s ease, transform .35s ease;
+      white-space: nowrap;
+    }
+    .scene.playground .pg-score-pop.show {
+      opacity: 1;
+      transform: translate(-50%, -70%) scale(1.15);
     }
     .scene.playground .pg-sign {
       position: absolute;
@@ -2963,9 +3006,10 @@
             <div class="pg-rim"></div>
             <span class="pg-net">🥅</span>
           </div>
-          <span class="pg-ball" aria-hidden="true">🏀</span>
         </div>
         <div class="npc-layer" id="playgroundNpcLayer" aria-label="操場人物"></div>
+        <span class="pg-ball" id="pgBall" role="button" tabindex="0" title="用手指／滑鼠彈射入籃框" aria-label="籃球：撥動彈射入框">🏀</span>
+        <div class="pg-score-pop" id="pgScorePop" aria-hidden="true">入波!</div>
         <div class="playground-empty" id="playgroundEmpty" hidden>而家操場靜靜地～</div>
         <span class="scene-badge" id="playgroundBadge">操場／籃球場 · PLAYGROUND1</span>
       </div>
@@ -6047,6 +6091,357 @@
   }
   var venueAutoPlayground = false;
 
+
+  /* ===== PLAYGROUND1 basketball flick / shoot ===== */
+  var pgBallState = {
+    mode: 'idle', // idle | aiming | flying | scored | resetting
+    pointerId: null,
+    samples: [],
+    x: 78,
+    y: 82,
+    vx: 0,
+    vy: 0,
+    homeX: 78,
+    homeY: 82,
+    raf: 0,
+    resetTimer: 0,
+    scoredThisShot: false,
+    rimCross: {}
+  };
+
+  function pgBallEl() { return document.getElementById('pgBall'); }
+  function pgCourtEl() { return document.querySelector('#scenePlayground .pg-court'); }
+  function pgSceneEl() { return document.getElementById('scenePlayground'); }
+
+  function pgClientToScenePercent(clientX, clientY) {
+    var scene = pgSceneEl();
+    if (!scene) return null;
+    var r = scene.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    return {
+      x: ((clientX - r.left) / r.width) * 100,
+      y: ((clientY - r.top) / r.height) * 100
+    };
+  }
+
+  function pgApplyBallPos(x, y, extraTransform) {
+    var ball = pgBallEl();
+    if (!ball) return;
+    pgBallState.x = x;
+    pgBallState.y = y;
+    ball.style.left = x.toFixed(2) + '%';
+    ball.style.top = y.toFixed(2) + '%';
+    var t = 'translate(-50%, -50%)';
+    if (extraTransform) t += ' ' + extraTransform;
+    ball.style.transform = t;
+  }
+
+  function pgSetBallMode(mode) {
+    var ball = pgBallEl();
+    pgBallState.mode = mode;
+    if (!ball) return;
+    ball.classList.toggle('is-aiming', mode === 'aiming');
+    ball.classList.toggle('is-flying', mode === 'flying');
+    ball.classList.toggle('is-scored', mode === 'scored');
+    ball.classList.toggle('is-resetting', mode === 'resetting');
+  }
+
+  function pgShowScorePop() {
+    var pop = document.getElementById('pgScorePop');
+    if (!pop) return;
+    pop.textContent = '入波!';
+    pop.classList.remove('show');
+    // reflow for restart
+    void pop.offsetWidth;
+    pop.classList.add('show');
+    clearTimeout(pgShowScorePop._t);
+    pgShowScorePop._t = setTimeout(function () {
+      pop.classList.remove('show');
+    }, 1200);
+  }
+
+  function pgResetBall(delayMs) {
+    clearTimeout(pgBallState.resetTimer);
+    if (pgBallState.raf) {
+      cancelAnimationFrame(pgBallState.raf);
+      pgBallState.raf = 0;
+    }
+    pgBallState.resetTimer = setTimeout(function () {
+      pgBallState.vx = 0;
+      pgBallState.vy = 0;
+      pgBallState.scoredThisShot = false;
+      pgBallState.rimCross = {};
+      pgBallState.samples = [];
+      pgBallState.pointerId = null;
+      pgSetBallMode('resetting');
+      pgApplyBallPos(pgBallState.homeX, pgBallState.homeY, '');
+      // brief pause then idle bob
+      setTimeout(function () {
+        var ball = pgBallEl();
+        if (ball) {
+          ball.style.transform = '';
+          ball.style.left = '';
+          ball.style.top = '';
+        }
+        pgSetBallMode('idle');
+      }, 80);
+    }, delayMs == null ? 700 : delayMs);
+  }
+
+  function pgRimTargets() {
+    var court = pgCourtEl();
+    var scene = pgSceneEl();
+    if (!court || !scene) return [];
+    var sceneR = scene.getBoundingClientRect();
+    if (!sceneR.width || !sceneR.height) return [];
+    var rims = court.querySelectorAll('.pg-rim');
+    var out = [];
+    for (var i = 0; i < rims.length; i++) {
+      var rr = rims[i].getBoundingClientRect();
+      var hoop = rims[i].closest('.pg-hoop');
+      var isTop = hoop && hoop.classList.contains('top');
+      out.push({
+        id: isTop ? 'top' : 'bottom',
+        cx: ((rr.left + rr.width / 2) - sceneR.left) / sceneR.width * 100,
+        cy: ((rr.top + rr.height / 2) - sceneR.top) / sceneR.height * 100,
+        rx: (rr.width / sceneR.width) * 100 * 0.55,
+        ry: (rr.height / sceneR.height) * 100 * 0.7,
+        isTop: !!isTop
+      });
+    }
+    return out;
+  }
+
+  function pgCheckScore(prevY) {
+    if (pgBallState.scoredThisShot) return false;
+    var targets = pgRimTargets();
+    var x = pgBallState.x;
+    var y = pgBallState.y;
+    for (var i = 0; i < targets.length; i++) {
+      var t = targets[i];
+      var rx = Math.max(0.8, t.rx * 1.25);
+      var ry = Math.max(0.6, t.ry * 1.35);
+      var dx = (x - t.cx) / rx;
+      var dy = (y - t.cy) / ry;
+      var inside = (dx * dx + dy * dy) <= 1;
+      var key = t.id;
+      var was = pgBallState.rimCross[key] || { above: null };
+      var above = y < t.cy;
+      var prevAbove = (prevY != null) ? (prevY < t.cy) : was.above;
+      var alignedX = Math.abs(x - t.cx) <= Math.max(1.6, rx * 1.5);
+      var crossedDown = prevAbove === true && above === false;
+      var crossedUp = prevAbove === false && above === true;
+      var scored = false;
+      if (alignedX) {
+        // Top rim: ball falling through; bottom rim: ball rising through
+        if (t.isTop && crossedDown) scored = true;
+        if (!t.isTop && crossedUp) scored = true;
+        // Forgiving: lingering inside the rim ellipse after a cross
+        if (inside && (crossedDown || crossedUp)) scored = true;
+      }
+      pgBallState.rimCross[key] = { above: above };
+      if (scored) return true;
+    }
+    return false;
+  }
+
+  function pgOnScore() {
+    pgBallState.scoredThisShot = true;
+    pgBallState.vx *= 0.25;
+    pgBallState.vy = Math.abs(pgBallState.vy) * 0.35 + 0.02; // drop through net
+    pgSetBallMode('scored');
+    pgShowScorePop();
+    try { toast('入波! 🏀'); } catch (e) {}
+    // finish flight briefly then reset
+    clearTimeout(pgBallState.resetTimer);
+    pgBallState.resetTimer = setTimeout(function () {
+      pgResetBall(200);
+    }, 900);
+  }
+
+  function pgFlightStep(ts) {
+    if (pgBallState.mode !== 'flying' && pgBallState.mode !== 'scored') {
+      pgBallState.raf = 0;
+      return;
+    }
+    if (!pgFlightStep._last) pgFlightStep._last = ts;
+    var dt = Math.min(32, ts - pgFlightStep._last) / 1000;
+    pgFlightStep._last = ts;
+
+    var prevY = pgBallState.y;
+    // gravity in scene-% / s^2
+    var GRAV = 55;
+    var DRAG = 0.995;
+    pgBallState.vy += GRAV * dt;
+    pgBallState.vx *= Math.pow(DRAG, dt * 60);
+    pgBallState.vy *= Math.pow(DRAG, dt * 60);
+    pgBallState.x += pgBallState.vx * dt;
+    pgBallState.y += pgBallState.vy * dt;
+
+    // Soft walls: court-ish bounds within scene (allow slight overshoot)
+    var minX = 8, maxX = 92, minY = 38, maxY = 94;
+    if (pgBallState.x < minX) { pgBallState.x = minX; pgBallState.vx = Math.abs(pgBallState.vx) * 0.55; }
+    if (pgBallState.x > maxX) { pgBallState.x = maxX; pgBallState.vx = -Math.abs(pgBallState.vx) * 0.55; }
+    if (pgBallState.y < minY) { pgBallState.y = minY; pgBallState.vy = Math.abs(pgBallState.vy) * 0.45; }
+    if (pgBallState.y > maxY) {
+      pgBallState.y = maxY;
+      pgBallState.vy *= -0.4;
+      pgBallState.vx *= 0.85;
+      if (Math.abs(pgBallState.vy) < 8) pgBallState.vy = 0;
+    }
+
+    var spin = (pgBallState.vx * 2.2);
+    pgApplyBallPos(pgBallState.x, pgBallState.y, 'rotate(' + spin.toFixed(1) + 'deg)');
+
+    if (!pgBallState.scoredThisShot && pgCheckScore(prevY)) {
+      pgOnScore();
+    }
+
+    var speed = Math.hypot(pgBallState.vx, pgBallState.vy);
+    var settled = pgBallState.y >= maxY - 0.4 && speed < 6 && !pgBallState.scoredThisShot;
+    var outOfPlay = pgBallState.y > 98 || pgBallState.y < 30;
+
+    if (settled || outOfPlay) {
+      pgBallState.raf = 0;
+      pgFlightStep._last = 0;
+      if (!pgBallState.scoredThisShot) pgResetBall(500);
+      return;
+    }
+
+    // Safety: end long flights
+    if (!pgFlightStep._t0) pgFlightStep._t0 = ts;
+    if (ts - pgFlightStep._t0 > 5000) {
+      pgBallState.raf = 0;
+      pgFlightStep._last = 0;
+      pgFlightStep._t0 = 0;
+      if (!pgBallState.scoredThisShot) pgResetBall(200);
+      return;
+    }
+
+    pgBallState.raf = requestAnimationFrame(pgFlightStep);
+  }
+
+  function pgLaunch(vx, vy) {
+    // vx/vy in scene-% per second
+    var speed = Math.hypot(vx, vy);
+    if (speed < 18) {
+      // weak flick — nudge back home
+      pgResetBall(120);
+      return;
+    }
+    var maxSp = 220;
+    if (speed > maxSp) {
+      var s = maxSp / speed;
+      vx *= s;
+      vy *= s;
+    }
+    pgBallState.vx = vx;
+    pgBallState.vy = vy;
+    pgBallState.scoredThisShot = false;
+    pgBallState.rimCross = {};
+    pgFlightStep._last = 0;
+    pgFlightStep._t0 = 0;
+    pgSetBallMode('flying');
+    if (pgBallState.raf) cancelAnimationFrame(pgBallState.raf);
+    pgBallState.raf = requestAnimationFrame(pgFlightStep);
+  }
+
+  function pgPushSample(clientX, clientY, t) {
+    var pos = pgClientToScenePercent(clientX, clientY);
+    if (!pos) return;
+    pgBallState.samples.push({ x: pos.x, y: pos.y, t: t });
+    if (pgBallState.samples.length > 8) pgBallState.samples.shift();
+  }
+
+  function pgVelocityFromSamples() {
+    var s = pgBallState.samples;
+    if (s.length < 2) return { vx: 0, vy: 0 };
+    var a = s[s.length - 1];
+    // use sample ~60–100ms earlier for stable flick
+    var b = s[0];
+    for (var i = s.length - 2; i >= 0; i--) {
+      if (a.t - s[i].t >= 60) { b = s[i]; break; }
+    }
+    var dt = (a.t - b.t) / 1000;
+    if (dt < 0.016) dt = 0.016;
+    return { vx: (a.x - b.x) / dt, vy: (a.y - b.y) / dt };
+  }
+
+  function initPlaygroundBasketball() {
+    var ball = pgBallEl();
+    var scene = pgSceneEl();
+    if (!ball || !scene || ball.dataset.flickBound === '1') return;
+    ball.dataset.flickBound = '1';
+
+    ball.addEventListener('pointerdown', function (ev) {
+      if (ev.button != null && ev.button !== 0) return;
+      if (typeof viewMode !== 'undefined' && viewMode !== 'playground') return;
+      if (pgBallState.mode === 'flying' || pgBallState.mode === 'scored' || pgBallState.mode === 'resetting') return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      clearTimeout(pgBallState.resetTimer);
+      try { ball.setPointerCapture(ev.pointerId); } catch (e) {}
+      pgBallState.pointerId = ev.pointerId;
+      pgBallState.samples = [];
+      pgSetBallMode('aiming');
+      // freeze at current visual home
+      var cur = pgClientToScenePercent(
+        ball.getBoundingClientRect().left + ball.getBoundingClientRect().width / 2,
+        ball.getBoundingClientRect().top + ball.getBoundingClientRect().height / 2
+      );
+      if (cur) pgApplyBallPos(cur.x, cur.y, '');
+      pgPushSample(ev.clientX, ev.clientY, performance.now());
+    });
+
+    ball.addEventListener('pointermove', function (ev) {
+      if (pgBallState.pointerId !== ev.pointerId || pgBallState.mode !== 'aiming') return;
+      ev.preventDefault();
+      var pos = pgClientToScenePercent(ev.clientX, ev.clientY);
+      if (!pos) return;
+      // Light pull: ball follows finger a bit (still on court)
+      var x = Math.max(10, Math.min(92, pos.x));
+      var y = Math.max(42, Math.min(93, pos.y));
+      pgApplyBallPos(x, y, 'scale(1.06)');
+      pgPushSample(ev.clientX, ev.clientY, performance.now());
+    });
+
+    function endAim(ev) {
+      if (pgBallState.pointerId == null) return;
+      if (ev && ev.pointerId != null && ev.pointerId !== pgBallState.pointerId) return;
+      var pid = pgBallState.pointerId;
+      pgBallState.pointerId = null;
+      try { ball.releasePointerCapture(pid); } catch (e2) {}
+      if (pgBallState.mode !== 'aiming') return;
+      if (ev && ev.clientX != null) pgPushSample(ev.clientX, ev.clientY, performance.now());
+      var vel = pgVelocityFromSamples();
+      pgLaunch(vel.vx, vel.vy);
+    }
+
+    ball.addEventListener('pointerup', endAim);
+    ball.addEventListener('pointercancel', endAim);
+
+    // Keyboard: arrow flick toward top hoop
+    ball.addEventListener('keydown', function (ev) {
+      if (pgBallState.mode !== 'idle') return;
+      var map = {
+        ArrowUp: { vx: 0, vy: -140 },
+        ArrowLeft: { vx: -90, vy: -110 },
+        ArrowRight: { vx: 40, vy: -120 },
+        ' ': { vx: -30, vy: -150 },
+        Enter: { vx: -30, vy: -150 }
+      };
+      var v = map[ev.key];
+      if (!v) return;
+      ev.preventDefault();
+      var cur = pgClientToScenePercent(
+        ball.getBoundingClientRect().left + ball.getBoundingClientRect().width / 2,
+        ball.getBoundingClientRect().top + ball.getBoundingClientRect().height / 2
+      );
+      if (cur) pgApplyBallPos(cur.x, cur.y, '');
+      pgLaunch(v.vx, v.vy);
+    });
+  }
+
   var viewMode = 'classroom'; // classroom | staff | playground
   var staffNpcState = { key: '', seated: [], walkers: [], bubbleTimer: 0, bubbleHide: 0, principalTimers: [], drag: null };
   var FORM_TEACHER_CODES = (function () {
@@ -7631,6 +8026,7 @@
     afterViewTab();
   });
   try { ensurePlaygroundWeather(false); } catch (eBootWx) {}
+  try { initPlaygroundBasketball(); } catch (eBootBall) {}
   if (tabS) tabS.addEventListener('click', function () {
     setViewMode('staff');
     afterViewTab();
