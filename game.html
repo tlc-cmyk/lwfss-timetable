@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="timeline-scrubber-v1" />
+  <meta name="game-build" content="minimal-classroom-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
-  <title>會員付費 · 準時到堂 · 劉皇發中學</title>
+  <title>準時到堂 · 課室模擬 · 劉皇發中學</title>
   <style>
     :root {
       --cream: #f7efe3;
@@ -2163,6 +2163,86 @@
       visibility: hidden !important;
       pointer-events: none !important;
     }
+
+    /* ===== Minimal UI: pick teacher / classroom + timeline only ===== */
+    .pick-card {
+      background: var(--card);
+      border: 3px solid var(--wood-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .pick-card .pick-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .pick-card .pick-row:first-child { margin-top: 0; }
+    .pick-card label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--wood-deeper);
+      min-width: 4.5em;
+    }
+    .pick-card select,
+    .pick-card .pick-btn {
+      flex: 1;
+      min-width: 140px;
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 8px 10px;
+      border: 2px solid var(--wood);
+      border-radius: 10px;
+      background: var(--cream);
+      color: var(--text);
+    }
+    .pick-card .pick-btn {
+      cursor: pointer;
+      background: linear-gradient(180deg, #f0c14b, #e8a05a);
+      border-color: var(--wood-dark);
+      flex: 0 0 auto;
+      min-width: 0;
+      white-space: nowrap;
+    }
+    .pick-card .pick-btn:active { transform: translateY(1px); }
+    .topbar .change-teacher-btn {
+      color: #fff8ee;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+      border: 2px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .topbar .change-teacher-btn:active { transform: translateY(1px); }
+    .timeline-hint { display: none !important; }
+    /* Strip clutter chrome (keep nodes that JS may touch via hidden ids where needed) */
+    .currency,
+    .status-card,
+    .scene-tabs,
+    .scene-badge,
+    .discipline-door,
+    .principal-door,
+    .hint-card,
+    .board-card,
+    .next-list,
+    .footer-note,
+    .actions,
+    .praise-backdrop,
+    .praise-sheet,
+    .teacher-hp-backdrop,
+    .teacher-hp-sheet,
+    #sceneStaff,
+    .staffroom { display: none !important; }
+    body.view-staff .wrap { max-width: 480px; }
+
   </style>
 </head>
 <body>
@@ -2201,25 +2281,34 @@
       <div class="code" id="topCode">TLC</div>
       <div class="sub" id="topNames">載入中…</div>
     </div>
-    <div class="currency" title="準時到堂分數（同讚賞星分開）" aria-label="準時到堂分數">
-      <span class="coin-label">準時</span>
-      <span class="coin">★</span>
-      <span id="pointsVal">0</span>
-    </div>
+    <button type="button" class="change-teacher-btn" id="changeTeacherBtn" title="搜尋／更換老師">換老師</button>
   </header>
 
   <main class="wrap">
-    <div class="status-card">
+    <div class="pick-card" id="classroomPickCard" aria-label="揀老師同課室">
+      <div class="pick-row">
+        <label for="classPickSelect">揀課室</label>
+        <select id="classPickSelect" aria-label="班別">
+          <option value="">自動（跟老師今節）</option>
+        </select>
+      </div>
+      <div class="pick-row">
+        <label for="roomPickSelect">課室／房間</label>
+        <select id="roomPickSelect" aria-label="房間">
+          <option value="">自動（跟今節房間）</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- hidden status nodes kept for render() null-safety / timeline sync -->
+    <div class="status-card" id="statusCardHidden" aria-hidden="true">
       <div class="status-row">
         <div class="clock" id="clockHm">--:--</div>
         <span class="day-pill" id="dayPill">—</span>
       </div>
-      <div class="slot-label" id="slotLabel">讀取香港時間…</div>
+      <div class="slot-label" id="slotLabel">—</div>
       <div class="countdown relaxed" id="countdown">—</div>
-      <div class="lesson-line" id="lessonLine">
-        <strong>今節</strong>：—<br />
-        <span class="muted">真實校曆循環日 · 一般／BF 鐘聲</span>
-      </div>
+      <div class="lesson-line" id="lessonLine"><strong>今節</strong>：—</div>
     </div>
 
     <div class="timeline-card" id="timelineCard" aria-label="上學日時間線">
@@ -2228,17 +2317,11 @@
         <button type="button" class="timeline-live-btn" id="timelineLiveBtn" disabled title="返到而家香港時間">實時</button>
       </div>
       <div class="timeline-period" id="timelinePeriodLabel">讀取時間線…</div>
-      <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室／教員室" />
+      <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室" />
       <div class="timeline-marks" id="timelineMarks" role="list"></div>
-      <div class="timeline-hint">拖曳時間線睇之前／之後狀態（課室同教員室一齊跟）；撳「實時」返到而家。</div>
     </div>
 
-    <div class="scene-tabs" role="tablist" aria-label="場景切換">
-      <button type="button" class="scene-tab active" id="tabClassroom" role="tab" aria-selected="true" data-view="classroom">🏫 課室</button>
-      <button type="button" class="scene-tab" id="tabStaff" role="tab" aria-selected="false" data-view="staff">☕ 教員室</button>
-    </div>
-
-    <div class="scene-frame" aria-label="學校場景">
+    <div class="scene-frame" aria-label="課室場景">
       <div class="scene classroom is-active" id="scene" data-mood="before">
         <div class="wall"></div>
         <div class="ceiling"></div>
@@ -2253,72 +2336,21 @@
         <span class="prop book" id="propBook" hidden>📖</span>
         <span class="prop sun" id="propSun">☀️</span>
         <span class="prop moon" id="propMoon" hidden>🌙</span>
-        <div class="discipline-door" id="disciplineDoor" title="入訓導室" aria-label="訓導室，可將同學拖入">
-          <span class="door-hint">入訓導室</span>
-          <div class="door-frame" aria-hidden="true"></div>
-          <div class="door-panel" aria-hidden="true"></div>
-          <span class="door-knob" aria-hidden="true"></span>
-          <span class="door-sign">訓導室</span>
-        </div>
         <div class="classroom-empty" id="classroomEmpty" hidden>而家空堂</div>
-        <span class="scene-badge" id="sceneBadge">課室</span>
-      </div>
-
-      <div class="scene staffroom" id="sceneStaff" data-tod="before" data-staff-theme="white-v3" aria-label="教員室">
-        <div class="wall"></div>
-        <div class="ceiling"></div>
-        <div class="floor"></div>
-        <div class="window" id="staffWindow"></div>
-        <div class="staff-banner">教員室</div>
-        <div class="pigeon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-        <div class="bookshelf" aria-hidden="true"><span class="book b1"></span><span class="book b2"></span><span class="book b3"></span><span class="book b4"></span><span class="book b5"></span><span class="book b6"></span><span class="book b7"></span><span class="book b8"></span><span class="book b9"></span><span class="book b10"></span></div>
-        <div class="whiteboard"><div class="board-text" id="staffBoardText">教員室</div></div>
-        <div class="coffee-bar" aria-hidden="true">
-          <span class="drink d1">☕</span>
-          <span class="drink d2">🍵</span>
-          <span class="drink d3">💧</span>
-        </div>
-        <div class="staff-desks" id="staffDesks" aria-hidden="true"></div>
-        <div class="npc-layer" id="staffNpcLayer" aria-label="教員室老師"></div>
-        <div class="staff-empty" id="staffEmpty" hidden>而家教員室靜靜地～</div>
-        <span class="prop plant" style="bottom:44%;left:36%;filter:grayscale(0.2);">🪴</span>
-        <div class="principal-door" id="principalDoor" title="見校長" aria-label="校長室，可將老師拖入見校長">
-          <span class="door-hint">見校長</span>
-          <div class="door-frame" aria-hidden="true"></div>
-          <div class="door-panel" aria-hidden="true"></div>
-          <span class="door-knob" aria-hidden="true"></span>
-          <span class="door-sign">校長室</span>
-        </div>
-        <span class="scene-badge" id="staffBadge" style="background:#fff;border-color:#9aa3b2;color:#2c3e50;">教員室</span>
       </div>
     </div>
 
-    <div class="actions">
+    <!-- hidden stubs so legacy listeners do not throw -->
+    <div class="actions" aria-hidden="true">
       <button type="button" class="btn primary" id="checkInBtn" disabled>★ 準時到堂簽到</button>
       <button type="button" class="btn ghost" id="refreshBtn">重新整理狀態</button>
-      <button type="button" class="btn ghost" id="changeTeacherBtn">換／搜尋老師</button>
     </div>
-
-    <div class="hint-card" id="hintCard">
-      <strong>玩法：</strong>場景預設跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）；可用上方<strong>時間線</strong>拖曳預覽之前／之後課室同教員室狀態，撳「實時」返到而家。
-      <strong>課室</strong>跟住你搜尋／揀嘅老師：有堂就見<strong>教授緊嘅老師</strong>（黑板前踱步）同<strong>嗰班／嗰組同學</strong>（大半坐喺 40 張書枱，偶爾 1–2 位行吓同講短句）；空堂就顯示「而家空堂」（唔會亂入全校同學）。
-      可切換<strong>課室／教員室</strong>：教員室喺上課前／午膳見<strong>今日當值</strong>；<strong>小息見全體老師</strong>（一般／BF）；<strong>閱讀時間見非班主任</strong>（班主任喺課室；一般 13:45–14:05）；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
-      撳「換／搜尋老師」用 ShortName 或中文名揀老師。撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>；可<strong>拖動同學入訓導室</strong>（約 5 秒後會走返出嚟）。教員室可<strong>拖動老師入校長室見校長</strong>。
-      頂部「準時★」係準時到堂分數，同讚賞星分開。課堂開始後 <strong>5 分鐘內</strong>可「準時到堂簽到」。
-    </div>
-
-    <div class="board-card" id="starBoardCard">
+    <div class="hint-card" id="hintCard" hidden></div>
+    <div class="board-card" id="starBoardCard" hidden>
       <h3>今個月最多星 <span class="board-month" id="boardMonthLabel">—</span></h3>
-      <div class="board-note">讚賞星排行（本機儲存 · 心心都係讚賞但唔計入排名）</div>
-      <div id="starBoardList"><div class="board-empty">未有讚賞星——撳課室同學送一顆啦 ✨</div></div>
+      <div id="starBoardList"></div>
     </div>
-
-    <div class="next-list">
-      <h3>今日其餘節次</h3>
-      <div id="todayList"></div>
-    </div>
-
-    <p class="footer-note">世界龍岡學校劉皇發中學 · 會員付費模擬遊戲用真實校曆／鐘聲／時間表資料 · zh-HK</p>
+    <div class="next-list" hidden><div id="todayList"></div></div>
   </main>
 
   <div class="teacher-pick-backdrop" id="teacherPickBackdrop" hidden></div>
@@ -2338,42 +2370,38 @@
   <div class="toast" id="toast" role="status"></div>
 
   <div class="praise-backdrop" id="praiseBackdrop" hidden></div>
-  <div class="praise-sheet" id="praiseSheet" role="dialog" aria-modal="true" aria-labelledby="psTitle" hidden>
-    <div class="ps-title" id="psTitle">同學</div>
-    <div class="ps-sub" id="psSub">—</div>
-    <div class="ps-stats">
-      <span id="psMonthStars">本月 ★ 0</span>
-      <span id="psMonthHearts">本月 ♥ 0</span>
-    </div>
+  <div class="praise-sheet" id="praiseSheet" hidden>
+    <div class="ps-title" id="psTitle"></div>
+    <div class="ps-sub" id="psSub"></div>
+    <div class="ps-stats"><span id="psMonthStars"></span><span id="psMonthHearts"></span></div>
     <div class="praise-actions">
-      <button type="button" class="btn star-btn" id="giveStarBtn">★ 讚賞星</button>
-      <button type="button" class="btn heart-btn" id="giveHeartBtn">♥ 心心</button>
+      <button type="button" class="btn star-btn" id="giveStarBtn"></button>
+      <button type="button" class="btn heart-btn" id="giveHeartBtn"></button>
     </div>
-    <button type="button" class="btn ghost ps-close" id="praiseCloseBtn">關閉</button>
-    <div class="ps-cap" id="psCap">今日上限：★ 3　♥ 5（每位同學）</div>
+    <button type="button" class="btn ghost ps-close" id="praiseCloseBtn"></button>
+    <div class="ps-cap" id="psCap"></div>
   </div>
-
   <div class="teacher-hp-backdrop" id="teacherHpBackdrop" hidden></div>
-  <div class="teacher-hp-sheet" id="teacherHpSheet" role="dialog" aria-modal="true" aria-labelledby="thpTitle" hidden>
-    <div class="thp-title" id="thpTitle">老師</div>
-    <div class="thp-sub" id="thpSub">—</div>
+  <div class="teacher-hp-sheet" id="teacherHpSheet" hidden>
+    <div class="thp-title" id="thpTitle"></div>
+    <div class="thp-sub" id="thpSub"></div>
     <div class="thp-meter">
-      <span class="thp-hearts" id="thpHearts" aria-hidden="true">♥♥♥♥♥</span>
+      <span class="thp-hearts" id="thpHearts"></span>
       <div class="thp-bar-wrap"><div class="thp-bar" id="thpBar"></div></div>
-      <span class="thp-pct" id="thpPct">100%</span>
+      <span class="thp-pct" id="thpPct"></span>
     </div>
-    <div class="thp-lessons" id="thpLessons">今日已上 0 堂</div>
-    <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn">關閉</button>
+    <div class="thp-lessons" id="thpLessons"></div>
+    <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn"></button>
   </div>
 
-  <script src="data.js?v=staff-recess-all-v1"></script>
-  <script src="bells.js?v=staff-recess-all-v1"></script>
-  <script src="calendar.js?v=staff-recess-all-v1"></script>
-  <script src="duty.js?v=staff-recess-all-v1"></script>
-  <script src="form-teachers.js?v=staff-recess-all-v1"></script>
-  <script src="students.js?v=house-sex-v1"></script>
-  <script src="groups.js?v=house-sex-groups-v1"></script>
-  <script src="seating.js?v=game-desks-v1"></script>
+  <script src="data.js?v=minimal-classroom-v1"></script>
+  <script src="bells.js?v=minimal-classroom-v1"></script>
+  <script src="calendar.js?v=minimal-classroom-v1"></script>
+  <script src="duty.js?v=minimal-classroom-v1"></script>
+  <script src="form-teachers.js?v=minimal-classroom-v1"></script>
+  <script src="students.js?v=minimal-classroom-v1"></script>
+  <script src="groups.js?v=minimal-classroom-v1"></script>
+  <script src="seating.js?v=minimal-classroom-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -2476,10 +2504,14 @@
     teachersByCode[t.code.toUpperCase()] = t;
   });
 
+  var LS_PICK_CLASS = 'tt_game_pick_class';
+  var LS_PICK_ROOM = 'tt_game_pick_room';
   var state = {
     teacher: null,
     points: 0,
-    claimed: {}
+    claimed: {},
+    pickClass: '', // e.g. "1A" or "" = auto from teacher lesson
+    pickRoom: ''  // e.g. "604" or "" = auto
   };
 
   function pad2(n) { return String(n).padStart(2, '0'); }
@@ -3063,6 +3095,9 @@
   }
 
   function openPraiseSheet(spec) {
+    return; // praise / stars chrome removed
+  }
+  function openPraiseSheet_DISABLED(spec) {
     praiseState.selected = spec;
     var ym = monthKeyHK();
     if (ym !== praiseState.monthKey) loadPraiseMonth(ym);
@@ -3170,6 +3205,120 @@
         '</span></div>';
     });
     list.innerHTML = html;
+  }
+
+
+  function normalizeClassId(raw) {
+    var m = String(raw || '').trim().match(/^S?(\d+[A-D])$/i);
+    return m ? m[1].toUpperCase() : '';
+  }
+
+  function lessonClassList(lesson) {
+    if (!lesson) return [];
+    var raw = String(lesson.class || lesson.classShort || '');
+    var out = [];
+    raw.split(/[,，、\s]+/).forEach(function (part) {
+      part = String(part || '').trim();
+      if (!part) return;
+      // expand 4A-D / 5A-D
+      var range = part.match(/^(\d+)([A-D])-([A-D])$/i);
+      if (range) {
+        var form = range[1];
+        var a = range[2].toUpperCase().charCodeAt(0);
+        var b = range[3].toUpperCase().charCodeAt(0);
+        if (a > b) { var tmp = a; a = b; b = tmp; }
+        for (var c = a; c <= b; c++) out.push(form + String.fromCharCode(c));
+        return;
+      }
+      var id = normalizeClassId(part);
+      if (id) out.push(id);
+    });
+    return out;
+  }
+
+  function lessonMatchesPick(lesson) {
+    if (!lesson) return false;
+    var pc = state.pickClass;
+    var pr = state.pickRoom;
+    if (!pc && !pr) return true;
+    var okClass = true;
+    var okRoom = true;
+    if (pc) {
+      var list = lessonClassList(lesson);
+      okClass = list.indexOf(pc) >= 0 ||
+        String(lesson.class || '').toUpperCase().indexOf(pc) >= 0 ||
+        String(lesson.classShort || '').toUpperCase().indexOf(pc) >= 0;
+    }
+    if (pr) {
+      okRoom = String(lesson.room || '').toUpperCase() === String(pr).toUpperCase();
+    }
+    return okClass && okRoom;
+  }
+
+  function fillClassroomPickers() {
+    var classSel = document.getElementById('classPickSelect');
+    var roomSel = document.getElementById('roomPickSelect');
+    if (classSel && classSel.options.length <= 1) {
+      ['1A','1B','1C','1D','2A','2B','2C','2D','3A','3B','3C','3D','4A','4B','4C','4D','5A','5B','5C','5D','6A','6B','6C','6D'].forEach(function (c) {
+        var opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        classSel.appendChild(opt);
+      });
+    }
+    if (roomSel && roomSel.options.length <= 1) {
+      var rooms = {};
+      (DATA.teachers || []).forEach(function (t) {
+        Object.keys(t.schedule || {}).forEach(function (d) {
+          Object.keys(t.schedule[d] || {}).forEach(function (p) {
+            var L = t.schedule[d][p];
+            if (L && L.room) rooms[String(L.room)] = true;
+          });
+        });
+      });
+      Object.keys(rooms).sort(function (a, b) {
+        var na = parseInt(a, 10), nb = parseInt(b, 10);
+        if (!isNaN(na) && !isNaN(nb) && String(na) === a && String(nb) === b) return na - nb;
+        if (!isNaN(na) && String(na) === a) return -1;
+        if (!isNaN(nb) && String(nb) === b) return 1;
+        return a.localeCompare(b);
+      }).forEach(function (r) {
+        var opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = r;
+        roomSel.appendChild(opt);
+      });
+    }
+    try {
+      state.pickClass = localStorage.getItem(LS_PICK_CLASS) || '';
+      state.pickRoom = localStorage.getItem(LS_PICK_ROOM) || '';
+    } catch (e) {}
+    if (classSel) classSel.value = state.pickClass || '';
+    if (roomSel) roomSel.value = state.pickRoom || '';
+  }
+
+  function bindClassroomPickers() {
+    fillClassroomPickers();
+    var classSel = document.getElementById('classPickSelect');
+    var roomSel = document.getElementById('roomPickSelect');
+    function onPick() {
+      state.pickClass = (classSel && classSel.value) || '';
+      state.pickRoom = (roomSel && roomSel.value) || '';
+      try {
+        if (state.pickClass) localStorage.setItem(LS_PICK_CLASS, state.pickClass);
+        else localStorage.removeItem(LS_PICK_CLASS);
+        if (state.pickRoom) localStorage.setItem(LS_PICK_ROOM, state.pickRoom);
+        else localStorage.removeItem(LS_PICK_ROOM);
+      } catch (e) {}
+      npcState.key = ''; // force rebuild
+      render();
+      var bits = [];
+      if (state.pickClass) bits.push(state.pickClass);
+      if (state.pickRoom) bits.push(state.pickRoom);
+      toast(bits.length ? ('課室：' + bits.join(' · ')) : '課室：跟老師今節');
+    }
+    if (classSel) classSel.addEventListener('change', onPick);
+    if (roomSel) roomSel.addEventListener('change', onPick);
   }
 
   function lookupTeacher(code) {
@@ -3966,26 +4115,80 @@
     }
 
     // Classroom tracks the *searched teacher's* current lesson — never fill with random school-wide kids.
+    // Optional pickClass / pickRoom narrow which class/room scene is shown.
     if (mood === 'class') {
-      // Full subject-group / class roster — no artificial student cap
-      var resolved = resolveLessonStudents(lesson, Number.POSITIVE_INFINITY, rng);
-      lessonNote = resolved.note || '';
-      resolved.students.forEach(function (s) {
-        addStudent(s, { bounce: false, wander: false, sitting: true });
-      });
-      var classStudents = roster.filter(function (s) { return s.role === 'student'; });
-      var seatLayout = lookupSeatingLayout({
-        groupCode: resolved.groupCode || '',
-        classes: resolved.classes || [],
-        teacherCode: (state.teacher && state.teacher.code) || (lesson && lesson.teacher) || ''
-      });
-      assignStudentDesks(classStudents, seatLayout, rng);
-      if (seatLayout) {
-        lessonNote = (lessonNote ? lessonNote + ' · ' : '') + '座位表';
-      }
-      addTeacher(player, { nearBoard: true, wander: false, pace: true });
-      if (!resolved.students.length) {
-        emptyMsg = lessonNote || '課室暫時只有老師';
+      var pickC = state.pickClass || '';
+      var pickR = state.pickRoom || '';
+      var useLesson = lesson && lessonMatchesPick(lesson);
+      if (useLesson) {
+        var resolved = resolveLessonStudents(lesson, Number.POSITIVE_INFINITY, rng);
+        // If user picked one class inside a multi-class lesson, filter to that class when possible
+        var studs = resolved.students || [];
+        if (pickC) {
+          var filtered = studs.filter(function (s) {
+            return normalizeClassId(s.class) === pickC;
+          });
+          if (filtered.length) studs = filtered;
+        }
+        lessonNote = resolved.note || '';
+        if (pickC) lessonNote = (lessonNote ? lessonNote + ' · ' : '') + pickC;
+        if (pickR) lessonNote = (lessonNote ? lessonNote + ' · ' : '') + pickR;
+        studs.forEach(function (s) {
+          addStudent(s, { bounce: false, wander: false, sitting: true });
+        });
+        var classStudents = roster.filter(function (s) { return s.role === 'student'; });
+        var seatLayout = lookupSeatingLayout({
+          groupCode: (!pickC && resolved.groupCode) || '',
+          classId: pickC || '',
+          classes: pickC ? [pickC] : (resolved.classes || []),
+          teacherCode: (state.teacher && state.teacher.code) || (lesson && lesson.teacher) || ''
+        });
+        assignStudentDesks(classStudents, seatLayout, rng);
+        if (seatLayout) {
+          lessonNote = (lessonNote ? lessonNote + ' · ' : '') + '座位表';
+        }
+        addTeacher(player, { nearBoard: true, wander: false, pace: true });
+        if (!studs.length) {
+          emptyMsg = lessonNote || '課室暫時只有老師';
+        }
+      } else if (pickC) {
+        // Selected class, but teacher's current lesson is elsewhere / no match — show that class roster
+        var pickStuds = (studentsByClass[pickC] || []).slice().sort(function (a, b) {
+          return Number(a.no) - Number(b.no);
+        });
+        pickStuds.forEach(function (s) {
+          addStudent(s, { bounce: false, wander: false, sitting: true });
+        });
+        var pickSeat = lookupSeatingLayout({
+          classId: pickC,
+          classes: [pickC],
+          teacherCode: (state.teacher && state.teacher.code) || ''
+        });
+        assignStudentDesks(roster.filter(function (s) { return s.role === 'student'; }), pickSeat, rng);
+        addTeacher(player, { nearBoard: true, wander: false, pace: true });
+        lessonNote = pickC + (pickR ? (' · ' + pickR) : '') + ' · 非老師今節班';
+        if (pickSeat) lessonNote += ' · 座位表';
+        if (!pickStuds.length) emptyMsg = '班別 ' + pickC + ' 暫未有同學名單';
+      } else if (pickR) {
+        addTeacher(player, { nearBoard: true, wander: false, pace: true });
+        emptyMsg = '房間 ' + pickR + ' · 而家唔係呢位老師嘅課';
+        lessonNote = pickR;
+      } else {
+        var resolved2 = resolveLessonStudents(lesson, Number.POSITIVE_INFINITY, rng);
+        lessonNote = resolved2.note || '';
+        resolved2.students.forEach(function (s) {
+          addStudent(s, { bounce: false, wander: false, sitting: true });
+        });
+        var classStudents2 = roster.filter(function (s) { return s.role === 'student'; });
+        var seatLayout2 = lookupSeatingLayout({
+          groupCode: resolved2.groupCode || '',
+          classes: resolved2.classes || [],
+          teacherCode: (state.teacher && state.teacher.code) || (lesson && lesson.teacher) || ''
+        });
+        assignStudentDesks(classStudents2, seatLayout2, rng);
+        if (seatLayout2) lessonNote = (lessonNote ? lessonNote + ' · ' : '') + '座位表';
+        addTeacher(player, { nearBoard: true, wander: false, pace: true });
+        if (!resolved2.students.length) emptyMsg = lessonNote || '課室暫時只有老師';
       }
     } else if (mood === 'free') {
       // Teacher free this period: empty-ish classroom + clear message (not school-wide students)
@@ -3993,7 +4196,7 @@
       emptyMsg = '而家空堂';
     } else if (mood === 'reading') {
       // 閱讀時間：班主任返課室睇住全班靜心閱讀（bells.js slot key=reading）
-      var rClass = readingClassForTeacher(player);
+      var rClass = state.pickClass || readingClassForTeacher(player);
       if (rClass) {
         var allStuds = (studentsByClass[rClass] || []).slice().sort(function (a, b) {
           return Number(a.no) - Number(b.no);
@@ -4301,7 +4504,9 @@
       (ctx.slot && ctx.slot.key) || '',
       lesson ? (lesson.class || lesson.classShort || '') : '',
       readingCls,
-      state.teacher ? state.teacher.code : ''
+      state.teacher ? state.teacher.code : '',
+      state.pickClass || '',
+      state.pickRoom || ''
     ].join('|');
     // Peek seating fingerprint so chart edits in 座位表 refresh desks
     var peekLayout = null;
@@ -5113,6 +5318,9 @@
   }
 
   function openTeacherHpSheet(spec) {
+    return; // HP popup chrome removed
+  }
+  function openTeacherHpSheet_DISABLED(spec) {
     if (!spec || spec.role !== 'teacher') return;
     var ctx = getContext();
     var t = spec.teacherRef || lookupTeacher(spec.code);
@@ -5673,12 +5881,22 @@
       }
     }
 
-    scene.setAttribute('data-mood', mood);
-    board.textContent = boardMsg;
-    badge.textContent = badgeMsg;
+    // Apply classroom / room pick onto board label
+    if (state.pickClass || state.pickRoom) {
+      var pickBits = [];
+      if (state.pickClass) pickBits.push(state.pickClass);
+      if (state.pickRoom) pickBits.push(state.pickRoom);
+      if (mood === 'class' || mood === 'free' || mood === 'reading') {
+        boardMsg = (boardMsg ? boardMsg + '\n' : '') + pickBits.join(' · ');
+      }
+    }
+    if (scene) scene.setAttribute('data-mood', mood);
+    if (board) board.textContent = boardMsg;
+    if (badge) badge.textContent = badgeMsg;
     syncNpcs(mood, ctx);
     startNpcLoop();
-    syncStaffNpcs(mood, ctx);
+    // 教員室 removed from UI — never sync staff scene
+    if (viewMode === 'staff') setViewMode('classroom');
     var ymNow = monthKeyHK(ctx.ymd);
     if (ymNow !== praiseState.monthKey) {
       loadPraiseMonth(ymNow);
@@ -6067,20 +6285,14 @@
   resolveTeacher();
   renderStarBoard();
 
-  try {
-    var savedView = localStorage.getItem('tt_game_view');
-    if (savedView === 'staff' || savedView === 'classroom') setViewMode(savedView);
-    else setViewMode('classroom');
-  } catch (eView) { setViewMode('classroom'); }
+  // Minimal UI: classroom only (教員室 tab removed)
+  try { setViewMode('classroom'); } catch (eView) {}
+  bindClassroomPickers();
 
-  document.getElementById('tabClassroom').addEventListener('click', function () {
-    setViewMode('classroom');
-  });
-  document.getElementById('tabStaff').addEventListener('click', function () {
-    setViewMode('staff');
-    // refresh staff seating for current context
-    try { syncStaffNpcs(document.getElementById('scene').getAttribute('data-mood') || 'before', getContext()); } catch (e2) {}
-  });
+  var tabC = document.getElementById('tabClassroom');
+  var tabS = document.getElementById('tabStaff');
+  if (tabC) tabC.addEventListener('click', function () { setViewMode('classroom'); });
+  if (tabS) tabS.addEventListener('click', function () { setViewMode('classroom'); });
 
   document.getElementById('giveStarBtn').addEventListener('click', function () { givePraise('star'); });
   document.getElementById('giveHeartBtn').addEventListener('click', function () { givePraise('heart'); });
