@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="classroom-subject-groups-s456-v1" />
+  <meta name="game-build" content="classroom-40-desks-full-roster-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -270,34 +270,79 @@
       word-break: break-word;
       white-space: pre-line;
     }
-    .scene .desk-row {
-      position: absolute;
-      left: 8%; right: 8%;
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-end;
-      height: 18%;
+    /* Elongated classroom: scrollable tall scene for 40 desks (5×8) */
+    .scene-frame:not(.scene-frame--staff) {
+      aspect-ratio: auto;
+      height: auto;
+      min-height: 640px;
+      max-height: min(90vh, 980px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
-    .scene .desk-row.r1 { bottom: 28%; }
-    .scene .desk-row.r2 { bottom: 8%; }
-    .desk {
-      width: 22%;
-      height: 70%;
+    .scene-frame:not(.scene-frame--staff) .scene.classroom {
       position: relative;
+      inset: auto;
+      width: 100%;
+      height: auto;
+      min-height: 820px;
     }
-    .desk .top {
-      position: absolute; top: 20%; left: 0; right: 0; height: 28%;
+    .scene.classroom .wall { height: 20%; }
+    .scene.classroom .ceiling { height: 8%; }
+    .scene.classroom .floor { height: 82%; }
+    .scene.classroom .board {
+      top: 3%;
+      width: 42%;
+      height: 12%;
+    }
+    .scene.classroom .window {
+      top: 3%;
+      right: 6%;
+      width: 16%;
+      height: 12%;
+    }
+    #classDesks {
+      position: absolute;
+      left: 3%;
+      right: 3%;
+      top: 20%;
+      bottom: 2%;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      gap: 0.6% 1.2%;
+      z-index: 4;
+      pointer-events: none;
+      align-content: stretch;
+    }
+    #classDesks .class-desk-slot {
+      position: relative;
+      pointer-events: none;
+      min-height: 0;
+    }
+    #classDesks .class-desk-slot .desk-top {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 28%;
+      height: 26%;
       background: #b88048;
       border: 2px solid #6b4423;
       border-radius: 3px;
+      z-index: 2;
+      box-shadow: 0 2px 0 #8b5e3c;
     }
-    .desk .leg-l, .desk .leg-r {
-      position: absolute; bottom: 0; width: 14%; height: 55%;
+    #classDesks .class-desk-slot .desk-leg {
+      position: absolute;
+      bottom: 8%;
+      width: 12%;
+      height: 32%;
       background: #8b5e3c;
       border: 1px solid #5c3a22;
+      z-index: 1;
     }
-    .desk .leg-l { left: 12%; }
-    .desk .leg-r { right: 12%; }
+    #classDesks .class-desk-slot .desk-leg.l { left: 18%; }
+    #classDesks .class-desk-slot .desk-leg.r { right: 18%; }
 
     /* cute pixel characters (CSS) — static leftovers + wandering NPCs */
     .char {
@@ -1781,7 +1826,10 @@
     }
 
     @media (min-width: 480px) {
-      .scene-frame:not(.scene-frame--staff) { aspect-ratio: 4 / 3; }
+      .scene-frame:not(.scene-frame--staff) {
+        aspect-ratio: auto;
+        min-height: 680px;
+      }
     }
 
     /* Member password gate (full-page) */
@@ -1961,16 +2009,7 @@
         <div class="floor"></div>
         <div class="window" id="sceneWindow"></div>
         <div class="board"><div class="board-text" id="boardText">歡迎</div></div>
-        <div class="desk-row r1">
-          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
-          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
-          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
-        </div>
-        <div class="desk-row r2">
-          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
-          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
-          <div class="desk"><div class="top"></div><div class="leg-l"></div><div class="leg-r"></div></div>
-        </div>
+        <div class="class-desks" id="classDesks" aria-hidden="true"></div>
         <div class="npc-layer" id="npcLayer" aria-label="課室人物"></div>
         <span class="prop clock-wall" id="propClock">🕐</span>
         <span class="prop plant" id="propPlant">🪴</span>
@@ -3406,9 +3445,12 @@
 
     // Classroom tracks the *searched teacher's* current lesson — never fill with random school-wide kids.
     if (mood === 'class') {
-      var resolved = resolveLessonStudents(lesson, 8, rng);
+      // Full subject-group / class roster — no artificial student cap
+      var resolved = resolveLessonStudents(lesson, Number.POSITIVE_INFINITY, rng);
       lessonNote = resolved.note || '';
-      resolved.students.forEach(function (s) { addStudent(s, { bounce: false }); });
+      resolved.students.forEach(function (s) {
+        addStudent(s, { bounce: false, wander: false, sitting: true });
+      });
       addTeacher(player, { nearBoard: true, wander: false });
       if (!resolved.students.length) {
         emptyMsg = lessonNote || '課室暫時只有老師';
@@ -3438,9 +3480,37 @@
     return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
   }
 
+  var CLASSROOM_DESK_COUNT = 40; // exactly 40 desks (5 cols × 8 rows)
+  var CLASSROOM_DESK_COLS = 5;
+  var CLASSROOM_DESK_ROWS = 8;
+
+  function ensureClassroomDesks(count) {
+    var wrap = document.getElementById('classDesks');
+    var scene = document.getElementById('scene');
+    if (!wrap) return 0;
+    count = Math.max(0, count | 0);
+    var existing = wrap.querySelectorAll('.class-desk-slot').length;
+    var roomH = Math.max(820, 200 + CLASSROOM_DESK_ROWS * 78);
+    if (scene) {
+      scene.style.minHeight = roomH + 'px';
+      scene.style.height = roomH + 'px';
+    }
+    if (existing === count) return count;
+    wrap.innerHTML = '';
+    for (var i = 0; i < count; i++) {
+      var slot = document.createElement('div');
+      slot.className = 'class-desk-slot';
+      slot.id = 'classDesk' + i;
+      slot.innerHTML = '<div class="desk-top"></div><div class="desk-leg l"></div><div class="desk-leg r"></div>';
+      wrap.appendChild(slot);
+    }
+    return count;
+  }
+
   function placeNpcs(roster, rng) {
     var layer = document.getElementById('npcLayer');
     if (!layer) return [];
+    ensureClassroomDesks(CLASSROOM_DESK_COUNT);
     clearBinTimers();
     npcState.drag = null;
     setTrashHot(false);
@@ -3448,12 +3518,27 @@
     if (binHint) binHint.classList.remove('show-hint', 'flash', 'hot');
     layer.innerHTML = '';
     var placed = [];
+    var seatIdx = 0;
+    var cols = CLASSROOM_DESK_COLS;
+    var rows = CLASSROOM_DESK_ROWS;
     roster.forEach(function (spec, idx) {
       var el = makeNpcEl(spec);
       var x, y, vx;
       if (spec.nearBoard) {
         x = 42 + rng() * 12; // %
-        y = 40 + rng() * 4;  // bottom %
+        y = 78 + rng() * 4;  // bottom % — front of elongated room near board
+        vx = 0;
+      } else if (spec.sitting || (!spec.wander && spec.role === 'student')) {
+        var deskIdx = Math.min(seatIdx, CLASSROOM_DESK_COUNT - 1);
+        seatIdx++;
+        var col = deskIdx % cols;
+        var row = Math.floor(deskIdx / cols); // 0 = front (near teacher/board)
+        x = 6 + (col + 0.5) * (88 / cols) + (rng() - 0.5) * 1.2;
+        // Higher bottom % = closer to board; front row ~70%, back row ~6%
+        var frontBottom = 70;
+        var backBottom = 6;
+        y = frontBottom - row * ((frontBottom - backBottom) / Math.max(1, rows - 1));
+        y += (rng() - 0.5) * 1.5;
         vx = 0;
       } else if (!spec.wander) {
         x = 12 + (idx % 6) * 13 + rng() * 4;
@@ -3461,11 +3546,12 @@
         vx = 0;
       } else {
         x = 8 + rng() * 78;
-        y = 5 + rng() * 28;
+        y = 5 + rng() * 55;
         vx = (0.004 + rng() * 0.008) * (rng() > 0.5 ? 1 : -1); // % per ms scale later
       }
       el.style.left = x + '%';
       el.style.bottom = y + '%';
+      el.style.zIndex = String(7 + Math.round(y));
       if (vx < 0) el.classList.add('facing-left');
       layer.appendChild(el);
       placed.push({
@@ -3538,7 +3624,7 @@
         n.el.style.zIndex = String(7 + Math.round(n.y));
       }
     }
-    stepWalkers(npcState.npcs, 38);
+    stepWalkers(npcState.npcs, 72);
     if (typeof staffNpcState !== 'undefined' && staffNpcState.walkers) stepWalkers(staffNpcState.walkers, 42);
   }
 
@@ -3587,6 +3673,7 @@
     if (staffScene) staffScene.classList.toggle('is-active', viewMode === 'staff');
     if (frame) frame.classList.toggle('scene-frame--staff', viewMode === 'staff');
     document.body.classList.toggle('view-staff', viewMode === 'staff');
+    if (viewMode === 'classroom') ensureClassroomDesks(CLASSROOM_DESK_COUNT);
     if (hint) hint.hidden = (viewMode === 'staff');
     if (viewMode === 'staff') startStaffBubbles();
     else {
