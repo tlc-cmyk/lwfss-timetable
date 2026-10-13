@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="reading-time-form-class-v1" />
+  <meta name="game-build" content="staff-reading-non-form-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -2084,7 +2084,7 @@
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
       <strong>課室</strong>跟住你搜尋／揀嘅老師：有堂就見<strong>教授緊嘅老師</strong>（黑板前踱步）同<strong>嗰班／嗰組同學</strong>（大半坐喺 40 張書枱，偶爾 1–2 位行吓同講短句）；空堂就顯示「而家空堂」（唔會亂入全校同學）。
-      可切換<strong>課室／教員室</strong>：教員室喺上課前／午膳見<strong>今日當值</strong>；<strong>小息見全體老師</strong>（一般／BF）；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
+      可切換<strong>課室／教員室</strong>：教員室喺上課前／午膳見<strong>今日當值</strong>；<strong>小息見全體老師</strong>（一般／BF）；<strong>閱讀時間見非班主任</strong>（班主任喺課室；一般 13:45–14:05）；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
       撳「換／搜尋老師」用 ShortName 或中文名揀老師。撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>；可<strong>拖動同學入訓導室</strong>（約 5 秒後會走返出嚟）。教員室可<strong>拖動老師入校長室見校長</strong>。
       頂部「準時★」係準時到堂分數，同讚賞星分開。課堂開始後 <strong>5 分鐘內</strong>可「準時到堂簽到」。
     </div>
@@ -4007,13 +4007,22 @@
     if (!FT) return set;
     function add(t) {
       if (!t) return;
-      var c = (t.timetableCode || t.code || '').toUpperCase();
-      if (c) set[c] = true;
+      [t.code, t.timetableCode].forEach(function (raw) {
+        var c = String(raw || '').trim().toUpperCase();
+        if (c) set[c] = true;
+      });
     }
+    // Only 班主任 (form teachers). nonForm stays out of this set.
     (FT.classes || []).forEach(function (cl) {
       (cl.teachers || []).forEach(add);
     });
-    (FT.nonForm || []).forEach(add);
+    var aliases = (FT.meta && FT.meta.codeAliases) || {};
+    Object.keys(aliases).forEach(function (from) {
+      var to = String(aliases[from] || '').toUpperCase();
+      from = String(from || '').toUpperCase();
+      if (from && set[from] && to) set[to] = true;
+      if (to && set[to] && from) set[from] = true;
+    });
     return set;
   })();
 
@@ -4076,6 +4085,24 @@
         chi: ft.chi || '',
         eng: ft.eng || ''
       });
+    });
+    return out;
+  }
+
+  function isFormTeacher(t) {
+    if (!t) return false;
+    var c = String(t.code || '').toUpperCase();
+    if (!c) return false;
+    if (FORM_CLASS_BY_TEACHER[c]) return true;
+    return !!FORM_TEACHER_CODES[c];
+  }
+
+  /** Teachers who are NOT 班主任 (in classrooms during 閱讀時段). */
+  function allNonFormTeachers() {
+    var out = [];
+    (DATA.teachers || []).forEach(function (t) {
+      if (!t || !t.code) return;
+      if (!isFormTeacher(t)) out.push(t);
     });
     return out;
   }
@@ -4171,6 +4198,8 @@
   /**
    * 教員室 who appears:
    * - recess (小息, general + BF Day 5/10 bell): all teachers
+   * - reading (閱讀時段, general 13:45–14:05): non–form teachers (非班主任);
+   *   form teachers (班主任) are in classrooms
    * - before / lunch (+ other breaks): today's duty only
    * - lesson periods: 空堂 teachers
    * - after school: tomorrow's duty (next duty-roster school day)
@@ -4208,12 +4237,17 @@
         mode = 'all-recess';
         labelHint = '小息 · 全體老師';
         list = DATA.teachers || [];
+      } else if (bk === 'reading') {
+        // 閱讀時段（一般 13:45–14:05；BF 無此刻）：非班主任喺教員室；班主任喺課室
+        // 坐／行仍按下一堂（通常 P6）有課／空堂
+        mode = 'non-form-reading';
+        labelHint = '閱讀時間 · 非班主任';
+        list = allNonFormTeachers();
       } else {
         mode = 'duty-today';
         if (bk === 'lunch') labelHint = '午膳 · 今日當值';
         else if (bk === 'gap') labelHint = '轉堂 · 今日當值';
         else if (bk === 'homeroom') labelHint = '早會 · 今日當值';
-        else if (bk === 'reading') labelHint = '閱讀時間 · 今日當值';
         else labelHint = (ctx.slot.label || '休息') + ' · 今日當值';
         list = dutyTeachersFor(ymd);
       }
@@ -4737,6 +4771,7 @@
         else if (picked.mode === 'duty-tomorrow') empty.textContent = '未找到明日當值老師';
         else if (picked.mode === 'duty-today') empty.textContent = '今日未有當值資料';
         else if (picked.mode === 'all-recess') empty.textContent = '小息教員室未載入老師';
+        else if (picked.mode === 'non-form-reading') empty.textContent = '閱讀時間 · 未載入非班主任';
         else if (picked.mode === 'free-period') empty.textContent = '今節冇老師空堂（或全部出晒堂）';
         else empty.textContent = '而家教員室靜靜地～';
       }
@@ -4877,6 +4912,8 @@
       lines.push('空堂 ' + nShow + ' 位');
     } else if (picked.mode === 'all-recess') {
       lines.push('全體 ' + nShow + ' 位');
+    } else if (picked.mode === 'non-form-reading') {
+      lines.push('非班主任 ' + nShow + ' 位');
     } else if (picked.mode === 'duty-tomorrow' && picked.nextDutyYmd) {
       lines.push('明日當值 ' + nShow + ' 位');
     } else if (nShow) {
@@ -4895,6 +4932,7 @@
       else if (ctx.slot && ctx.slot.kind === 'break') {
         var bk = ctx.slot.key;
         if (bk === 'recess') badge.textContent = '教員室 · 小息全體';
+        else if (bk === 'reading') badge.textContent = '教員室 · 閱讀非班主任';
         else if (bk === 'lunch') badge.textContent = '教員室 · 午膳當值';
         else if (bk === 'gap') badge.textContent = '教員室 · 轉堂當值';
         else badge.textContent = '教員室 · 當值';
