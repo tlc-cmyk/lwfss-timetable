@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build students.js / students.json from class-register.xlsx (class + chi only).
+"""Build students.js / students.json from class-register.xlsx.
 
 Source sheets: 1A–6D with columns No, English Name, Alias, 中文姓名, Sex, House.
-Public output: Chinese display name + class + class number only (no emails).
+Public output: Chinese display name + class + class number + Sex + House (no emails).
 """
 from __future__ import annotations
 
@@ -79,7 +79,20 @@ def parse_xlsx(xlsx_path: Path) -> dict:
                     continue
                 chi = eng.title() if eng.isupper() else eng
                 eng_fallback += 1
-            students.append({"class": cls, "no": no, "chi": chi})
+            sex = cell_str(row[4]) if len(row) > 4 else ""
+            house = cell_str(row[5]) if len(row) > 5 else ""
+            sex = sex.upper()[:1] if sex else ""
+            if sex not in ("M", "F"):
+                sex = ""
+            house = house.upper()[:1] if house else ""
+            if house not in ("S", "W", "E", "N"):
+                house = ""
+            rec = {"class": cls, "no": no, "chi": chi}
+            if sex:
+                rec["sex"] = sex
+            if house:
+                rec["house"] = house
+            students.append(rec)
 
     students.sort(key=lambda s: (s["class"], s["no"]))
     by_class = Counter(s["class"] for s in students)
@@ -93,10 +106,10 @@ def parse_xlsx(xlsx_path: Path) -> dict:
         "studentCount": len(students),
         "classCount": len(by_class),
         "classes": dict(sorted(by_class.items())),
-        "fields": ["class", "no", "chi"],
-        "privacy": "Chinese display name + class + class number only; no emails",
+        "fields": ["class", "no", "chi", "sex", "house"],
+        "privacy": "Chinese display name + class + class number + Sex + House; no emails",
         "note": (
-            "From class register: No + 中文姓名; "
+            "From class register: No + 中文姓名 + Sex + House; "
             "English Name used as display only when 中文姓名 blank"
             + (f" ({eng_fallback} fallbacks)" if eng_fallback else "")
         ),
@@ -111,7 +124,7 @@ def write_outputs(payload: dict) -> None:
     js = (
         "// Auto-generated student roster for 模擬遊戲 — do not edit by hand.\n"
         "// Rebuild: python3 scripts/build_students.py [class-register.xlsx]\n"
-        "// Privacy: Chinese names + class only (no emails).\n"
+        "// Privacy: Chinese names + class + Sex + House (no emails).\n"
         "window.STUDENTS_DATA = "
         + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
         + ";\n"

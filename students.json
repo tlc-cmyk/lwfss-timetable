@@ -2,7 +2,7 @@
   "meta": {
     "school": "世界龍岡學校劉皇發中學",
     "source": "Class Register Excel (sheets 1A–6D)",
-    "generatedAt": "2026-10-13T10:44:43+08:00",
+    "generatedAt": "2026-10-13T13:58:15+08:00",
     "timezone": "Asia/Hong_Kong",
     "studentCount": 754,
     "classCount": 24,
@@ -35,3781 +35,5290 @@
     "fields": [
       "class",
       "no",
-      "chi"
+      "chi",
+      "sex",
+      "house"
     ],
-    "privacy": "Chinese display name + class + class number only; no emails",
-    "note": "From class register: No + 中文姓名; English Name used as display only when 中文姓名 blank (4 fallbacks)"
+    "privacy": "Chinese display name + class + class number + Sex + House; no emails",
+    "note": "From class register: No + 中文姓名 + Sex + House; English Name used as display only when 中文姓名 blank (4 fallbacks)"
   },
   "students": [
     {
       "class": "1A",
       "no": "01",
-      "chi": "陳慧敏"
+      "chi": "陳慧敏",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "02",
-      "chi": "趙芷晴"
+      "chi": "趙芷晴",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "03",
-      "chi": "蔡紫妍"
+      "chi": "蔡紫妍",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1A",
       "no": "04",
-      "chi": "李天慈"
+      "chi": "李天慈",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "05",
-      "chi": "黃梓涵"
+      "chi": "黃梓涵",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "06",
-      "chi": "靳開妍"
+      "chi": "靳開妍",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1A",
       "no": "07",
-      "chi": "金芸莃"
+      "chi": "金芸莃",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1A",
       "no": "08",
-      "chi": "羅艾琳"
+      "chi": "羅艾琳",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "09",
-      "chi": "梁雅琪"
+      "chi": "梁雅琪",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1A",
       "no": "10",
-      "chi": "呂欣妍"
+      "chi": "呂欣妍",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "11",
-      "chi": "吳芷賢"
+      "chi": "吳芷賢",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "12",
-      "chi": "戴希桐"
+      "chi": "戴希桐",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "13",
-      "chi": "曾凱莉"
+      "chi": "曾凱莉",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1A",
       "no": "14",
-      "chi": "黃芷澄"
+      "chi": "黃芷澄",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1A",
       "no": "15",
-      "chi": "尹琬喬"
+      "chi": "尹琬喬",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "16",
-      "chi": "翟駿崎"
+      "chi": "翟駿崎",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "17",
-      "chi": "陳俊豪"
+      "chi": "陳俊豪",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "18",
-      "chi": "鄭鈺鴻"
+      "chi": "鄭鈺鴻",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "19",
-      "chi": "莊峻遠"
+      "chi": "莊峻遠",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1A",
       "no": "20",
-      "chi": "馮海揚"
+      "chi": "馮海揚",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1A",
       "no": "21",
-      "chi": "林予珅"
+      "chi": "林予珅",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1A",
       "no": "22",
-      "chi": "劉俊逸"
+      "chi": "劉俊逸",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1A",
       "no": "23",
-      "chi": "李皓軒"
+      "chi": "李皓軒",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "24",
-      "chi": "李耀華"
+      "chi": "李耀華",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "25",
-      "chi": "廖梓傑"
+      "chi": "廖梓傑",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1A",
       "no": "26",
-      "chi": "文智鋒"
+      "chi": "文智鋒",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "27",
-      "chi": "蘇柏華"
+      "chi": "蘇柏華",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "28",
-      "chi": "戴翹一"
+      "chi": "戴翹一",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1A",
       "no": "29",
-      "chi": "譚晧耀"
+      "chi": "譚晧耀",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1A",
       "no": "30",
-      "chi": "俞知颂"
+      "chi": "俞知颂",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "31",
-      "chi": "周林峰"
+      "chi": "周林峰",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1A",
       "no": "32",
-      "chi": "李藝馨"
+      "chi": "李藝馨",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "01",
-      "chi": "陳曉陶"
+      "chi": "陳曉陶",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "02",
-      "chi": "陳心柔"
+      "chi": "陳心柔",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "03",
-      "chi": "陳梓愉"
+      "chi": "陳梓愉",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1B",
       "no": "04",
-      "chi": "張貝𣾷"
+      "chi": "張貝𣾷",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1B",
       "no": "05",
-      "chi": "何詩涵"
+      "chi": "何詩涵",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "06",
-      "chi": "何妧翹"
+      "chi": "何妧翹",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "07",
-      "chi": "柯蘇琋"
+      "chi": "柯蘇琋",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "08",
-      "chi": "黎奕圻"
+      "chi": "黎奕圻",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "09",
-      "chi": "潘煐麒"
+      "chi": "潘煐麒",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "10",
-      "chi": "唐子蕊"
+      "chi": "唐子蕊",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "11",
-      "chi": "黃瑜芊"
+      "chi": "黃瑜芊",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "12",
-      "chi": "黃均堯"
+      "chi": "黃均堯",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "13",
-      "chi": "余穎翹"
+      "chi": "余穎翹",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1B",
       "no": "14",
-      "chi": "Bappi Raihan Ardiansyah Abdus"
+      "chi": "Bappi Raihan Ardiansyah Abdus",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "15",
-      "chi": "曹子恩"
+      "chi": "曹子恩",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1B",
       "no": "16",
-      "chi": "陳浩鵬"
+      "chi": "陳浩鵬",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1B",
       "no": "17",
-      "chi": "陳睿晞"
+      "chi": "陳睿晞",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "18",
-      "chi": "張嘉麟"
+      "chi": "張嘉麟",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "19",
-      "chi": "馮梓晉"
+      "chi": "馮梓晉",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "20",
-      "chi": "何華棟"
+      "chi": "何華棟",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "21",
-      "chi": "甘宏浚"
+      "chi": "甘宏浚",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "22",
-      "chi": "曲珝珣"
+      "chi": "曲珝珣",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "23",
-      "chi": "郭珀僖"
+      "chi": "郭珀僖",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "24",
-      "chi": "梁子諾"
+      "chi": "梁子諾",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1B",
       "no": "25",
-      "chi": "羅梓銘"
+      "chi": "羅梓銘",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "26",
-      "chi": "莫子豪"
+      "chi": "莫子豪",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1B",
       "no": "27",
-      "chi": "思文"
+      "chi": "思文",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "28",
-      "chi": "潘天佑"
+      "chi": "潘天佑",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1B",
       "no": "29",
-      "chi": "戴洧霆"
+      "chi": "戴洧霆",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1B",
       "no": "30",
-      "chi": "鄧睿謙"
+      "chi": "鄧睿謙",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1B",
       "no": "31",
-      "chi": "謝裕俊"
+      "chi": "謝裕俊",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "01",
-      "chi": "曹詩灵"
+      "chi": "曹詩灵",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "02",
-      "chi": "陳薇弛"
+      "chi": "陳薇弛",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "03",
-      "chi": "陳雅靜"
+      "chi": "陳雅靜",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "04",
-      "chi": "蔡霖霖"
+      "chi": "蔡霖霖",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1C",
       "no": "05",
-      "chi": "龔芷晴"
+      "chi": "龔芷晴",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1C",
       "no": "06",
-      "chi": "郭琸姸"
+      "chi": "郭琸姸",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "07",
-      "chi": "李曦晨"
+      "chi": "李曦晨",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "08",
-      "chi": "林祉昱"
+      "chi": "林祉昱",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "09",
-      "chi": "Muskaan Sonawish"
+      "chi": "Muskaan Sonawish",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "10",
-      "chi": "謝幗姿"
+      "chi": "謝幗姿",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "11",
-      "chi": "楊凱晴"
+      "chi": "楊凱晴",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "12",
-      "chi": "安娜"
+      "chi": "安娜",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "13",
-      "chi": "陳灝斌"
+      "chi": "陳灝斌",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "14",
-      "chi": "陳天樂"
+      "chi": "陳天樂",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "15",
-      "chi": "陳杰"
+      "chi": "陳杰",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "16",
-      "chi": "陳思任"
+      "chi": "陳思任",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "17",
-      "chi": "鄭尚宇"
+      "chi": "鄭尚宇",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "18",
-      "chi": "周卓禧"
+      "chi": "周卓禧",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "19",
-      "chi": "傅駿堯"
+      "chi": "傅駿堯",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1C",
       "no": "20",
-      "chi": "龔灝翔"
+      "chi": "龔灝翔",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "21",
-      "chi": "古佰臣"
+      "chi": "古佰臣",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "22",
-      "chi": "韓進衍"
+      "chi": "韓進衍",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "23",
-      "chi": "何晧宏"
+      "chi": "何晧宏",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "24",
-      "chi": "江子睿"
+      "chi": "江子睿",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1C",
       "no": "25",
-      "chi": "林學謙"
+      "chi": "林學謙",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "26",
-      "chi": "劉永樂"
+      "chi": "劉永樂",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "27",
-      "chi": "李浚逸"
+      "chi": "李浚逸",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "28",
-      "chi": "梁正堂"
+      "chi": "梁正堂",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "29",
-      "chi": "林楷煜"
+      "chi": "林楷煜",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "30",
-      "chi": "彭翊軒"
+      "chi": "彭翊軒",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "31",
-      "chi": "黃正賢"
+      "chi": "黃正賢",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1C",
       "no": "32",
-      "chi": "王廸森"
+      "chi": "王廸森",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1C",
       "no": "33",
-      "chi": "許秉真"
+      "chi": "許秉真",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "01",
-      "chi": "蔡欣盈"
+      "chi": "蔡欣盈",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "02",
-      "chi": "高紫彤"
+      "chi": "高紫彤",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "03",
-      "chi": "陳幸瑤"
+      "chi": "陳幸瑤",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "04",
-      "chi": "陳雅勤"
+      "chi": "陳雅勤",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "05",
-      "chi": "陳恩行"
+      "chi": "陳恩行",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "06",
-      "chi": "陳楊微"
+      "chi": "陳楊微",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "07",
-      "chi": "朱紫凝"
+      "chi": "朱紫凝",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "08",
-      "chi": "許詩穎"
+      "chi": "許詩穎",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "09",
-      "chi": "李卓瑩"
+      "chi": "李卓瑩",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "10",
-      "chi": "羅寶兒"
+      "chi": "羅寶兒",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1D",
       "no": "11",
-      "chi": "三原加奈"
+      "chi": "三原加奈",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1D",
       "no": "12",
-      "chi": "鄧倇璧"
+      "chi": "鄧倇璧",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "13",
-      "chi": "謝安淳"
+      "chi": "謝安淳",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "1D",
       "no": "14",
-      "chi": "黃綽瞳"
+      "chi": "黃綽瞳",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "15",
-      "chi": "王祉淇"
+      "chi": "王祉淇",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "16",
-      "chi": "黃芸慧"
+      "chi": "黃芸慧",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "17",
-      "chi": "袁璻翹"
+      "chi": "袁璻翹",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "18",
-      "chi": "翁秋婷"
+      "chi": "翁秋婷",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "19",
-      "chi": "徐子銓"
+      "chi": "徐子銓",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "20",
-      "chi": "符竣琅"
+      "chi": "符竣琅",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1D",
       "no": "21",
-      "chi": "黃奕暢"
+      "chi": "黃奕暢",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "22",
-      "chi": "許林鴻"
+      "chi": "許林鴻",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "1D",
       "no": "23",
-      "chi": "黎啟光"
+      "chi": "黎啟光",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "24",
-      "chi": "林澤謙"
+      "chi": "林澤謙",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "25",
-      "chi": "林湛佳"
+      "chi": "林湛佳",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "26",
-      "chi": "林語亮"
+      "chi": "林語亮",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "27",
-      "chi": "雷嘉豪"
+      "chi": "雷嘉豪",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "28",
-      "chi": "李杰明"
+      "chi": "李杰明",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "1D",
       "no": "29",
-      "chi": "林新亮"
+      "chi": "林新亮",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "30",
-      "chi": "馬晧智"
+      "chi": "馬晧智",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "1D",
       "no": "31",
-      "chi": "王浚希"
+      "chi": "王浚希",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "32",
-      "chi": "楊梓樂"
+      "chi": "楊梓樂",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "33",
-      "chi": "劉卓熹"
+      "chi": "劉卓熹",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "1D",
       "no": "34",
-      "chi": "李美樺"
+      "chi": "李美樺",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2A",
       "no": "01",
-      "chi": "陳秋韓"
+      "chi": "陳秋韓",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "02",
-      "chi": "鄭紫丹"
+      "chi": "鄭紫丹",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2A",
       "no": "03",
-      "chi": "莊詠僑"
+      "chi": "莊詠僑",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2A",
       "no": "04",
-      "chi": "戴子傜"
+      "chi": "戴子傜",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "05",
-      "chi": "鄧棋月"
+      "chi": "鄧棋月",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2A",
       "no": "06",
-      "chi": "范稀瑤"
+      "chi": "范稀瑤",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "07",
-      "chi": "傅銘心"
+      "chi": "傅銘心",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "08",
-      "chi": "韓佳逸"
+      "chi": "韓佳逸",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "09",
-      "chi": "黃曉彤"
+      "chi": "黃曉彤",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "10",
-      "chi": "葉淑儀"
+      "chi": "葉淑儀",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2A",
       "no": "11",
-      "chi": "郭晞晴"
+      "chi": "郭晞晴",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2A",
       "no": "12",
-      "chi": "李梓琪"
+      "chi": "李梓琪",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2A",
       "no": "13",
-      "chi": "梁夢琪"
+      "chi": "梁夢琪",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2A",
       "no": "14",
-      "chi": "羅佳怡"
+      "chi": "羅佳怡",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "15",
-      "chi": "肖雨悅"
+      "chi": "肖雨悅",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "16",
-      "chi": "楊嵐茜"
+      "chi": "楊嵐茜",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2A",
       "no": "17",
-      "chi": "葉泳彤"
+      "chi": "葉泳彤",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "18",
-      "chi": "翁可喬"
+      "chi": "翁可喬",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2A",
       "no": "19",
-      "chi": "周俐萱"
+      "chi": "周俐萱",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "20",
-      "chi": "陳啟赫"
+      "chi": "陳啟赫",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "21",
-      "chi": "鄭梓憲"
+      "chi": "鄭梓憲",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "22",
-      "chi": "戚滙林"
+      "chi": "戚滙林",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2A",
       "no": "23",
-      "chi": "施辰涵"
+      "chi": "施辰涵",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "24",
-      "chi": "蘇睿杰"
+      "chi": "蘇睿杰",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "25",
-      "chi": "鄧宏謙"
+      "chi": "鄧宏謙",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "26",
-      "chi": "謝梓軒"
+      "chi": "謝梓軒",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2A",
       "no": "27",
-      "chi": "王卓楠"
+      "chi": "王卓楠",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "28",
-      "chi": "王梓曦"
+      "chi": "王梓曦",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2A",
       "no": "29",
-      "chi": "夏宜豪"
+      "chi": "夏宜豪",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "30",
-      "chi": "葉杰鴻"
+      "chi": "葉杰鴻",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2A",
       "no": "31",
-      "chi": "詹騤越"
+      "chi": "詹騤越",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2B",
       "no": "01",
-      "chi": "歐樂兒"
+      "chi": "歐樂兒",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "02",
-      "chi": "陳家恩"
+      "chi": "陳家恩",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "03",
-      "chi": "陳穎妍"
+      "chi": "陳穎妍",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "04",
-      "chi": "張巧薏"
+      "chi": "張巧薏",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "05",
-      "chi": "徐晨霏"
+      "chi": "徐晨霏",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2B",
       "no": "06",
-      "chi": "秦睿浠"
+      "chi": "秦睿浠",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "07",
-      "chi": "黃熙晴"
+      "chi": "黃熙晴",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "08",
-      "chi": "林咏怡"
+      "chi": "林咏怡",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "09",
-      "chi": "梁凱婷"
+      "chi": "梁凱婷",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "10",
-      "chi": "李嘉然"
+      "chi": "李嘉然",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "11",
-      "chi": "李晨希"
+      "chi": "李晨希",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "12",
-      "chi": "李昕蔓"
+      "chi": "李昕蔓",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "13",
-      "chi": "羅海霞"
+      "chi": "羅海霞",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "14",
-      "chi": "羅潁珊"
+      "chi": "羅潁珊",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2B",
       "no": "15",
-      "chi": "巫嘉恩"
+      "chi": "巫嘉恩",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2B",
       "no": "16",
-      "chi": "胡睿晴"
+      "chi": "胡睿晴",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "17",
-      "chi": "吴棱暄"
+      "chi": "吴棱暄",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "18",
-      "chi": "吳澤曦"
+      "chi": "吳澤曦",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "19",
-      "chi": "亞恩"
+      "chi": "亞恩",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "20",
-      "chi": "陳立堯"
+      "chi": "陳立堯",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2B",
       "no": "21",
-      "chi": "陳狄伽"
+      "chi": "陳狄伽",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2B",
       "no": "22",
-      "chi": "張嘉諾"
+      "chi": "張嘉諾",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2B",
       "no": "23",
-      "chi": "劉廸彥"
+      "chi": "劉廸彥",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "24",
-      "chi": "李云升"
+      "chi": "李云升",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "25",
-      "chi": "廖浩成"
+      "chi": "廖浩成",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "26",
-      "chi": "盧律衡"
+      "chi": "盧律衡",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "27",
-      "chi": "吳梓朗"
+      "chi": "吳梓朗",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "28",
-      "chi": "阮家成"
+      "chi": "阮家成",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2B",
       "no": "29",
-      "chi": "施文樂"
+      "chi": "施文樂",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2B",
       "no": "30",
-      "chi": "徐晨軒"
+      "chi": "徐晨軒",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2B",
       "no": "31",
-      "chi": "殷子彧"
+      "chi": "殷子彧",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2B",
       "no": "32",
-      "chi": "鍾濠旭"
+      "chi": "鍾濠旭",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "01",
-      "chi": "敖珊珊"
+      "chi": "敖珊珊",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "02",
-      "chi": "周留萱"
+      "chi": "周留萱",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2C",
       "no": "03",
-      "chi": "鄧雅言"
+      "chi": "鄧雅言",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2C",
       "no": "04",
-      "chi": "符曉晶"
+      "chi": "符曉晶",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2C",
       "no": "05",
-      "chi": "韓銥霏"
+      "chi": "韓銥霏",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "06",
-      "chi": "何善兒"
+      "chi": "何善兒",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2C",
       "no": "07",
-      "chi": "黃詩雅"
+      "chi": "黃詩雅",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "08",
-      "chi": "賴雯希"
+      "chi": "賴雯希",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2C",
       "no": "09",
-      "chi": "梁芷瑜"
+      "chi": "梁芷瑜",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "10",
-      "chi": "林慧姍"
+      "chi": "林慧姍",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "11",
-      "chi": "羅苑楹"
+      "chi": "羅苑楹",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "12",
-      "chi": "毛文佳"
+      "chi": "毛文佳",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "13",
-      "chi": "吳梓瑩"
+      "chi": "吳梓瑩",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2C",
       "no": "14",
-      "chi": "譚栩"
+      "chi": "譚栩",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "15",
-      "chi": "鄧巧妍"
+      "chi": "鄧巧妍",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "16",
-      "chi": "張嘉琳"
+      "chi": "張嘉琳",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2C",
       "no": "17",
-      "chi": "陳啟豪"
+      "chi": "陳啟豪",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2C",
       "no": "18",
-      "chi": "戴嘉輝"
+      "chi": "戴嘉輝",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2C",
       "no": "19",
-      "chi": "范祉隆"
+      "chi": "范祉隆",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2C",
       "no": "20",
-      "chi": "何子鈞"
+      "chi": "何子鈞",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "21",
-      "chi": "黃創業"
+      "chi": "黃創業",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2C",
       "no": "22",
-      "chi": "李冠希"
+      "chi": "李冠希",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2C",
       "no": "23",
-      "chi": "羅家楠"
+      "chi": "羅家楠",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2C",
       "no": "24",
-      "chi": "羅銘睿"
+      "chi": "羅銘睿",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "25",
-      "chi": "莫梓熙"
+      "chi": "莫梓熙",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "26",
-      "chi": "彭俊熙"
+      "chi": "彭俊熙",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2C",
       "no": "27",
-      "chi": "譚君睿"
+      "chi": "譚君睿",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "28",
-      "chi": "田純一"
+      "chi": "田純一",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "29",
-      "chi": "温錦燁"
+      "chi": "温錦燁",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "30",
-      "chi": "王浩銘"
+      "chi": "王浩銘",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2C",
       "no": "31",
-      "chi": "吳錦一"
+      "chi": "吳錦一",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2C",
       "no": "32",
-      "chi": "楊鴻"
+      "chi": "楊鴻",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "01",
-      "chi": "岑穎瑩"
+      "chi": "岑穎瑩",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "02",
-      "chi": "周詩錡"
+      "chi": "周詩錡",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "03",
-      "chi": "陶詠思"
+      "chi": "陶詠思",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "04",
-      "chi": "何梓盈"
+      "chi": "何梓盈",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "05",
-      "chi": "黃新茹"
+      "chi": "黃新茹",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "06",
-      "chi": "劉蒨縈"
+      "chi": "劉蒨縈",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "07",
-      "chi": "羅閔筠"
+      "chi": "羅閔筠",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "08",
-      "chi": "李彥醇"
+      "chi": "李彥醇",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "09",
-      "chi": "鄭楚穎"
+      "chi": "鄭楚穎",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2D",
       "no": "10",
-      "chi": "黃梓澄"
+      "chi": "黃梓澄",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "11",
-      "chi": "云同歡"
+      "chi": "云同歡",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "2D",
       "no": "12",
-      "chi": "陳鎵言"
+      "chi": "陳鎵言",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "13",
-      "chi": "陳鵬潤"
+      "chi": "陳鵬潤",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "14",
-      "chi": "陳子堯"
+      "chi": "陳子堯",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "15",
-      "chi": "鄒昊洋"
+      "chi": "鄒昊洋",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "16",
-      "chi": "馮珀頌"
+      "chi": "馮珀頌",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "17",
-      "chi": "鄺耀洋"
+      "chi": "鄺耀洋",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "18",
-      "chi": "林昶瑋"
+      "chi": "林昶瑋",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "19",
-      "chi": "劉子豪"
+      "chi": "劉子豪",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "20",
-      "chi": "梁鋆垣"
+      "chi": "梁鋆垣",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "21",
-      "chi": "李祉諾"
+      "chi": "李祉諾",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2D",
       "no": "22",
-      "chi": "林焯研"
+      "chi": "林焯研",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "23",
-      "chi": "羅雋傑"
+      "chi": "羅雋傑",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "24",
-      "chi": "吳祈朗"
+      "chi": "吳祈朗",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "25",
-      "chi": "阮英明"
+      "chi": "阮英明",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "26",
-      "chi": "覃家然"
+      "chi": "覃家然",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "2D",
       "no": "27",
-      "chi": "王平藝"
+      "chi": "王平藝",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "28",
-      "chi": "黃兆康"
+      "chi": "黃兆康",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2D",
       "no": "29",
-      "chi": "王梓謙"
+      "chi": "王梓謙",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "30",
-      "chi": "謝冠平"
+      "chi": "謝冠平",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "2D",
       "no": "31",
-      "chi": "余心南"
+      "chi": "余心南",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "2D",
       "no": "32",
-      "chi": "曾程"
+      "chi": "曾程",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "2D",
       "no": "33",
-      "chi": "張燊以"
+      "chi": "張燊以",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "01",
-      "chi": "徐芯悠"
+      "chi": "徐芯悠",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "02",
-      "chi": "高晞然"
+      "chi": "高晞然",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "03",
-      "chi": "何烯慈"
+      "chi": "何烯慈",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3A",
       "no": "04",
-      "chi": "林梓柔"
+      "chi": "林梓柔",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "05",
-      "chi": "李泳枬"
+      "chi": "李泳枬",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "06",
-      "chi": "連婥嵐"
+      "chi": "連婥嵐",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "07",
-      "chi": "劉雅淇"
+      "chi": "劉雅淇",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3A",
       "no": "08",
-      "chi": "羅雨錡"
+      "chi": "羅雨錡",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3A",
       "no": "09",
-      "chi": "羅一然"
+      "chi": "羅一然",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "10",
-      "chi": "馬千壹"
+      "chi": "馬千壹",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3A",
       "no": "11",
-      "chi": "麥明熙"
+      "chi": "麥明熙",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3A",
       "no": "12",
-      "chi": "麥婧琪"
+      "chi": "麥婧琪",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "13",
-      "chi": "彭詩涵"
+      "chi": "彭詩涵",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "14",
-      "chi": "任玥玥"
+      "chi": "任玥玥",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3A",
       "no": "15",
-      "chi": "王祉諾"
+      "chi": "王祉諾",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3A",
       "no": "16",
-      "chi": "俞泓羽"
+      "chi": "俞泓羽",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3A",
       "no": "18",
-      "chi": "陳壯国"
+      "chi": "陳壯国",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "19",
-      "chi": "何枃熹"
+      "chi": "何枃熹",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3A",
       "no": "20",
-      "chi": "許兆鋒"
+      "chi": "許兆鋒",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3A",
       "no": "21",
-      "chi": "葉嘉維"
+      "chi": "葉嘉維",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "22",
-      "chi": "富金"
+      "chi": "富金",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3A",
       "no": "23",
-      "chi": "林倬行"
+      "chi": "林倬行",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "24",
-      "chi": "李智信"
+      "chi": "李智信",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3A",
       "no": "25",
-      "chi": "李心諾"
+      "chi": "李心諾",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "26",
-      "chi": "劉李祥"
+      "chi": "劉李祥",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "27",
-      "chi": "吳國亮"
+      "chi": "吳國亮",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "28",
-      "chi": "吳沛恒"
+      "chi": "吳沛恒",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "29",
-      "chi": "汪澤瀚"
+      "chi": "汪澤瀚",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "30",
-      "chi": "黃睿炘"
+      "chi": "黃睿炘",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3A",
       "no": "31",
-      "chi": "葉煜坤"
+      "chi": "葉煜坤",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "32",
-      "chi": "袁卓煬"
+      "chi": "袁卓煬",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3A",
       "no": "33",
-      "chi": "袁浩瑋"
+      "chi": "袁浩瑋",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "01",
-      "chi": "Bernardino Anya Denise"
+      "chi": "Bernardino Anya Denise",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3B",
       "no": "02",
-      "chi": "陳梓晴"
+      "chi": "陳梓晴",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3B",
       "no": "03",
-      "chi": "鄒月瞳"
+      "chi": "鄒月瞳",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "04",
-      "chi": "劉思懿"
+      "chi": "劉思懿",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "05",
-      "chi": "李逸雅"
+      "chi": "李逸雅",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "06",
-      "chi": "駱韻嘉"
+      "chi": "駱韻嘉",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "07",
-      "chi": "吳千語"
+      "chi": "吳千語",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3B",
       "no": "08",
-      "chi": "譚芯渘"
+      "chi": "譚芯渘",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "09",
-      "chi": "田銣懿"
+      "chi": "田銣懿",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3B",
       "no": "10",
-      "chi": "楊晴雲"
+      "chi": "楊晴雲",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "11",
-      "chi": "陳師正"
+      "chi": "陳師正",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "12",
-      "chi": "陳遠傑"
+      "chi": "陳遠傑",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "13",
-      "chi": "徐卓希"
+      "chi": "徐卓希",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "14",
-      "chi": "鍾鳴泰"
+      "chi": "鍾鳴泰",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "15",
-      "chi": "范峻傑"
+      "chi": "范峻傑",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "16",
-      "chi": "黃宏博"
+      "chi": "黃宏博",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "17",
-      "chi": "蘭林森"
+      "chi": "蘭林森",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "18",
-      "chi": "劉柏浩"
+      "chi": "劉柏浩",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3B",
       "no": "19",
-      "chi": "羅志豪"
+      "chi": "羅志豪",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "20",
-      "chi": "梁希朗"
+      "chi": "梁希朗",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3B",
       "no": "21",
-      "chi": "梁瀚瓏"
+      "chi": "梁瀚瓏",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3B",
       "no": "22",
-      "chi": "李思毅"
+      "chi": "李思毅",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "23",
-      "chi": "李炫昇"
+      "chi": "李炫昇",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "24",
-      "chi": "李奕承"
+      "chi": "李奕承",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3B",
       "no": "25",
-      "chi": "盧政康"
+      "chi": "盧政康",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3B",
       "no": "26",
-      "chi": "邱術朗"
+      "chi": "邱術朗",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "27",
-      "chi": "鄧駿傑"
+      "chi": "鄧駿傑",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "28",
-      "chi": "鄭耀斌"
+      "chi": "鄭耀斌",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "29",
-      "chi": "蔡承熹"
+      "chi": "蔡承熹",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3B",
       "no": "30",
-      "chi": "黃澤熙"
+      "chi": "黃澤熙",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3B",
       "no": "31",
-      "chi": "楊東霖"
+      "chi": "楊東霖",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3B",
       "no": "32",
-      "chi": "姚智藍"
+      "chi": "姚智藍",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3B",
       "no": "33",
-      "chi": "曾俊杰"
+      "chi": "曾俊杰",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3B",
       "no": "34",
-      "chi": "曾柯華"
+      "chi": "曾柯華",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "01",
-      "chi": "陳仟彤"
+      "chi": "陳仟彤",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "02",
-      "chi": "張敏誼"
+      "chi": "張敏誼",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3C",
       "no": "03",
-      "chi": "朱巧琦"
+      "chi": "朱巧琦",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "04",
-      "chi": "何欣桐"
+      "chi": "何欣桐",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "05",
-      "chi": "許曉妮"
+      "chi": "許曉妮",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "06",
-      "chi": "甘樂雯"
+      "chi": "甘樂雯",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "07",
-      "chi": "劉渃桸"
+      "chi": "劉渃桸",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "08",
-      "chi": "李泳霖"
+      "chi": "李泳霖",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "09",
-      "chi": "黎奕彤"
+      "chi": "黎奕彤",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "10",
-      "chi": "盧學緯"
+      "chi": "盧學緯",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "11",
-      "chi": "任星彤"
+      "chi": "任星彤",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "12",
-      "chi": "譚穎茵"
+      "chi": "譚穎茵",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "13",
-      "chi": "黃梓瑗"
+      "chi": "黃梓瑗",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "14",
-      "chi": "吳可茵"
+      "chi": "吳可茵",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3C",
       "no": "15",
-      "chi": "楊宇晴"
+      "chi": "楊宇晴",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "16",
-      "chi": "余榞"
+      "chi": "余榞",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "17",
-      "chi": "區銘峰"
+      "chi": "區銘峰",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "18",
-      "chi": "陳奕羽"
+      "chi": "陳奕羽",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "19",
-      "chi": "鍾海軒"
+      "chi": "鍾海軒",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "20",
-      "chi": "葛瑞晟"
+      "chi": "葛瑞晟",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "21",
-      "chi": "李天祥"
+      "chi": "李天祥",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "22",
-      "chi": "韓承希"
+      "chi": "韓承希",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3C",
       "no": "23",
-      "chi": "林楷傑"
+      "chi": "林楷傑",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "24",
-      "chi": "梁振浩"
+      "chi": "梁振浩",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "25",
-      "chi": "林栢豪"
+      "chi": "林栢豪",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "26",
-      "chi": "羅裕儉"
+      "chi": "羅裕儉",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3C",
       "no": "27",
-      "chi": "潘嘉朗"
+      "chi": "潘嘉朗",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3C",
       "no": "28",
-      "chi": "陳文謙"
+      "chi": "陳文謙",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3C",
       "no": "29",
-      "chi": "王嘉俊"
+      "chi": "王嘉俊",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3C",
       "no": "30",
-      "chi": "楊光輝"
+      "chi": "楊光輝",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3C",
       "no": "31",
-      "chi": "朱成真"
+      "chi": "朱成真",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3D",
       "no": "01",
-      "chi": "陳瓏妃"
+      "chi": "陳瓏妃",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "02",
-      "chi": "陳瓏月"
+      "chi": "陳瓏月",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3D",
       "no": "03",
-      "chi": "鄭咏芝"
+      "chi": "鄭咏芝",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "04",
-      "chi": "張心愉"
+      "chi": "張心愉",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3D",
       "no": "05",
-      "chi": "庄紫妤"
+      "chi": "庄紫妤",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "06",
-      "chi": "范禧彤"
+      "chi": "范禧彤",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3D",
       "no": "07",
-      "chi": "何佩詩"
+      "chi": "何佩詩",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3D",
       "no": "08",
-      "chi": "許森森"
+      "chi": "許森森",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "09",
-      "chi": "林慧珠"
+      "chi": "林慧珠",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3D",
       "no": "10",
-      "chi": "梁晞澄"
+      "chi": "梁晞澄",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "11",
-      "chi": "梁晞琳"
+      "chi": "梁晞琳",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "12",
-      "chi": "吳樂桐"
+      "chi": "吳樂桐",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3D",
       "no": "13",
-      "chi": "吳芷君"
+      "chi": "吳芷君",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3D",
       "no": "14",
-      "chi": "司徒芷澄"
+      "chi": "司徒芷澄",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "15",
-      "chi": "楊雅鈮"
+      "chi": "楊雅鈮",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "16",
-      "chi": "容芷晴"
+      "chi": "容芷晴",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "3D",
       "no": "17",
-      "chi": "張子桐"
+      "chi": "張子桐",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "3D",
       "no": "18",
-      "chi": "陳律言"
+      "chi": "陳律言",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "19",
-      "chi": "何天揚"
+      "chi": "何天揚",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "20",
-      "chi": "羅俊傑"
+      "chi": "羅俊傑",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "21",
-      "chi": "梁家健"
+      "chi": "梁家健",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "3D",
       "no": "22",
-      "chi": "李嘉宸"
+      "chi": "李嘉宸",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "23",
-      "chi": "李嘉炫"
+      "chi": "李嘉炫",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "24",
-      "chi": "馬俊源"
+      "chi": "馬俊源",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "3D",
       "no": "25",
-      "chi": "繆梓樺"
+      "chi": "繆梓樺",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "26",
-      "chi": "敖逸朗"
+      "chi": "敖逸朗",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "27",
-      "chi": "徐國鴻"
+      "chi": "徐國鴻",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "28",
-      "chi": "王樂行"
+      "chi": "王樂行",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "29",
-      "chi": "吳清遠"
+      "chi": "吳清遠",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "30",
-      "chi": "許誥言"
+      "chi": "許誥言",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "3D",
       "no": "31",
-      "chi": "楊宏力"
+      "chi": "楊宏力",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "3D",
       "no": "32",
-      "chi": "楊逸希"
+      "chi": "楊逸希",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "01",
-      "chi": "陳子欣"
+      "chi": "陳子欣",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "02",
-      "chi": "陳璐"
+      "chi": "陳璐",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "03",
-      "chi": "陳泰文"
+      "chi": "陳泰文",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "04",
-      "chi": "趙儷丹"
+      "chi": "趙儷丹",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "05",
-      "chi": "耿昕伊"
+      "chi": "耿昕伊",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "06",
-      "chi": "韓心然"
+      "chi": "韓心然",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "07",
-      "chi": "黃可雯"
+      "chi": "黃可雯",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "08",
-      "chi": "劉安琪"
+      "chi": "劉安琪",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4A",
       "no": "09",
-      "chi": "李懿霏"
+      "chi": "李懿霏",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "10",
-      "chi": "林思妤"
+      "chi": "林思妤",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "11",
-      "chi": "廖晞喬"
+      "chi": "廖晞喬",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "12",
-      "chi": "呂倬寧"
+      "chi": "呂倬寧",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4A",
       "no": "13",
-      "chi": "戚加寶"
+      "chi": "戚加寶",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "14",
-      "chi": "譚尹然"
+      "chi": "譚尹然",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "15",
-      "chi": "丁嘉怡"
+      "chi": "丁嘉怡",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "16",
-      "chi": "王嘉欣"
+      "chi": "王嘉欣",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4A",
       "no": "17",
-      "chi": "王思涵"
+      "chi": "王思涵",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "18",
-      "chi": "黃芷淇"
+      "chi": "黃芷淇",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "19",
-      "chi": "熊芷妍"
+      "chi": "熊芷妍",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "20",
-      "chi": "鄒雨妍"
+      "chi": "鄒雨妍",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "21",
-      "chi": "陳旻韜"
+      "chi": "陳旻韜",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "22",
-      "chi": "陳泰安"
+      "chi": "陳泰安",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "23",
-      "chi": "程子濤"
+      "chi": "程子濤",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "24",
-      "chi": "馮熙"
+      "chi": "馮熙",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "25",
-      "chi": "何偉滔"
+      "chi": "何偉滔",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "26",
-      "chi": "黃子楓"
+      "chi": "黃子楓",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "27",
-      "chi": "林柏皓"
+      "chi": "林柏皓",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4A",
       "no": "28",
-      "chi": "李駿然"
+      "chi": "李駿然",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "29",
-      "chi": "羅嘉穎"
+      "chi": "羅嘉穎",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4A",
       "no": "30",
-      "chi": "吳榮瀚"
+      "chi": "吳榮瀚",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "31",
-      "chi": "姚權城"
+      "chi": "姚權城",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4A",
       "no": "32",
-      "chi": "姚源"
+      "chi": "姚源",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4A",
       "no": "33",
-      "chi": "楊宗凱"
+      "chi": "楊宗凱",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4A",
       "no": "34",
-      "chi": "張煜東"
+      "chi": "張煜東",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4B",
       "no": "01",
-      "chi": "張諾悠"
+      "chi": "張諾悠",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4B",
       "no": "02",
-      "chi": "庄紫莹"
+      "chi": "庄紫莹",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4B",
       "no": "03",
-      "chi": "黃盈盈"
+      "chi": "黃盈盈",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "04",
-      "chi": "黃溢瑋"
+      "chi": "黃溢瑋",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "05",
-      "chi": "林菲菲"
+      "chi": "林菲菲",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "06",
-      "chi": "劉晞宜"
+      "chi": "劉晞宜",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4B",
       "no": "07",
-      "chi": "陸沁雨"
+      "chi": "陸沁雨",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "08",
-      "chi": "馬翠兒"
+      "chi": "馬翠兒",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "09",
-      "chi": "吳凱瞳"
+      "chi": "吳凱瞳",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4B",
       "no": "10",
-      "chi": "彭芷清"
+      "chi": "彭芷清",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4B",
       "no": "11",
-      "chi": "邱熙彤"
+      "chi": "邱熙彤",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "12",
-      "chi": "黃詠嘉"
+      "chi": "黃詠嘉",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4B",
       "no": "13",
-      "chi": "吳婧艷"
+      "chi": "吳婧艷",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "14",
-      "chi": "楊芯瑜"
+      "chi": "楊芯瑜",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4B",
       "no": "15",
-      "chi": "陳亮光"
+      "chi": "陳亮光",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "16",
-      "chi": "陳彥羽"
+      "chi": "陳彥羽",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "17",
-      "chi": "蔣成杰"
+      "chi": "蔣成杰",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4B",
       "no": "18",
-      "chi": "鄺瑋智"
+      "chi": "鄺瑋智",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4B",
       "no": "19",
-      "chi": "林鈞霆"
+      "chi": "林鈞霆",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4B",
       "no": "20",
-      "chi": "梁捷豐"
+      "chi": "梁捷豐",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4B",
       "no": "22",
-      "chi": "盧釓溍"
+      "chi": "盧釓溍",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4B",
       "no": "23",
-      "chi": "羅世杰"
+      "chi": "羅世杰",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4B",
       "no": "25",
-      "chi": "任俊澤"
+      "chi": "任俊澤",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "26",
-      "chi": "曾進"
+      "chi": "曾進",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4B",
       "no": "27",
-      "chi": "謝佳銘"
+      "chi": "謝佳銘",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4B",
       "no": "28",
-      "chi": "黃智軒"
+      "chi": "黃智軒",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4B",
       "no": "29",
-      "chi": "吳煜東"
+      "chi": "吳煜東",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4B",
       "no": "30",
-      "chi": "甄嘉熙"
+      "chi": "甄嘉熙",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4B",
       "no": "31",
-      "chi": "張炳豪"
+      "chi": "張炳豪",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4B",
       "no": "32",
-      "chi": "鍾濠駿"
+      "chi": "鍾濠駿",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "01",
-      "chi": "陳韻儀"
+      "chi": "陳韻儀",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "02",
-      "chi": "陳艷美"
+      "chi": "陳艷美",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "03",
-      "chi": "黃婷婷"
+      "chi": "黃婷婷",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4C",
       "no": "04",
-      "chi": "黃貽荷"
+      "chi": "黃貽荷",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "05",
-      "chi": "許因喬"
+      "chi": "許因喬",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "06",
-      "chi": "林紫瑩"
+      "chi": "林紫瑩",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "07",
-      "chi": "梁慧瑩"
+      "chi": "梁慧瑩",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "08",
-      "chi": "曾芷晴"
+      "chi": "曾芷晴",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "09",
-      "chi": "張淑君"
+      "chi": "張淑君",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4C",
       "no": "10",
-      "chi": "蔡逸朗"
+      "chi": "蔡逸朗",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4C",
       "no": "11",
-      "chi": "周傑禧"
+      "chi": "周傑禧",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "12",
-      "chi": "鄧展亨"
+      "chi": "鄧展亨",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "13",
-      "chi": "馮林城"
+      "chi": "馮林城",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4C",
       "no": "14",
-      "chi": "黃子杰"
+      "chi": "黃子杰",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4C",
       "no": "15",
-      "chi": "甄嘉熙"
+      "chi": "甄嘉熙",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4C",
       "no": "16",
-      "chi": "江俊霆"
+      "chi": "江俊霆",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "17",
-      "chi": "賴俊邦"
+      "chi": "賴俊邦",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4C",
       "no": "18",
-      "chi": "劉天佑"
+      "chi": "劉天佑",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "19",
-      "chi": "梁耀元"
+      "chi": "梁耀元",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "20",
-      "chi": "李長霖"
+      "chi": "李長霖",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "21",
-      "chi": "李浩輝"
+      "chi": "李浩輝",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4C",
       "no": "22",
-      "chi": "李佳翰"
+      "chi": "李佳翰",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4C",
       "no": "23",
-      "chi": "李世良"
+      "chi": "李世良",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "24",
-      "chi": "練仲軒"
+      "chi": "練仲軒",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "25",
-      "chi": "梁宇斌"
+      "chi": "梁宇斌",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "26",
-      "chi": "盧桓宇"
+      "chi": "盧桓宇",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4C",
       "no": "27",
-      "chi": "岑柏忠"
+      "chi": "岑柏忠",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "28",
-      "chi": "黃俊熹"
+      "chi": "黃俊熹",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4C",
       "no": "29",
-      "chi": "黃敬傑"
+      "chi": "黃敬傑",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4C",
       "no": "30",
-      "chi": "黃耀城"
+      "chi": "黃耀城",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4C",
       "no": "31",
-      "chi": "楊昊鑫"
+      "chi": "楊昊鑫",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4C",
       "no": "32",
-      "chi": "姚諾言"
+      "chi": "姚諾言",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4C",
       "no": "33",
-      "chi": "朱家寶"
+      "chi": "朱家寶",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4D",
       "no": "01",
-      "chi": "區芊語"
+      "chi": "區芊語",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4D",
       "no": "02",
-      "chi": "陳雅妍"
+      "chi": "陳雅妍",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4D",
       "no": "03",
-      "chi": "陳潔湞"
+      "chi": "陳潔湞",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "04",
-      "chi": "范紫怡"
+      "chi": "范紫怡",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "4D",
       "no": "05",
-      "chi": "李芷蕎"
+      "chi": "李芷蕎",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "06",
-      "chi": "石洛思"
+      "chi": "石洛思",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "4D",
       "no": "07",
-      "chi": "杜芷欣"
+      "chi": "杜芷欣",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "09",
-      "chi": "利豪"
+      "chi": "利豪",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4D",
       "no": "10",
-      "chi": "陳靖淳"
+      "chi": "陳靖淳",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4D",
       "no": "11",
-      "chi": "陳進渝"
+      "chi": "陳進渝",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "12",
-      "chi": "陳柏滔"
+      "chi": "陳柏滔",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "13",
-      "chi": "陳敏謙"
+      "chi": "陳敏謙",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4D",
       "no": "14",
-      "chi": "陳文駿"
+      "chi": "陳文駿",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "15",
-      "chi": "鄭仲桁"
+      "chi": "鄭仲桁",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "16",
-      "chi": "方政毅"
+      "chi": "方政毅",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "4D",
       "no": "17",
-      "chi": "付澤"
+      "chi": "付澤",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "18",
-      "chi": "顧梓賢"
+      "chi": "顧梓賢",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "19",
-      "chi": "李柏熹"
+      "chi": "李柏熹",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4D",
       "no": "20",
-      "chi": "盧縉賢"
+      "chi": "盧縉賢",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "21",
-      "chi": "羅善宇"
+      "chi": "羅善宇",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "4D",
       "no": "22",
-      "chi": "彭天陽"
+      "chi": "彭天陽",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "23",
-      "chi": "龐隆泓"
+      "chi": "龐隆泓",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "24",
-      "chi": "黃俊寧"
+      "chi": "黃俊寧",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "25",
-      "chi": "黃浚夫"
+      "chi": "黃浚夫",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "26",
-      "chi": "黃雨誠"
+      "chi": "黃雨誠",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "27",
-      "chi": "黃睿瀚"
+      "chi": "黃睿瀚",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "29",
-      "chi": "謝宇涵"
+      "chi": "謝宇涵",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "4D",
       "no": "30",
-      "chi": "曾忠燁"
+      "chi": "曾忠燁",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "4D",
       "no": "31",
-      "chi": "張晋烯"
+      "chi": "張晋烯",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "01",
-      "chi": "白家兒"
+      "chi": "白家兒",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "02",
-      "chi": "陳凱桐"
+      "chi": "陳凱桐",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "03",
-      "chi": "陳好"
+      "chi": "陳好",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "04",
-      "chi": "陳子茵"
+      "chi": "陳子茵",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "05",
-      "chi": "張心妍"
+      "chi": "張心妍",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "06",
-      "chi": "張慧"
+      "chi": "張慧",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "07",
-      "chi": "郭淑媛"
+      "chi": "郭淑媛",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5A",
       "no": "08",
-      "chi": "李卓桐"
+      "chi": "李卓桐",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5A",
       "no": "09",
-      "chi": "李晴雯"
+      "chi": "李晴雯",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "10",
-      "chi": "劉佳利"
+      "chi": "劉佳利",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5A",
       "no": "11",
-      "chi": "劉鎰涵"
+      "chi": "劉鎰涵",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "12",
-      "chi": "雷顏語"
+      "chi": "雷顏語",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "13",
-      "chi": "莫燁婷"
+      "chi": "莫燁婷",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5A",
       "no": "14",
-      "chi": "彭海圓"
+      "chi": "彭海圓",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5A",
       "no": "15",
-      "chi": "蕭嘉慧"
+      "chi": "蕭嘉慧",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "16",
-      "chi": "肖韶儀"
+      "chi": "肖韶儀",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "17",
-      "chi": "袁清怡"
+      "chi": "袁清怡",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "18",
-      "chi": "鄭啟威"
+      "chi": "鄭啟威",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "19",
-      "chi": "范禮宏"
+      "chi": "范禮宏",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "20",
-      "chi": "洪子朗"
+      "chi": "洪子朗",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5A",
       "no": "21",
-      "chi": "黃崇軒"
+      "chi": "黃崇軒",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5A",
       "no": "22",
-      "chi": "許嘉樂"
+      "chi": "許嘉樂",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "23",
-      "chi": "劉鎰熙"
+      "chi": "劉鎰熙",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5A",
       "no": "24",
-      "chi": "馬諾文"
+      "chi": "馬諾文",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5A",
       "no": "25",
-      "chi": "吳昂謙"
+      "chi": "吳昂謙",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5A",
       "no": "26",
-      "chi": "譚偉乾"
+      "chi": "譚偉乾",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5A",
       "no": "27",
-      "chi": "曹庭彰"
+      "chi": "曹庭彰",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5A",
       "no": "28",
-      "chi": "謝兆榮"
+      "chi": "謝兆榮",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5A",
       "no": "29",
-      "chi": "徐海僖"
+      "chi": "徐海僖",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "30",
-      "chi": "黃治平"
+      "chi": "黃治平",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5A",
       "no": "31",
-      "chi": "顏銘"
+      "chi": "顏銘",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5A",
       "no": "32",
-      "chi": "楊卓楠"
+      "chi": "楊卓楠",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "01",
-      "chi": "陳思琦"
+      "chi": "陳思琦",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "02",
-      "chi": "諶睿婕"
+      "chi": "諶睿婕",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "03",
-      "chi": "何樂兒"
+      "chi": "何樂兒",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "04",
-      "chi": "何心悠"
+      "chi": "何心悠",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5B",
       "no": "05",
-      "chi": "郭婉婷"
+      "chi": "郭婉婷",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "06",
-      "chi": "劉芷晴"
+      "chi": "劉芷晴",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5B",
       "no": "07",
-      "chi": "李心如"
+      "chi": "李心如",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "08",
-      "chi": "廖芷珊"
+      "chi": "廖芷珊",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "09",
-      "chi": "馬潁恩"
+      "chi": "馬潁恩",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "10",
-      "chi": "馬穎儀"
+      "chi": "馬穎儀",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "11",
-      "chi": "龐靜雯"
+      "chi": "龐靜雯",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5B",
       "no": "12",
-      "chi": "施嘉祺"
+      "chi": "施嘉祺",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "13",
-      "chi": "譚栢欣"
+      "chi": "譚栢欣",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "14",
-      "chi": "田欣蕾"
+      "chi": "田欣蕾",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "15",
-      "chi": "曾麗嫦"
+      "chi": "曾麗嫦",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "16",
-      "chi": "黃靖茵"
+      "chi": "黃靖茵",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5B",
       "no": "17",
-      "chi": "王樂潼"
+      "chi": "王樂潼",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "18",
-      "chi": "吳莉莎"
+      "chi": "吳莉莎",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5B",
       "no": "19",
-      "chi": "邢文俙"
+      "chi": "邢文俙",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "20",
-      "chi": "袁梓慧"
+      "chi": "袁梓慧",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "21",
-      "chi": "張亦萱"
+      "chi": "張亦萱",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "22",
-      "chi": "詹嘉傑"
+      "chi": "詹嘉傑",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "23",
-      "chi": "何珈諭"
+      "chi": "何珈諭",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "24",
-      "chi": "關允樂"
+      "chi": "關允樂",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "25",
-      "chi": "羅傑成"
+      "chi": "羅傑成",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "26",
-      "chi": "阮兆澎"
+      "chi": "阮兆澎",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5B",
       "no": "27",
-      "chi": "孫良燊"
+      "chi": "孫良燊",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "28",
-      "chi": "王藝皓"
+      "chi": "王藝皓",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5B",
       "no": "29",
-      "chi": "王卓成"
+      "chi": "王卓成",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5B",
       "no": "30",
-      "chi": "黃樂熙"
+      "chi": "黃樂熙",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5B",
       "no": "31",
-      "chi": "曾嘉嶸"
+      "chi": "曾嘉嶸",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5C",
       "no": "01",
-      "chi": "蔡曉柔"
+      "chi": "蔡曉柔",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "02",
-      "chi": "范瑋琪"
+      "chi": "范瑋琪",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "03",
-      "chi": "何芷琪"
+      "chi": "何芷琪",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "04",
-      "chi": "何泳澄"
+      "chi": "何泳澄",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "05",
-      "chi": "關亦棋"
+      "chi": "關亦棋",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "06",
-      "chi": "藍鈺琳"
+      "chi": "藍鈺琳",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "07",
-      "chi": "劉柏妤"
+      "chi": "劉柏妤",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "08",
-      "chi": "林雅婧"
+      "chi": "林雅婧",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5C",
       "no": "09",
-      "chi": "馬千尋"
+      "chi": "馬千尋",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5C",
       "no": "10",
-      "chi": "邵蔚嵐"
+      "chi": "邵蔚嵐",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "11",
-      "chi": "謝雙霜"
+      "chi": "謝雙霜",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "12",
-      "chi": "黃熙雯"
+      "chi": "黃熙雯",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "13",
-      "chi": "黃羽琦"
+      "chi": "黃羽琦",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "14",
-      "chi": "薛雅心"
+      "chi": "薛雅心",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "15",
-      "chi": "楊致維"
+      "chi": "楊致維",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5C",
       "no": "16",
-      "chi": "陳汶駿"
+      "chi": "陳汶駿",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "17",
-      "chi": "陳彥熙"
+      "chi": "陳彥熙",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "18",
-      "chi": "張博熙"
+      "chi": "張博熙",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5C",
       "no": "19",
-      "chi": "張影越"
+      "chi": "張影越",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "20",
-      "chi": "范倬弘"
+      "chi": "范倬弘",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5C",
       "no": "21",
-      "chi": "馮博然"
+      "chi": "馮博然",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5C",
       "no": "22",
-      "chi": "何浩霖"
+      "chi": "何浩霖",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "23",
-      "chi": "姚弘哲"
+      "chi": "姚弘哲",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "24",
-      "chi": "劉啟邦"
+      "chi": "劉啟邦",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5C",
       "no": "25",
-      "chi": "林景朗"
+      "chi": "林景朗",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5C",
       "no": "26",
-      "chi": "麥標豪"
+      "chi": "麥標豪",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5C",
       "no": "27",
-      "chi": "曾梓垚"
+      "chi": "曾梓垚",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5C",
       "no": "28",
-      "chi": "翁樂舜"
+      "chi": "翁樂舜",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "29",
-      "chi": "黃澤恒"
+      "chi": "黃澤恒",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5C",
       "no": "30",
-      "chi": "謝家全"
+      "chi": "謝家全",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5C",
       "no": "31",
-      "chi": "楊子鋒"
+      "chi": "楊子鋒",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5C",
       "no": "32",
-      "chi": "余心彥"
+      "chi": "余心彥",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "01",
-      "chi": "陳嘉棋"
+      "chi": "陳嘉棋",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "02",
-      "chi": "蔡瑜"
+      "chi": "蔡瑜",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "03",
-      "chi": "丁琳"
+      "chi": "丁琳",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5D",
       "no": "04",
-      "chi": "黃煒婷"
+      "chi": "黃煒婷",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "05",
-      "chi": "郭頌欣"
+      "chi": "郭頌欣",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "06",
-      "chi": "林欣萍"
+      "chi": "林欣萍",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "07",
-      "chi": "藍悅"
+      "chi": "藍悅",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "08",
-      "chi": "李詩慧"
+      "chi": "李詩慧",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "09",
-      "chi": "李穎希"
+      "chi": "李穎希",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5D",
       "no": "10",
-      "chi": "李星諾"
+      "chi": "李星諾",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "11",
-      "chi": "梁樂心"
+      "chi": "梁樂心",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "12",
-      "chi": "伍美鳳"
+      "chi": "伍美鳳",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "5D",
       "no": "13",
-      "chi": "曾可兒"
+      "chi": "曾可兒",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "14",
-      "chi": "張清琳"
+      "chi": "張清琳",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "15",
-      "chi": "鄭雅慧"
+      "chi": "鄭雅慧",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "16",
-      "chi": "Awan Ghani Gul"
+      "chi": "Awan Ghani Gul",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "17",
-      "chi": "陳洛"
+      "chi": "陳洛",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "18",
-      "chi": "陳懷希"
+      "chi": "陳懷希",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "19",
-      "chi": "高鑫磊"
+      "chi": "高鑫磊",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "20",
-      "chi": "李首毅"
+      "chi": "李首毅",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5D",
       "no": "21",
-      "chi": "伍家良"
+      "chi": "伍家良",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "22",
-      "chi": "歐陽承俊"
+      "chi": "歐陽承俊",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "23",
-      "chi": "蘇朗昇"
+      "chi": "蘇朗昇",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "24",
-      "chi": "譚鈞澤"
+      "chi": "譚鈞澤",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "25",
-      "chi": "譚煒繽"
+      "chi": "譚煒繽",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "5D",
       "no": "26",
-      "chi": "杜冠賢"
+      "chi": "杜冠賢",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "27",
-      "chi": "曾梓朗"
+      "chi": "曾梓朗",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "28",
-      "chi": "曾廷軒"
+      "chi": "曾廷軒",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "5D",
       "no": "29",
-      "chi": "徐子揚"
+      "chi": "徐子揚",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "30",
-      "chi": "黃政陽"
+      "chi": "黃政陽",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "5D",
       "no": "31",
-      "chi": "葉文永"
+      "chi": "葉文永",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "5D",
       "no": "32",
-      "chi": "源浩朗"
+      "chi": "源浩朗",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "01",
-      "chi": "李佳欣"
+      "chi": "李佳欣",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "02",
-      "chi": "陳潔琳"
+      "chi": "陳潔琳",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "03",
-      "chi": "周穎瑜"
+      "chi": "周穎瑜",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "04",
-      "chi": "鄭黃茵"
+      "chi": "鄭黃茵",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6A",
       "no": "05",
-      "chi": "徐芯媛"
+      "chi": "徐芯媛",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "06",
-      "chi": "方紀茵"
+      "chi": "方紀茵",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "07",
-      "chi": "黎晉瑄"
+      "chi": "黎晉瑄",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "08",
-      "chi": "黎芷悠"
+      "chi": "黎芷悠",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "09",
-      "chi": "林鈺珊"
+      "chi": "林鈺珊",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "10",
-      "chi": "劉姍婷"
+      "chi": "劉姍婷",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "11",
-      "chi": "羅子淇"
+      "chi": "羅子淇",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "12",
-      "chi": "羅雅藍"
+      "chi": "羅雅藍",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "13",
-      "chi": "李思萱"
+      "chi": "李思萱",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "14",
-      "chi": "李梓慧"
+      "chi": "李梓慧",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "15",
-      "chi": "羅永霖"
+      "chi": "羅永霖",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6A",
       "no": "16",
-      "chi": "麥曉藍"
+      "chi": "麥曉藍",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "17",
-      "chi": "吳卓璟"
+      "chi": "吳卓璟",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6A",
       "no": "18",
-      "chi": "區文熙"
+      "chi": "區文熙",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "19",
-      "chi": "石和鈺"
+      "chi": "石和鈺",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "20",
-      "chi": "鄧穎榆"
+      "chi": "鄧穎榆",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6A",
       "no": "21",
-      "chi": "董泯榕"
+      "chi": "董泯榕",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "22",
-      "chi": "王敏兒"
+      "chi": "王敏兒",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6A",
       "no": "23",
-      "chi": "王梓嵐"
+      "chi": "王梓嵐",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6A",
       "no": "24",
-      "chi": "吳思穎"
+      "chi": "吳思穎",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6A",
       "no": "25",
-      "chi": "莊子晴"
+      "chi": "莊子晴",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "26",
-      "chi": "朱振毅"
+      "chi": "朱振毅",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "27",
-      "chi": "馮亮森"
+      "chi": "馮亮森",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6A",
       "no": "28",
-      "chi": "黃奕迅"
+      "chi": "黃奕迅",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "29",
-      "chi": "梁瑋淇"
+      "chi": "梁瑋淇",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "30",
-      "chi": "劉曉華"
+      "chi": "劉曉華",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6A",
       "no": "31",
-      "chi": "杜倬滔"
+      "chi": "杜倬滔",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6A",
       "no": "32",
-      "chi": "黃俊軒"
+      "chi": "黃俊軒",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "01",
-      "chi": "鄭諾瑤"
+      "chi": "鄭諾瑤",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6B",
       "no": "02",
-      "chi": "張櫻譽"
+      "chi": "張櫻譽",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6B",
       "no": "03",
-      "chi": "鍾寶儀"
+      "chi": "鍾寶儀",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6B",
       "no": "04",
-      "chi": "韓雅妃"
+      "chi": "韓雅妃",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6B",
       "no": "05",
-      "chi": "黃玉婷"
+      "chi": "黃玉婷",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6B",
       "no": "06",
-      "chi": "簡佩姿"
+      "chi": "簡佩姿",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6B",
       "no": "07",
-      "chi": "黎可樂"
+      "chi": "黎可樂",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6B",
       "no": "08",
-      "chi": "林苑瑩"
+      "chi": "林苑瑩",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6B",
       "no": "09",
-      "chi": "雷穎琳"
+      "chi": "雷穎琳",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6B",
       "no": "10",
-      "chi": "梁安琪"
+      "chi": "梁安琪",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6B",
       "no": "11",
-      "chi": "梁玉怡"
+      "chi": "梁玉怡",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6B",
       "no": "12",
-      "chi": "劉家敏"
+      "chi": "劉家敏",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "13",
-      "chi": "劉月儀"
+      "chi": "劉月儀",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "14",
-      "chi": "駱嘉欣"
+      "chi": "駱嘉欣",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "15",
-      "chi": "沈美萱"
+      "chi": "沈美萱",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "16",
-      "chi": "董嘉盈"
+      "chi": "董嘉盈",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "17",
-      "chi": "王余燕"
+      "chi": "王余燕",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6B",
       "no": "18",
-      "chi": "謝穎瑜"
+      "chi": "謝穎瑜",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "19",
-      "chi": "杜釗豪"
+      "chi": "杜釗豪",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6B",
       "no": "20",
-      "chi": "李志高"
+      "chi": "李志高",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6B",
       "no": "21",
-      "chi": "李家鋒"
+      "chi": "李家鋒",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6B",
       "no": "22",
-      "chi": "林俊權"
+      "chi": "林俊權",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6B",
       "no": "23",
-      "chi": "羅晓亮"
+      "chi": "羅晓亮",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "01",
-      "chi": "鄧見銘"
+      "chi": "鄧見銘",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "02",
-      "chi": "傅靜儀"
+      "chi": "傅靜儀",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6C",
       "no": "03",
-      "chi": "林卓熹"
+      "chi": "林卓熹",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "04",
-      "chi": "邵永鈺"
+      "chi": "邵永鈺",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "05",
-      "chi": "邵雪嵐"
+      "chi": "邵雪嵐",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "06",
-      "chi": "蘇碧瑶"
+      "chi": "蘇碧瑶",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "07",
-      "chi": "譚鈞寶"
+      "chi": "譚鈞寶",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "08",
-      "chi": "卓芷羽"
+      "chi": "卓芷羽",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "09",
-      "chi": "陳家豪"
+      "chi": "陳家豪",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6C",
       "no": "11",
-      "chi": "陳宇生"
+      "chi": "陳宇生",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "12",
-      "chi": "趙崇希"
+      "chi": "趙崇希",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "13",
-      "chi": "樊昇"
+      "chi": "樊昇",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6C",
       "no": "14",
-      "chi": "何梓鋒"
+      "chi": "何梓鋒",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "15",
-      "chi": "洪奕琛"
+      "chi": "洪奕琛",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6C",
       "no": "16",
-      "chi": "葉廷謙"
+      "chi": "葉廷謙",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "17",
-      "chi": "甘晉謙"
+      "chi": "甘晉謙",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "18",
-      "chi": "賴育緯"
+      "chi": "賴育緯",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "19",
-      "chi": "李沛虔"
+      "chi": "李沛虔",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6C",
       "no": "20",
-      "chi": "歐陽宇栩"
+      "chi": "歐陽宇栩",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "21",
-      "chi": "潘立文"
+      "chi": "潘立文",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6C",
       "no": "22",
-      "chi": "陳文韜"
+      "chi": "陳文韜",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "23",
-      "chi": "顏培源"
+      "chi": "顏培源",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6C",
       "no": "24",
-      "chi": "楊天宇"
+      "chi": "楊天宇",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6C",
       "no": "25",
-      "chi": "葉凱俊"
+      "chi": "葉凱俊",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6D",
       "no": "01",
-      "chi": "區瑞燕"
+      "chi": "區瑞燕",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6D",
       "no": "02",
-      "chi": "陳姵杏"
+      "chi": "陳姵杏",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "03",
-      "chi": "周海晴"
+      "chi": "周海晴",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6D",
       "no": "04",
-      "chi": "何靖瑩"
+      "chi": "何靖瑩",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "05",
-      "chi": "李子珊"
+      "chi": "李子珊",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "06",
-      "chi": "廖心怡"
+      "chi": "廖心怡",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "07",
-      "chi": "司徒珈琪"
+      "chi": "司徒珈琪",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "08",
-      "chi": "屈婉琪"
+      "chi": "屈婉琪",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6D",
       "no": "09",
-      "chi": "王曼亭"
+      "chi": "王曼亭",
+      "sex": "F",
+      "house": "N"
     },
     {
       "class": "6D",
       "no": "10",
-      "chi": "吳穎欣"
+      "chi": "吳穎欣",
+      "sex": "F",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "11",
-      "chi": "鄔雨欣"
+      "chi": "鄔雨欣",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6D",
       "no": "12",
-      "chi": "翁皓韓"
+      "chi": "翁皓韓",
+      "sex": "F",
+      "house": "E"
     },
     {
       "class": "6D",
       "no": "13",
-      "chi": "趙雅欣"
+      "chi": "趙雅欣",
+      "sex": "F",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "14",
-      "chi": "陳靜謙"
+      "chi": "陳靜謙",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6D",
       "no": "15",
-      "chi": "陳梓軒"
+      "chi": "陳梓軒",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "16",
-      "chi": "張倬熙"
+      "chi": "張倬熙",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "17",
-      "chi": "蔡樹恒"
+      "chi": "蔡樹恒",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "18",
-      "chi": "高任正翔"
+      "chi": "高任正翔",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "19",
-      "chi": "蔣文佑"
+      "chi": "蔣文佑",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "20",
-      "chi": "江嘉恒"
+      "chi": "江嘉恒",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "21",
-      "chi": "黎柏軒"
+      "chi": "黎柏軒",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "22",
-      "chi": "梁棨項"
+      "chi": "梁棨項",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6D",
       "no": "23",
-      "chi": "梁羽傑"
+      "chi": "梁羽傑",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "24",
-      "chi": "梁峻宝"
+      "chi": "梁峻宝",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "25",
-      "chi": "林子亨"
+      "chi": "林子亨",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "26",
-      "chi": "陸俊笙"
+      "chi": "陸俊笙",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "27",
-      "chi": "馬諾賢"
+      "chi": "馬諾賢",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6D",
       "no": "28",
-      "chi": "莫贄豪"
+      "chi": "莫贄豪",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6D",
       "no": "29",
-      "chi": "顏祖昌"
+      "chi": "顏祖昌",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "30",
-      "chi": "司徒仁傑"
+      "chi": "司徒仁傑",
+      "sex": "M",
+      "house": "W"
     },
     {
       "class": "6D",
       "no": "31",
-      "chi": "杜宇哲"
+      "chi": "杜宇哲",
+      "sex": "M",
+      "house": "E"
     },
     {
       "class": "6D",
       "no": "32",
-      "chi": "黃俊穎"
+      "chi": "黃俊穎",
+      "sex": "M",
+      "house": "N"
     },
     {
       "class": "6D",
       "no": "33",
-      "chi": "葉富邦"
+      "chi": "葉富邦",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "34",
-      "chi": "甄卓文"
+      "chi": "甄卓文",
+      "sex": "M",
+      "house": "S"
     },
     {
       "class": "6D",
       "no": "35",
-      "chi": "陳嘉澍"
+      "chi": "陳嘉澍",
+      "sex": "M"
     }
   ]
 }

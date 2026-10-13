@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-reading-non-form-v1" />
+  <meta name="game-build" content="house-sex-sprites-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -443,6 +443,38 @@
       border: 2px solid #2a1a10;
       border-radius: 3px 3px 0 0;
       box-sizing: border-box;
+      z-index: 2;
+    }
+    /* Male: short hair */
+    .npc.sex-M .npc-hair {
+      width: 16px; height: 5px;
+      border-radius: 2px 2px 0 0;
+    }
+    /* Female: long hair (top + side locks) */
+    .npc.sex-F .npc-hair {
+      width: 20px; height: 9px;
+      border-radius: 5px 5px 1px 1px;
+    }
+    .npc.sex-F .npc-hair::before,
+    .npc.sex-F .npc-hair::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      width: 5px; height: 14px;
+      background: inherit;
+      border: 2px solid #2a1a10;
+      box-sizing: border-box;
+      z-index: 0;
+    }
+    .npc.sex-F .npc-hair::before {
+      left: -2px;
+      border-radius: 3px 0 2px 3px;
+      border-right-width: 0;
+    }
+    .npc.sex-F .npc-hair::after {
+      right: -2px;
+      border-radius: 0 3px 3px 2px;
+      border-left-width: 0;
     }
     .npc .npc-head {
       position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
@@ -473,12 +505,52 @@
     }
     .npc.role-teacher .npc-body { background: #8b5e3c; }
     .npc.role-teacher .npc-head { background: #e8c4a0; }
+    /* Legacy random palettes (teachers / fallback) */
     .npc.palette-o .npc-body { background: #f0a060; }
     .npc.palette-g .npc-body { background: #6bb89a; }
     .npc.palette-p .npc-body { background: #c48ad4; }
     .npc.palette-b .npc-body { background: #5b8def; }
     .npc.palette-r .npc-body { background: #e07878; }
     .npc.palette-y .npc-body { background: #e8c45a; }
+    /* House uniform colours: S=blue W=yellow E=green N=red */
+    .npc.house-S .npc-body, .npc.house-S .npc-skirt { background: #4a7fd4; }
+    .npc.house-W .npc-body, .npc.house-W .npc-skirt { background: #e6c84a; }
+    .npc.house-E .npc-body, .npc.house-E .npc-skirt { background: #4a9a62; }
+    .npc.house-N .npc-body, .npc.house-N .npc-skirt { background: #d44a4a; }
+    /* Female skirt */
+    .npc .npc-skirt {
+      display: none;
+    }
+    .npc.sex-F .npc-skirt {
+      display: block;
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 8px;
+      background: #4a7fd4;
+      border: 2px solid #5c3a22;
+      border-top: 0;
+      border-radius: 0 0 3px 3px;
+      box-sizing: border-box;
+      clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+      z-index: 1;
+    }
+    .npc.sex-F .npc-body {
+      height: 12px;
+      border-radius: 2px 2px 0 0;
+    }
+    .npc.sex-F.sitting .npc-skirt {
+      top: 24px;
+      height: 6px;
+      width: 18px;
+    }
+    .npc.sex-F.sitting .npc-legs {
+      top: 28px;
+      height: 4px;
+      width: 14px;
+    }
     .npc .npc-label {
       position: absolute;
       left: 50%;
@@ -2153,7 +2225,7 @@
   <script src="calendar.js?v=staff-recess-all-v1"></script>
   <script src="duty.js?v=staff-recess-all-v1"></script>
   <script src="form-teachers.js?v=staff-recess-all-v1"></script>
-  <script src="students.js?v=class-register-2020-v1"></script>
+  <script src="students.js?v=house-sex-v1"></script>
   <script src="groups.js?v=subject-groups-s456-v1"></script>
   <script>
 (function () {
@@ -3375,7 +3447,10 @@
 
   function makeNpcEl(spec) {
     var el = document.createElement('div');
-    el.className = 'npc role-' + spec.role + (spec.palette ? (' palette-' + spec.palette) : '');
+    el.className = 'npc role-' + spec.role
+      + (spec.palette ? (' palette-' + spec.palette) : '')
+      + (spec.house ? (' house-' + spec.house) : '')
+      + (spec.sex ? (' sex-' + spec.sex) : '');
     if (spec.sleep) el.classList.add('sleep');
     if (spec.bounce) el.classList.add('wander-bounce');
     el.setAttribute('role', 'button');
@@ -3385,6 +3460,8 @@
     el.dataset.detail = spec.detail || '';
     if (spec.class) el.dataset.class = spec.class;
     if (spec.no) el.dataset.no = spec.no;
+    if (spec.house) el.dataset.house = spec.house;
+    if (spec.sex) el.dataset.sex = spec.sex;
     if (spec.sitting) el.classList.add('sitting', 'idle-bob');
     if (spec.reading) el.classList.add('reading');
     el.innerHTML =
@@ -3393,6 +3470,7 @@
         '<div class="npc-hair" style="background:' + (spec.hair || '#3e2a1a') + '"></div>' +
         '<div class="npc-head"></div>' +
         '<div class="npc-body"></div>' +
+        (spec.sex === 'F' ? '<div class="npc-skirt"></div>' : '') +
         (spec.sitting ? '<div class="npc-legs"></div>' : '') +
         (spec.reading ? '<span class="npc-book" aria-hidden="true">📖</span>' : '') +
         (spec.sleep ? '<span class="npc-zzz">z</span>' : '') +
@@ -3440,15 +3518,22 @@
     function addStudent(s, opts) {
       opts = opts || {};
       var label = s.chi;
+      var house = (s.house || '').toUpperCase();
+      if (house !== 'S' && house !== 'W' && house !== 'E' && house !== 'N') house = '';
+      var sex = (s.sex || '').toUpperCase();
+      if (sex !== 'M' && sex !== 'F') sex = '';
+      var houseTag = house ? (' · ' + house + '社') : '';
       roster.push({
         role: 'student',
         name: s.chi,
         chi: s.chi,
         class: s.class,
         no: s.no,
+        house: house,
+        sex: sex,
         label: label,
-        detail: s.chi + ' · ' + s.class + s.no,
-        palette: PALETTES[Math.floor(rng() * PALETTES.length)],
+        detail: s.chi + ' · ' + s.class + s.no + houseTag,
+        palette: house ? null : PALETTES[Math.floor(rng() * PALETTES.length)],
         hair: HAIRS[Math.floor(rng() * HAIRS.length)],
         sleep: !!opts.sleep,
         bounce: !!opts.bounce,
