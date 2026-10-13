@@ -3150,10 +3150,7 @@
     teacherList.appendChild(opt);
   });
 
-  var calYear = (CAL && CAL.meta && CAL.meta.schoolYear) ? CAL.meta.schoolYear : '';
-  document.getElementById('appFooter').textContent =
-    DATA.meta.school + ' · ' + DATA.meta.teacherCount + ' 位教師 · 校曆 ' + calYear +
-    ' · 離線可用 · 資料來源：' + (DATA.meta.sourceName || 'timetable');
+  document.getElementById('appFooter').textContent = 'LWFSS 資訊系統1.0';
 
   function periodsForDay(d) {
     return (d === 5 || d === 10) ? 8 : 7;
