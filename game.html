@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="classroom-40-desks-full-roster-v1" />
+  <meta name="game-build" content="classroom-ambience-walk-bubble-pace-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -1490,7 +1490,7 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-1.5px); }
     }
-    /* staff-room speech bubbles */
+    /* speech bubbles (classroom + staff room) */
     .npc .npc-bubble {
       position: absolute;
       left: 50%;
@@ -2065,7 +2065,7 @@
 
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
-      <strong>課室</strong>跟住你搜尋／揀嘅老師：有堂就見<strong>教授緊嘅老師</strong>同<strong>嗰班／嗰組同學</strong>；空堂就顯示「而家空堂」（唔會亂入全校同學）。
+      <strong>課室</strong>跟住你搜尋／揀嘅老師：有堂就見<strong>教授緊嘅老師</strong>（黑板前踱步）同<strong>嗰班／嗰組同學</strong>（大半坐喺 40 張書枱，偶爾 1–2 位行吓同講短句）；空堂就顯示「而家空堂」（唔會亂入全校同學）。
       可切換<strong>課室／教員室</strong>：教員室喺上課前／午膳見<strong>今日當值</strong>；<strong>小息見全體老師</strong>（一般／BF）；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
       撳「換／搜尋老師」用 ShortName 或中文名揀老師。撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>；可<strong>拖動同學入訓導室</strong>（約 5 秒後會走返出嚟）。教員室可<strong>拖動老師入校長室見校長</strong>。
       頂部「準時★」係準時到堂分數，同讚賞星分開。課堂開始後 <strong>5 分鐘內</strong>可「準時到堂簽到」。
@@ -2761,7 +2761,10 @@
     lastTs: 0,
     started: false,
     binTimers: [],
-    drag: null
+    drag: null,
+    bubbleTimer: 0,
+    bubbleHide: 0,
+    walkTimer: 0
   };
 
   function mulberry32(a) {
@@ -3224,7 +3227,7 @@
     if (!n || !n.el || !n.el.isConnected) return;
     n.inBin = false;
     n.el.classList.remove('in-bin', 'bin-poof');
-    // reappear near the bin, then wander again
+    // reappear near the bin, walk briefly, then sit back if they have a desk
     var x = 72 + Math.random() * 12;
     var y = 8 + Math.random() * 10;
     n.x = x;
@@ -3235,14 +3238,25 @@
       : -(0.004 + Math.random() * 0.008);
     n.el.style.left = n.x.toFixed(2) + '%';
     n.el.style.bottom = n.y.toFixed(2) + '%';
-    n.el.classList.add('facing-left', 'bin-return');
-    if (n.spec.bounce) n.el.classList.add('wander-bounce');
+    n.el.classList.add('facing-left', 'bin-return', 'wander-bounce');
+    n.el.classList.remove('sitting', 'idle-bob');
+    var legs = n.el.querySelector('.npc-legs');
+    if (legs) legs.remove();
     n.spec.wander = true;
+    n.walkState = 'walking';
     var name = n.spec.chi || n.spec.label || n.spec.name || '同學';
     toast(name + ' 走返出嚟啦！');
     setTimeout(function () {
       if (n.el) n.el.classList.remove('bin-return');
     }, 500);
+    if (n.homeX != null) {
+      clearTimeout(n._returnTimer);
+      n._returnTimer = setTimeout(function () {
+        if (!n.inBin && !n.dragging && typeof seatStudentNpc === 'function') {
+          seatStudentNpc(n);
+        }
+      }, 3500 + Math.floor(Math.random() * 2500));
+    }
   }
 
   function clientToScenePercent(clientX, clientY, sceneEl) {
@@ -3419,7 +3433,8 @@
         sleep: !!opts.sleep,
         bounce: !!opts.bounce,
         nearBoard: false,
-        wander: opts.wander !== false
+        sitting: !!opts.sitting,
+        wander: opts.wander !== false && !opts.sitting
       });
     }
     function addTeacher(t, opts) {
@@ -3439,7 +3454,8 @@
         sleep: !!opts.sleep,
         bounce: !!opts.bounce,
         nearBoard: !!opts.nearBoard,
-        wander: opts.wander !== false && !opts.nearBoard
+        pace: !!opts.pace,
+        wander: opts.wander !== false && !opts.nearBoard && !opts.pace
       });
     }
 
@@ -3451,7 +3467,7 @@
       resolved.students.forEach(function (s) {
         addStudent(s, { bounce: false, wander: false, sitting: true });
       });
-      addTeacher(player, { nearBoard: true, wander: false });
+      addTeacher(player, { nearBoard: true, wander: false, pace: true });
       if (!resolved.students.length) {
         emptyMsg = lessonNote || '課室暫時只有老師';
       }
@@ -3512,6 +3528,7 @@
     if (!layer) return [];
     ensureClassroomDesks(CLASSROOM_DESK_COUNT);
     clearBinTimers();
+    stopClassAmbience(true);
     npcState.drag = null;
     setTrashHot(false);
     var binHint = trashEl();
@@ -3524,11 +3541,12 @@
     roster.forEach(function (spec, idx) {
       var el = makeNpcEl(spec);
       var x, y, vx;
-      if (spec.nearBoard) {
-        x = 42 + rng() * 12; // %
+      var seatedStudent = spec.role === 'student' && (spec.sitting || !spec.wander);
+      if (spec.nearBoard || spec.pace) {
+        x = 34 + rng() * 32; // % — along blackboard front
         y = 78 + rng() * 4;  // bottom % — front of elongated room near board
-        vx = 0;
-      } else if (spec.sitting || (!spec.wander && spec.role === 'student')) {
+        vx = spec.pace ? ((0.006 + rng() * 0.008) * (rng() > 0.5 ? 1 : -1)) : 0;
+      } else if (seatedStudent) {
         var deskIdx = Math.min(seatIdx, CLASSROOM_DESK_COUNT - 1);
         seatIdx++;
         var col = deskIdx % cols;
@@ -3561,7 +3579,12 @@
         y: y,
         vx: vx,
         baseY: y,
-        phase: rng() * Math.PI * 2
+        phase: rng() * Math.PI * 2,
+        homeX: seatedStudent ? x : null,
+        homeY: seatedStudent ? y : null,
+        walkState: seatedStudent ? 'seated' : '',
+        pauseUntil: 0,
+        _returnTimer: 0
       });
     });
     return placed;
@@ -3595,6 +3618,9 @@
     npcState.npcs = placeNpcs(built.roster, built.rng);
     npcState.lastTs = 0;
     setClassroomEmptyMsg(built.emptyMsg || '');
+    if (typeof viewMode === 'undefined' || viewMode === 'classroom') {
+      startClassAmbience();
+    }
   }
 
   function npcTick(ts) {
@@ -3612,7 +3638,27 @@
     function stepWalkers(list, yMax) {
       for (var i = 0; i < list.length; i++) {
         var n = list[i];
-        if (!n.spec || !n.spec.wander || !n.vx || n.inBin || n.inPrincipal || n.dragging) continue;
+        if (!n.spec || n.inBin || n.inPrincipal || n.dragging) continue;
+        // Teacher paces in front of blackboard; occasionally stops
+        if (n.spec.pace) {
+          if (n.pauseUntil && ts < n.pauseUntil) continue;
+          if (!n.vx) n.vx = 0.007;
+          n.x += n.vx * dt;
+          n.y = n.baseY + Math.sin((ts / 1100) + n.phase) * 0.7;
+          if (n.x < 28) { n.x = 28; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
+          if (n.x > 72) { n.x = 72; n.vx = -Math.abs(n.vx); n.el.classList.add('facing-left'); }
+          if (n.y < 74) n.y = 74;
+          if (n.y > 86) n.y = 86;
+          // ~stop every few seconds of walking
+          if (Math.random() < 0.00055 * dt) {
+            n.pauseUntil = ts + 1400 + Math.random() * 3200;
+          }
+          n.el.style.left = n.x.toFixed(2) + '%';
+          n.el.style.bottom = n.y.toFixed(2) + '%';
+          n.el.style.zIndex = String(7 + Math.round(n.y));
+          continue;
+        }
+        if (!n.spec.wander || !n.vx) continue;
         n.x += n.vx * dt;
         n.y = n.baseY + Math.sin((ts / 900) + n.phase) * 1.2;
         if (n.x < 6) { n.x = 6; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
@@ -3628,6 +3674,172 @@
     if (typeof staffNpcState !== 'undefined' && staffNpcState.walkers) stepWalkers(staffNpcState.walkers, 42);
   }
 
+  /* ===== Classroom ambience: walkers + zh-HK bubbles ===== */
+  var CLASS_PHRASES = [
+    '好悶啊～',
+    '聽唔明…',
+    '幾時完堂？',
+    '肚餓…',
+    '抄緊筆記',
+    '呢題好難',
+    '等陣小息',
+    '老師講緊',
+    '可唔可以去廁所？',
+    '好攰～',
+    '借支筆吖',
+    '今日功課好多',
+    '哈哈',
+    '係咪測驗？',
+    '想瞓…',
+    '明白喇'
+  ];
+
+  function seatStudentNpc(n) {
+    if (!n || !n.el || n.homeX == null) return;
+    clearTimeout(n._returnTimer);
+    n._returnTimer = 0;
+    n.walkState = 'seated';
+    if (n.spec) n.spec.wander = false;
+    n.vx = 0;
+    n.x = n.homeX;
+    n.y = n.homeY;
+    n.baseY = n.homeY;
+    n.el.classList.add('sitting', 'idle-bob');
+    n.el.classList.remove('wander-bounce', 'facing-left');
+    var sprite = n.el.querySelector('.npc-sprite');
+    if (sprite && !sprite.querySelector('.npc-legs')) {
+      var legs = document.createElement('div');
+      legs.className = 'npc-legs';
+      sprite.appendChild(legs);
+    }
+    n.el.style.left = n.x.toFixed(2) + '%';
+    n.el.style.bottom = n.y.toFixed(2) + '%';
+    n.el.style.zIndex = String(7 + Math.round(n.y));
+  }
+
+  function standStudentNpc(n) {
+    if (!n || !n.el || n.inBin || n.dragging) return;
+    n.walkState = 'walking';
+    if (n.spec) n.spec.wander = true;
+    n.vx = (0.005 + Math.random() * 0.008) * (Math.random() > 0.5 ? 1 : -1);
+    n.baseY = Math.min(58, Math.max(10, (n.homeY != null ? n.homeY : 30) + (Math.random() - 0.5) * 18));
+    n.y = n.baseY;
+    n.el.classList.remove('sitting', 'idle-bob');
+    n.el.classList.add('wander-bounce');
+    var legs = n.el.querySelector('.npc-legs');
+    if (legs) legs.remove();
+    if (n.vx < 0) n.el.classList.add('facing-left');
+    else n.el.classList.remove('facing-left');
+  }
+
+  function clearClassWalkTimers() {
+    (npcState.npcs || []).forEach(function (n) {
+      if (n && n._returnTimer) {
+        clearTimeout(n._returnTimer);
+        n._returnTimer = 0;
+      }
+    });
+    clearTimeout(npcState.walkTimer);
+    npcState.walkTimer = 0;
+  }
+
+  function maybeStartStudentWalk() {
+    if (document.hidden || viewMode !== 'classroom') return;
+    var seated = [];
+    var walking = [];
+    (npcState.npcs || []).forEach(function (n) {
+      if (!n || !n.spec || n.spec.role !== 'student' || n.inBin || n.dragging) return;
+      if (n.walkState === 'walking') walking.push(n);
+      else if (n.homeX != null) seated.push(n);
+    });
+    // Occasionally send a walker back to their desk
+    if (walking.length && Math.random() < 0.5) {
+      seatStudentNpc(walking[Math.floor(Math.random() * walking.length)]);
+      walking = walking.filter(function (n) { return n.walkState === 'walking'; });
+    }
+    // Keep at most 1–2 walkers
+    if (walking.length >= 2 || !seated.length) return;
+    if (walking.length === 1 && Math.random() > 0.5) return;
+    var pick = seated[Math.floor(Math.random() * seated.length)];
+    standStudentNpc(pick);
+    var retDelay = 5500 + Math.floor(Math.random() * 9000);
+    clearTimeout(pick._returnTimer);
+    pick._returnTimer = setTimeout(function () {
+      if (pick.walkState === 'walking' && !pick.inBin && !pick.dragging) {
+        seatStudentNpc(pick);
+      }
+    }, retDelay);
+  }
+
+  function scheduleClassStudentWalk() {
+    clearTimeout(npcState.walkTimer);
+    if (viewMode !== 'classroom') return;
+    var delay = 3500 + Math.floor(Math.random() * 5500);
+    npcState.walkTimer = setTimeout(function () {
+      maybeStartStudentWalk();
+      scheduleClassStudentWalk();
+    }, delay);
+  }
+
+  function clearClassBubbles() {
+    (npcState.npcs || []).forEach(function (n) {
+      if (!n || !n.el) return;
+      var b = n.el.querySelector('.npc-bubble');
+      if (b) b.remove();
+    });
+  }
+
+  function showClassBubble() {
+    if (document.hidden || viewMode !== 'classroom') return;
+    var candidates = (npcState.npcs || []).filter(function (n) {
+      return n && n.el && n.spec && n.spec.role === 'student' && !n.inBin && !n.dragging;
+    });
+    if (!candidates.length) return;
+    clearClassBubbles();
+    var n = candidates[Math.floor(Math.random() * candidates.length)];
+    var phrase = CLASS_PHRASES[Math.floor(Math.random() * CLASS_PHRASES.length)];
+    var bubble = document.createElement('div');
+    bubble.className = 'npc-bubble';
+    bubble.textContent = phrase;
+    n.el.appendChild(bubble);
+    void bubble.offsetWidth;
+    bubble.classList.add('show');
+    clearTimeout(npcState.bubbleHide);
+    npcState.bubbleHide = setTimeout(function () {
+      bubble.classList.remove('show');
+      setTimeout(function () { if (bubble.parentNode) bubble.remove(); }, 200);
+    }, 2000 + Math.floor(Math.random() * 900));
+  }
+
+  function scheduleClassBubble() {
+    clearTimeout(npcState.bubbleTimer);
+    if (viewMode !== 'classroom') return;
+    var delay = 3200 + Math.floor(Math.random() * 5200);
+    npcState.bubbleTimer = setTimeout(function () {
+      showClassBubble();
+      scheduleClassBubble();
+    }, delay);
+  }
+
+  function startClassAmbience() {
+    scheduleClassStudentWalk();
+    scheduleClassBubble();
+  }
+
+  function stopClassAmbience(keepWalkers) {
+    clearTimeout(npcState.bubbleTimer);
+    clearTimeout(npcState.bubbleHide);
+    npcState.bubbleTimer = 0;
+    npcState.bubbleHide = 0;
+    clearClassBubbles();
+    clearClassWalkTimers();
+    if (!keepWalkers) {
+      (npcState.npcs || []).forEach(function (n) {
+        if (n && n.walkState === 'walking') seatStudentNpc(n);
+      });
+    }
+  }
+
   function startNpcLoop() {
     if (npcState.started) return;
     npcState.started = true;
@@ -3636,8 +3848,10 @@
       if (!document.hidden) {
         npcState.lastTs = 0;
         if (viewMode === 'staff') scheduleStaffBubble();
+        else startClassAmbience();
       } else {
         stopStaffBubbles();
+        stopClassAmbience(true);
       }
     });
   }
@@ -3675,9 +3889,12 @@
     document.body.classList.toggle('view-staff', viewMode === 'staff');
     if (viewMode === 'classroom') ensureClassroomDesks(CLASSROOM_DESK_COUNT);
     if (hint) hint.hidden = (viewMode === 'staff');
-    if (viewMode === 'staff') startStaffBubbles();
-    else {
+    if (viewMode === 'staff') {
+      stopClassAmbience(true);
+      startStaffBubbles();
+    } else {
       stopStaffBubbles();
+      startClassAmbience();
       closeTeacherHpSheet();
     }
     if (tabC) {
