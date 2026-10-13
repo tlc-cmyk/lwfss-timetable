@@ -244,17 +244,39 @@
     }
     .timeline-live-btn:not(:disabled):active { transform: translateY(1px); }
     .timeline-period {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px 12px;
+      flex-wrap: wrap;
       font-size: 0.92rem;
       font-weight: 800;
       color: var(--text);
       margin-bottom: 6px;
       min-height: 1.35em;
     }
+    .timeline-period .tl-label {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
     .timeline-period .tl-time {
       font-weight: 700;
       color: var(--muted);
       font-size: 0.82rem;
       font-variant-numeric: tabular-nums;
+    }
+    .timeline-period .tl-cd {
+      flex: 0 0 auto;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #c0392b;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .timeline-period .tl-cd.relaxed {
+      color: var(--muted);
+      font-weight: 700;
     }
     .timeline-scrubber {
       width: 100%;
@@ -2898,7 +2920,10 @@
         <span class="timeline-mode" id="timelineModeLabel">● 實時</span>
         <button type="button" class="timeline-live-btn" id="timelineLiveBtn" disabled title="返到而家香港時間">實時</button>
       </div>
-      <div class="timeline-period" id="timelinePeriodLabel">讀取時間線…</div>
+      <div class="timeline-period" id="timelinePeriodRow">
+        <span class="tl-label" id="timelinePeriodLabel">讀取時間線…</span>
+        <span class="tl-cd relaxed" id="timelineCountdown" aria-live="polite">—</span>
+      </div>
       <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室／操場／教員室" />
       <div class="timeline-marks" id="timelineMarks" role="list"></div>
     </div>
@@ -3568,6 +3593,7 @@
     if (card) card.classList.toggle('is-preview', !timelineState.live);
     if (mode) mode.textContent = timelineState.live ? '● 實時' : '◎ 預覽';
     if (liveBtn) liveBtn.disabled = timelineState.live;
+    updateTimelineCountdown(ctx);
   }
 
   function bindTimelineUI() {
@@ -3612,6 +3638,95 @@
       return m ? ('仲有 ' + h + ' 小時 ' + m + ' 分鐘') : ('仲有 ' + h + ' 小時');
     }
     return '仲有 ' + mins + ' 分鐘';
+  }
+
+  /** Seconds until HH:MM (HKT live or scrubbed). Negative if past. */
+  function secondsLeftUntilHm(endHm) {
+    var endM = hmToMinutes(endHm);
+    if (endM == null) return null;
+    var now = getEffectiveNowParts();
+    return endM * 60 - (now.hour * 3600 + now.minute * 60 + (now.second || 0));
+  }
+
+  /** zh-HK e.g. 「尚餘 12:34」 or 「尚餘 1:05:09」 when ≥1h. */
+  function formatShangYuMmSs(secs) {
+    if (secs == null) return '';
+    var s = Math.max(0, Math.floor(secs));
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    var sec = s % 60;
+    if (h > 0) return '尚餘 ' + h + ':' + pad2(m) + ':' + pad2(sec);
+    return '尚餘 ' + pad2(m) + ':' + pad2(sec);
+  }
+
+  /**
+   * Next bell target for timeline countdown:
+   * - in a slot → slot end (period/break end)
+   * - between / before → next slot start
+   * - after / holiday → null
+   */
+  function resolveTimelineCountdownTarget(ctx) {
+    if (!ctx || ctx.holiday || !ctx.cycle || ctx.cycle.day == null) return null;
+    var day = ctx.cycle.day;
+    var mins = ctx.minutes != null ? ctx.minutes : getEffectiveNowParts().minutes;
+    var slot = ctx.slot;
+    if (!slot) return null;
+    if (slot.kind === 'after') return null;
+
+    if (slot.kind === 'before') {
+      var sched0 = scheduleForDay(day);
+      if (sched0 && sched0.slots && sched0.slots.length && sched0.slots[0].start) {
+        return { hm: sched0.slots[0].start, reason: 'start' };
+      }
+      return null;
+    }
+
+    // Named period/break with an end → countdown to that bell
+    if (slot.slot && slot.slot.end) {
+      return { hm: slot.slot.end, reason: 'end' };
+    }
+
+    // Gap between slots → next slot start
+    if (slot.kind === 'break' && (slot.key === 'gap' || !slot.slot)) {
+      var sched = scheduleForDay(day);
+      if (sched && sched.slots) {
+        for (var i = 0; i < sched.slots.length; i++) {
+          var a = hmToMinutes(sched.slots[i].start);
+          if (a != null && a > mins) {
+            return { hm: sched.slots[i].start, reason: 'start' };
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /** Update #timelineCountdown; returns seconds left (or null). */
+  function updateTimelineCountdown(ctx) {
+    var el = document.getElementById('timelineCountdown');
+    if (!el) return null;
+    var target = resolveTimelineCountdownTarget(ctx);
+    if (!target || !target.hm) {
+      if (ctx && ctx.holiday) {
+        el.textContent = '—';
+      } else if (ctx && ctx.slot && ctx.slot.kind === 'after') {
+        el.textContent = '今日完結';
+      } else {
+        el.textContent = '—';
+      }
+      el.className = 'tl-cd relaxed';
+      return null;
+    }
+    var left = secondsLeftUntilHm(target.hm);
+    if (left == null) {
+      el.textContent = '—';
+      el.className = 'tl-cd relaxed';
+      return null;
+    }
+    el.textContent = formatShangYuMmSs(left);
+    el.className = left <= 0 ? 'tl-cd relaxed' : 'tl-cd';
+    el.title = (target.reason === 'start' ? '距下一節開始 ' : '距本節完結 ') + target.hm;
+    return left;
   }
 
   function scheduleIdForDay(d) {
@@ -7976,8 +8091,28 @@
     render();
   }
 
+  var _lastCountdownSlotKey = null;
+  function tickCountdown() {
+    if (!timelineState.live) return;
+    try {
+      var ctx = getContext();
+      var key = ctx.holiday
+        ? 'holiday'
+        : (ctx.slot
+          ? (ctx.slot.key || (ctx.slot.kind + ':' + (ctx.slot.period != null ? ctx.slot.period : '')))
+          : 'none');
+      updateTimelineCountdown(ctx);
+      // Slot flipped on the minute (bell) — refresh scene without waiting for 30s tick
+      if (_lastCountdownSlotKey !== null && key !== _lastCountdownSlotKey) {
+        render();
+      }
+      _lastCountdownSlotKey = key;
+    } catch (eCd) {}
+  }
+
   function startTicks() {
     tick();
+    setInterval(tickCountdown, 1000);
     var parts = nowHKTParts();
     var msToNext = Math.max(1000, (60 - (parts.second || 0)) * 1000);
     setTimeout(function () {
