@@ -1332,12 +1332,12 @@
     }
     #sceneStaff.staffroom .window,
     .scene.staffroom .window {
-      top: 1.5% !important;
-      right: 22% !important;
-      width: 10% !important;
-      height: 8% !important;
+      top: 2.5% !important;
+      right: 24% !important;
+      width: 5% !important;
+      height: 4% !important;
       background: #d6ebfb !important;
-      border: 3px solid #9aa3b2 !important;
+      border: 2px solid #9aa3b2 !important;
       box-shadow: inset 0 0 0 1px #ffffff !important;
     }
     #sceneStaff.staffroom .window::after,
@@ -1369,12 +1369,12 @@
       border: 1px solid #aeb6c2;
       border-radius: 1px;
     }
-    /* tall white bookshelf with colourful books */
+    /* tall white bookshelf — single column / slot */
     #sceneStaff .bookshelf {
       position: absolute;
       top: 1.5%;
       left: 25%;
-      width: 8%;
+      width: 3.5%;
       height: 10%;
       background: #eef0f4;
       border: 2px solid #8a93a3;
@@ -1402,28 +1402,29 @@
     }
     #sceneStaff .bookshelf .book {
       position: absolute;
-      width: 16%;
+      left: 18%;
+      width: 64%;
       border: 1px solid #3e2a1a;
       border-radius: 1px 1px 0 0;
       box-sizing: border-box;
     }
-    #sceneStaff .bookshelf .book.b1 { left: 8%; height: 24%; background: #e74c3c; bottom: 70%; }
-    #sceneStaff .bookshelf .book.b2 { left: 28%; height: 28%; background: #3498db; bottom: 70%; }
-    #sceneStaff .bookshelf .book.b3 { left: 48%; height: 20%; background: #2ecc71; bottom: 70%; }
-    #sceneStaff .bookshelf .book.b4 { left: 68%; height: 26%; background: #f1c40f; bottom: 70%; }
-    #sceneStaff .bookshelf .book.b5 { left: 10%; height: 26%; background: #9b59b6; bottom: 37%; }
-    #sceneStaff .bookshelf .book.b6 { left: 32%; height: 22%; background: #e67e22; bottom: 37%; }
-    #sceneStaff .bookshelf .book.b7 { left: 52%; height: 30%; background: #1abc9c; bottom: 37%; }
-    #sceneStaff .bookshelf .book.b8 { left: 12%; height: 24%; background: #2980b9; bottom: 4%; }
-    #sceneStaff .bookshelf .book.b9 { left: 34%; height: 28%; background: #c0392b; bottom: 4%; }
-    #sceneStaff .bookshelf .book.b10 { left: 56%; height: 20%; background: #27ae60; bottom: 4%; }
-    /* white coffee / drinks bar */
+    #sceneStaff .bookshelf .book.b1 { height: 24%; background: #e74c3c; bottom: 70%; }
+    #sceneStaff .bookshelf .book.b2,
+    #sceneStaff .bookshelf .book.b3,
+    #sceneStaff .bookshelf .book.b4 { display: none; }
+    #sceneStaff .bookshelf .book.b5 { height: 26%; background: #9b59b6; bottom: 37%; }
+    #sceneStaff .bookshelf .book.b6,
+    #sceneStaff .bookshelf .book.b7 { display: none; }
+    #sceneStaff .bookshelf .book.b8 { height: 24%; background: #2980b9; bottom: 4%; }
+    #sceneStaff .bookshelf .book.b9,
+    #sceneStaff .bookshelf .book.b10 { display: none; }
+    /* white coffee / drinks bar — half size */
     #sceneStaff .coffee-bar {
       position: absolute;
-      top: 3.5%;
+      top: 4%;
       right: 3%;
-      width: 12%;
-      height: 5.5%;
+      width: 6%;
+      height: 2.8%;
       background: #f7f8fa;
       border: 2px solid #9aa3b2;
       border-radius: 2px;
@@ -1431,13 +1432,13 @@
     }
     #sceneStaff .coffee-bar .drink {
       position: absolute;
-      bottom: 45%;
-      font-size: clamp(0.5rem, 2.2vw, 0.75rem);
+      bottom: 35%;
+      font-size: clamp(0.35rem, 1.4vw, 0.5rem);
       line-height: 1;
       filter: drop-shadow(1px 1px 0 rgba(0,0,0,.12));
     }
-    #sceneStaff .coffee-bar .drink.d1 { left: 8%; }
-    #sceneStaff .coffee-bar .drink.d2 { left: 36%; }
+    #sceneStaff .coffee-bar .drink.d1 { left: 6%; }
+    #sceneStaff .coffee-bar .drink.d2 { left: 34%; }
     #sceneStaff .coffee-bar .drink.d3 { left: 62%; }
     #sceneStaff .whiteboard {
       position: absolute;
@@ -2298,7 +2299,7 @@
         <div class="staff-banner">教員室</div>
         <div class="pigeon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <div class="bookshelf" aria-hidden="true"><span class="book b1"></span><span class="book b2"></span><span class="book b3"></span><span class="book b4"></span><span class="book b5"></span><span class="book b6"></span><span class="book b7"></span><span class="book b8"></span><span class="book b9"></span><span class="book b10"></span></div>
-        <div class="whiteboard"><div class="board-text" id="staffBoardText">教員室</div></div>
+        <div class="whiteboard"><div class="board-text" id="staffBoardText">空堂人數：—</div></div>
         <div class="coffee-bar" aria-hidden="true">
           <span class="drink d1">☕</span>
           <span class="drink d2">🍵</span>
@@ -5792,28 +5793,11 @@
     var scene = document.getElementById('sceneStaff');
     var tod = mood || 'before';
     if (scene) scene.setAttribute('data-tod', tod);
-    var lines = [];
-    var nShow = (picked.teachers && picked.teachers.length) ? picked.teachers.length : 0;
-    var hint = picked.labelHint || '教員室';
-    if (picked.mode === 'free-period') {
-      lines.push(hint);
-      if (nShow) lines.push('空堂 ' + nShow);
-    } else if (picked.mode === 'all-recess') {
-      lines.push(hint);
-      if (nShow) lines.push(nShow + ' 位');
-    } else if (picked.mode === 'non-form-reading') {
-      lines.push(hint);
-      if (nShow) lines.push('非班主任 ' + nShow);
-    } else if (picked.mode === 'duty-tomorrow') {
-      lines.push(hint);
-      if (nShow) lines.push('明日當值 ' + nShow);
-    } else if (nShow) {
-      lines.push(hint);
-      lines.push(nShow + ' 位');
-    } else {
-      lines.push(hint);
+    var nShow = 0;
+    if (picked && picked.mode === 'free-period' && picked.teachers && picked.teachers.length) {
+      nShow = picked.teachers.length;
     }
-    if (board) board.textContent = lines.slice(0, 2).join('\n');
+    if (board) board.textContent = '空堂人數：' + nShow;
   }
 
   function paintScene(ctx) {
