@@ -1082,12 +1082,38 @@
       color: var(--muted);
       margin: 4px 0 6px;
     }
+    .seat-save-box {
+      margin: 0 0 14px;
+      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: #f7f9fc;
+    }
+    .seat-save-box .seat-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-bottom: 8px;
+    }
+    .seat-save-box .field {
+      flex: 1 1 160px;
+      min-width: 140px;
+    }
+    .seat-save-box .seat-actions { margin-bottom: 8px; }
+    .seat-save-hint {
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 700;
+      min-height: 1.2em;
+    }
+    .seat-save-hint.is-error { color: #b42318; }
     @media (max-width: 420px) {
       .seat-cell { width: 64px; height: 58px; }
       .seat-chip .sc-name { font-size: 0.72rem; }
     }
     @media print {
-      .seat-actions, .seat-mode-row, .seat-controls, .tabs, .app-header, .app-footer,
+      .seat-actions, .seat-mode-row, .seat-controls, .seat-save-box, .tabs, .app-header, .app-footer,
       .teacher-banner, #panel-seating .hint { display: none !important; }
       .seat-pool { display: none !important; }
       .seat-cell { break-inside: avoid; }
@@ -2675,7 +2701,7 @@
     <section class="panel" id="panel-seating">
       <div class="card">
         <h2>座位表</h2>
-        <p class="hint" style="margin-bottom:10px;">老師揀班別（或中四至中六科組）製作座位表；可隨機編排；可拖拉學生到座位。佈局只存本機瀏覽器（可選教師代碼分開儲存）。無電郵資料。</p>
+        <p class="hint" style="margin-bottom:10px;">老師揀班別（或中四至中六科組）製作座位表；可隨機編排；可拖拉學生到座位。拖動時會自動暫存本機；亦可撳「儲存」並為佈局命名，之後從列表載入。可選教師代碼分開儲存。無電郵資料。</p>
 
         <div class="seat-mode-row" role="group" aria-label="名單來源">
           <button type="button" class="seat-mode-btn active" id="seatModeClass" data-mode="class">班別（1A–6D）</button>
@@ -2724,6 +2750,27 @@
           <button class="btn btn-ghost" id="seatClearBtn" type="button">清空座位</button>
           <button class="btn btn-ghost" id="seatApplyGridBtn" type="button">套用行列</button>
           <button class="btn btn-ghost" id="seatPrintBtn" type="button">列印</button>
+        </div>
+
+        <div class="seat-save-box" aria-label="儲存座位佈局">
+          <div class="seat-row">
+            <div class="field">
+              <label class="field-label" for="seatLayoutName">佈局名稱（可選）</label>
+              <input type="text" id="seatLayoutName" placeholder="例如：日常座位／考試座位" maxlength="40" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="seatNamedSelect">已存佈局</label>
+              <select id="seatNamedSelect">
+                <option value="">（尚未命名儲存）</option>
+              </select>
+            </div>
+          </div>
+          <div class="seat-actions">
+            <button class="btn" id="seatSaveBtn" type="button">儲存</button>
+            <button class="btn btn-ghost" id="seatLoadNamedBtn" type="button">載入</button>
+            <button class="btn btn-ghost" id="seatDeleteNamedBtn" type="button">刪除佈局</button>
+          </div>
+          <div class="seat-save-hint" id="seatSaveHint" role="status" aria-live="polite"></div>
         </div>
 
         <div class="seat-meta" id="seatMeta"></div>
@@ -3005,7 +3052,7 @@
   <script src="form-teachers.js"></script>
   <script src="students.js?v=seating-v1"></script>
   <script src="groups.js?v=house-sex-groups-v1"></script>
-  <script src="seating.js?v=1"></script>
+  <script src="seating.js?v=2"></script>
   <script>
 (function () {
   'use strict';

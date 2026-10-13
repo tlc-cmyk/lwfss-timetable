@@ -1,12 +1,14 @@
 /**
  * 座位表 — teacher picks class (1A–6D) or S4–S6 subject group;
- * randomize + drag students onto seats; persist in localStorage.
+ * randomize + drag students onto seats; auto-persist + named layouts in localStorage.
  * Privacy: Chinese names + class + no only (no emails). Depends on students.js / groups.js.
  */
 (function (global) {
   'use strict';
 
   var LS_PREFIX = 'tt_seating_v1:';
+  var LS_NAMED_PREFIX = 'tt_seating_named_v1:';
+  var saveHintTimer = null;
   var DEFAULT_ROWS = 5;
   var DEFAULT_COLS = 8;
 
@@ -60,6 +62,189 @@
     }
     id = ($('seatClassSelect') && $('seatClassSelect').value) || '';
     return LS_PREFIX + 'class:' + id + (t ? ':t:' + t : '');
+  }
+
+  function namedStoreKey() {
+    return storageKey().replace(LS_PREFIX, LS_NAMED_PREFIX);
+  }
+
+  function scopeReady() {
+    var key = storageKey();
+    return !!(key && !key.endsWith('class:') && !key.endsWith('group:'));
+  }
+
+  function showSaveHint(msg, isError) {
+    var el = $('seatSaveHint');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('is-error', !!isError);
+    if (saveHintTimer) clearTimeout(saveHintTimer);
+    if (msg && !isError) {
+      saveHintTimer = setTimeout(function () {
+        if ($('seatSaveHint') === el && el.textContent === msg) {
+          el.textContent = '';
+        }
+      }, 4000);
+    }
+  }
+
+  function readNamedStore() {
+    if (!scopeReady()) return {};
+    try {
+      var raw = localStorage.getItem(namedStoreKey());
+      if (!raw) return {};
+      var data = JSON.parse(raw);
+      if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+      var layouts = data.layouts;
+      if (!layouts || typeof layouts !== 'object' || Array.isArray(layouts)) return {};
+      return layouts;
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function writeNamedStore(layouts) {
+    if (!scopeReady()) return false;
+    try {
+      localStorage.setItem(namedStoreKey(), JSON.stringify({
+        layouts: layouts || {},
+        updated: new Date().toISOString()
+      }));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function listNamedLayoutNames() {
+    var layouts = readNamedStore();
+    return Object.keys(layouts).sort(function (a, b) {
+      return a.localeCompare(b, 'zh-HK');
+    });
+  }
+
+  function refreshNamedSelect(preferName) {
+    var sel = $('seatNamedSelect');
+    if (!sel) return;
+    var layouts = readNamedStore();
+    var names = Object.keys(layouts).sort(function (a, b) {
+      return a.localeCompare(b, 'zh-HK');
+    });
+    var prev = preferName != null ? preferName : sel.value;
+    if (!names.length) {
+      sel.innerHTML = '<option value="">（尚未命名儲存）</option>';
+      return;
+    }
+    sel.innerHTML = names.map(function (n) {
+      var u = layouts[n] && layouts[n].updated ? layouts[n].updated : '';
+      var label = n;
+      if (u) {
+        try {
+          var d = new Date(u);
+          if (!isNaN(d.getTime())) {
+            label = n + ' · ' + d.toLocaleString('zh-HK', { hour12: false });
+          }
+        } catch (e) {}
+      }
+      return '<option value="' + esc(n) + '">' + esc(label) + '</option>';
+    }).join('');
+    if (prev && names.indexOf(prev) !== -1) sel.value = prev;
+    else sel.value = names[0];
+  }
+
+  function applyLayoutData(data) {
+    if (!data) return false;
+    if (data.rows && data.cols) {
+      rows = parseIntClamp(data.rows, 1, 12, rows);
+      cols = parseIntClamp(data.cols, 1, 12, cols);
+      var rowsEl = $('seatRows');
+      var colsEl = $('seatCols');
+      if (rowsEl) rowsEl.value = String(rows);
+      if (colsEl) colsEl.value = String(cols);
+    }
+    ensureSeatArray();
+    var saved = Array.isArray(data.seats) ? data.seats : [];
+    var valid = {};
+    roster.forEach(function (s) { valid[s.key] = true; });
+    var used = {};
+    seats = new Array(rows * cols).fill(null);
+    for (var i = 0; i < seats.length; i++) {
+      var k = saved[i];
+      if (k && valid[k] && !used[k]) {
+        seats[i] = k;
+        used[k] = true;
+      }
+    }
+    return true;
+  }
+
+  function saveNamedLayout(name) {
+    name = String(name || '').trim();
+    if (!name) return { ok: false, reason: 'empty' };
+    if (!scopeReady()) return { ok: false, reason: 'scope' };
+    ensureSeatArray();
+    var layouts = readNamedStore();
+    layouts[name] = {
+      name: name,
+      rows: rows,
+      cols: cols,
+      seats: seats.slice(),
+      mode: mode,
+      updated: new Date().toISOString()
+    };
+    if (!writeNamedStore(layouts)) return { ok: false, reason: 'quota' };
+    return { ok: true, name: name };
+  }
+
+  function loadNamedLayout(name) {
+    name = String(name || '').trim();
+    if (!name) return { ok: false, reason: 'empty' };
+    var layouts = readNamedStore();
+    var data = layouts[name];
+    if (!data) return { ok: false, reason: 'missing' };
+    buildRoster();
+    applyLayoutData(data);
+    saveLayout();
+    renderMeta();
+    renderPool();
+    renderGrid();
+    refreshNamedSelect(name);
+    var nameEl = $('seatLayoutName');
+    if (nameEl) nameEl.value = name;
+    return { ok: true, name: name };
+  }
+
+  function deleteNamedLayout(name) {
+    name = String(name || '').trim();
+    if (!name) return { ok: false, reason: 'empty' };
+    var layouts = readNamedStore();
+    if (!layouts[name]) return { ok: false, reason: 'missing' };
+    delete layouts[name];
+    if (!writeNamedStore(layouts)) return { ok: false, reason: 'quota' };
+    refreshNamedSelect('');
+    return { ok: true, name: name };
+  }
+
+  function explicitSave() {
+    if (!scopeReady()) {
+      showSaveHint('請先選擇班別或科組。', true);
+      return;
+    }
+    saveLayout();
+    var nameEl = $('seatLayoutName');
+    var name = nameEl ? String(nameEl.value || '').trim() : '';
+    if (name) {
+      var res = saveNamedLayout(name);
+      if (!res.ok) {
+        showSaveHint(res.reason === 'quota' ? '儲存失敗（本機空間不足）。' : '儲存失敗。', true);
+        return;
+      }
+      refreshNamedSelect(name);
+      showSaveHint('已儲存「' + name + '」✓');
+    } else {
+      showSaveHint('已儲存 ✓（自動暫存；可輸入名稱以建立命名佈局）');
+      refreshNamedSelect();
+    }
   }
 
   function ensureSeatArray() {
@@ -206,28 +391,7 @@
         seats = new Array(rows * cols).fill(null);
         return;
       }
-      var data = JSON.parse(raw);
-      if (data && data.rows && data.cols) {
-        rows = parseIntClamp(data.rows, 1, 12, rows);
-        cols = parseIntClamp(data.cols, 1, 12, cols);
-        var rowsEl = $('seatRows');
-        var colsEl = $('seatCols');
-        if (rowsEl) rowsEl.value = String(rows);
-        if (colsEl) colsEl.value = String(cols);
-      }
-      ensureSeatArray();
-      var saved = Array.isArray(data.seats) ? data.seats : [];
-      var valid = {};
-      roster.forEach(function (s) { valid[s.key] = true; });
-      var used = {};
-      seats = new Array(rows * cols).fill(null);
-      for (var i = 0; i < seats.length; i++) {
-        var k = saved[i];
-        if (k && valid[k] && !used[k]) {
-          seats[i] = k;
-          used[k] = true;
-        }
-      }
+      applyLayoutData(JSON.parse(raw));
     } catch (e) {
       seats = new Array(rows * cols).fill(null);
     }
@@ -339,6 +503,7 @@
     if (!ready) return;
     buildRoster();
     loadLayout();
+    refreshNamedSelect();
     renderMeta();
     renderPool();
     renderGrid();
@@ -569,6 +734,63 @@
     if (applyBtn) applyBtn.addEventListener('click', function () { applyGridSize(true); });
     var printBtn = $('seatPrintBtn');
     if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
+
+    var saveBtn = $('seatSaveBtn');
+    if (saveBtn) saveBtn.addEventListener('click', explicitSave);
+
+    var loadNamedBtn = $('seatLoadNamedBtn');
+    if (loadNamedBtn) {
+      loadNamedBtn.addEventListener('click', function () {
+        var sel = $('seatNamedSelect');
+        var name = sel ? sel.value : '';
+        var res = loadNamedLayout(name);
+        if (!res.ok) {
+          if (res.reason === 'empty') showSaveHint('請先選擇要載入的佈局。', true);
+          else showSaveHint('找不到該佈局。', true);
+          return;
+        }
+        showSaveHint('已載入「' + res.name + '」✓');
+      });
+    }
+
+    var deleteNamedBtn = $('seatDeleteNamedBtn');
+    if (deleteNamedBtn) {
+      deleteNamedBtn.addEventListener('click', function () {
+        var sel = $('seatNamedSelect');
+        var name = sel ? sel.value : '';
+        if (!name) {
+          showSaveHint('請先選擇要刪除的佈局。', true);
+          return;
+        }
+        if (!window.confirm('確定刪除命名佈局「' + name + '」？')) return;
+        var res = deleteNamedLayout(name);
+        if (!res.ok) {
+          showSaveHint('刪除失敗。', true);
+          return;
+        }
+        var nameEl = $('seatLayoutName');
+        if (nameEl && String(nameEl.value || '').trim() === name) nameEl.value = '';
+        showSaveHint('已刪除「' + res.name + '」');
+      });
+    }
+
+    var namedSel = $('seatNamedSelect');
+    if (namedSel) {
+      namedSel.addEventListener('change', function () {
+        var nameEl = $('seatLayoutName');
+        if (nameEl && namedSel.value) nameEl.value = namedSel.value;
+      });
+    }
+
+    var layoutNameEl = $('seatLayoutName');
+    if (layoutNameEl) {
+      layoutNameEl.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          explicitSave();
+        }
+      });
+    }
 
     bindPoolDropZone();
   }
