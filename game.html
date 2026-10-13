@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-room-hp-v1" />
+  <meta name="game-build" content="staff-next-discipline-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>會員付費 · 準時到堂 · 劉皇發中學</title>
@@ -694,69 +694,92 @@
 
     .prop.star { top: 8%; left: 40%; }
 
-    /* ===== Classroom trash can (pixel cozy) ===== */
-    .trash-can {
+    /* ===== Classroom 訓導室 door (pixel cozy; students drag-in) ===== */
+    .discipline-door {
       position: absolute;
-      right: 6%;
-      bottom: 10%;
-      width: 36px;
-      height: 42px;
+      right: 4%;
+      bottom: 8%;
+      width: 38px;
+      height: 64px;
       z-index: 9;
       cursor: default;
       filter: drop-shadow(1px 2px 0 rgba(0,0,0,.18));
       touch-action: none;
       -webkit-tap-highlight-color: transparent;
     }
-    .trash-can .trash-lid {
+    .discipline-door .door-frame {
       position: absolute;
-      top: 0;
-      left: 2px;
-      width: 32px;
-      height: 8px;
-      background: #5a6a72;
-      border: 2px solid #2c3a42;
-      border-radius: 3px 3px 2px 2px;
-      box-sizing: border-box;
-      transform-origin: 20% 80%;
-      transition: transform 0.18s ease;
-    }
-    .trash-can .trash-lid::before {
-      content: '';
-      position: absolute;
-      top: -5px;
-      left: 10px;
-      width: 10px;
-      height: 5px;
-      background: #5a6a72;
-      border: 2px solid #2c3a42;
-      border-bottom: none;
-      border-radius: 4px 4px 0 0;
+      inset: 0;
+      background: #3d4f66;
+      border: 2px solid #1e2a3a;
+      border-radius: 4px 4px 2px 2px;
       box-sizing: border-box;
     }
-    .trash-can .trash-body {
+    .discipline-door .door-panel {
       position: absolute;
-      top: 8px;
       left: 4px;
-      width: 28px;
-      height: 32px;
-      background: linear-gradient(180deg, #7a8a94 0%, #5e6e78 55%, #4a5a64 100%);
-      border: 2px solid #2c3a42;
-      border-radius: 2px 2px 5px 5px;
+      right: 4px;
+      top: 4px;
+      bottom: 2px;
+      background: linear-gradient(180deg, #6b8ab8 0%, #4a6a94 55%, #3a5578 100%);
+      border: 2px solid #243448;
+      border-radius: 2px;
       box-sizing: border-box;
-      overflow: hidden;
     }
-    .trash-can .trash-body::before,
-    .trash-can .trash-body::after {
+    .discipline-door .door-panel::before {
       content: '';
       position: absolute;
-      top: 4px;
-      bottom: 4px;
-      width: 2px;
-      background: rgba(44,58,66,0.45);
+      left: 5px;
+      right: 5px;
+      top: 6px;
+      height: 22px;
+      border: 2px solid rgba(30,42,58,0.45);
+      border-radius: 2px;
+      box-sizing: border-box;
     }
-    .trash-can .trash-body::before { left: 7px; }
-    .trash-can .trash-body::after { right: 7px; }
-    .trash-can .trash-hint {
+    .discipline-door .door-panel::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: 34px;
+      bottom: 8px;
+      border: 2px solid rgba(30,42,58,0.45);
+      border-radius: 2px;
+      box-sizing: border-box;
+    }
+    .discipline-door .door-knob {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      margin-top: -3px;
+      background: #d4e4f7;
+      border: 1.5px solid #1e2a3a;
+      border-radius: 50%;
+      box-sizing: border-box;
+      z-index: 2;
+    }
+    .discipline-door .door-sign {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-size: 0.48rem;
+      font-weight: 900;
+      color: #f4f8ff;
+      background: #3d5a80;
+      border: 1.5px solid #1e2a3a;
+      border-radius: 3px;
+      padding: 1px 4px;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      box-shadow: 0 1px 0 rgba(0,0,0,.15);
+      pointer-events: none;
+    }
+    .discipline-door .door-hint {
       position: absolute;
       left: 50%;
       bottom: calc(100% + 4px);
@@ -764,9 +787,9 @@
       white-space: nowrap;
       font-size: 0.62rem;
       font-weight: 800;
-      color: #2c3a42;
+      color: #1e2a3a;
       background: rgba(255,250,242,0.95);
-      border: 1.5px solid #2c3a42;
+      border: 1.5px solid #1e2a3a;
       border-radius: 999px;
       padding: 2px 7px;
       opacity: 0;
@@ -774,23 +797,23 @@
       transition: opacity 0.15s ease;
       box-shadow: 0 1px 0 rgba(0,0,0,.1);
     }
-    .trash-can.hot {
-      filter: drop-shadow(0 0 6px rgba(90,160,90,0.55)) drop-shadow(1px 2px 0 rgba(0,0,0,.18));
-      transform: scale(1.08);
+    .discipline-door.hot {
+      filter: drop-shadow(0 0 6px rgba(90,140,200,0.65)) drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      transform: scale(1.06);
     }
-    .trash-can.hot .trash-lid {
-      transform: rotate(-28deg) translateY(-2px);
+    .discipline-door.hot .door-panel {
+      filter: brightness(1.1);
     }
-    .trash-can.hot .trash-hint,
-    .trash-can.show-hint .trash-hint {
+    .discipline-door.hot .door-hint,
+    .discipline-door.show-hint .door-hint {
       opacity: 1;
     }
-    .trash-can.flash .trash-body {
-      animation: trashFlash 0.45s ease;
+    .discipline-door.flash .door-panel {
+      animation: disciplineFlash 0.45s ease;
     }
-    @keyframes trashFlash {
+    @keyframes disciplineFlash {
       0%, 100% { filter: none; }
-      40% { filter: brightness(1.35); }
+      40% { filter: brightness(1.4); }
     }
     .npc.dragging {
       z-index: 40 !important;
@@ -1882,10 +1905,12 @@
         <span class="prop book" id="propBook" hidden>📖</span>
         <span class="prop sun" id="propSun">☀️</span>
         <span class="prop moon" id="propMoon" hidden>🌙</span>
-        <div class="trash-can" id="trashCan" title="掉入垃圾桶" aria-label="垃圾桶，可將同學拖入">
-          <span class="trash-hint">掉入垃圾桶</span>
-          <div class="trash-lid" aria-hidden="true"></div>
-          <div class="trash-body" aria-hidden="true"></div>
+        <div class="discipline-door" id="disciplineDoor" title="入訓導室" aria-label="訓導室，可將同學拖入">
+          <span class="door-hint">入訓導室</span>
+          <div class="door-frame" aria-hidden="true"></div>
+          <div class="door-panel" aria-hidden="true"></div>
+          <span class="door-knob" aria-hidden="true"></span>
+          <span class="door-sign">訓導室</span>
         </div>
         <span class="scene-badge" id="sceneBadge">課室</span>
       </div>
@@ -1927,8 +1952,8 @@
 
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
-      可切換<strong>課室／教員室</strong>：上課前／小息／午膳見<strong>今日當值</strong>；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐＋行）。
-      撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。可<strong>拖動同學掉入垃圾桶</strong>（約 5 秒後會走返出嚟）；老師唔入垃圾桶。教員室可<strong>拖動老師入校長室見校長</strong>（約 10 秒後會走返出嚟）。
+      可切換<strong>課室／教員室</strong>：上課前／小息／午膳見<strong>今日當值</strong>；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐／行按下一堂）。
+      撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。可<strong>拖動同學入訓導室</strong>（約 5 秒後會走返出嚟）；老師唔入訓導室。教員室可<strong>拖動老師入校長室見校長</strong>（約 10 秒後會走返出嚟）。教員室：坐喺度＝下一堂有課；企／行＝下一堂都空（或已冇下一堂）。
       頂部「準時★」係準時到堂分數，同讚賞星分開。
       喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集準時 ★（每節每日一次）。
     </div>
@@ -1978,12 +2003,12 @@
     <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn">關閉</button>
   </div>
 
-  <script src="data.js?v=staff-room-hp-v1"></script>
-  <script src="bells.js?v=staff-room-hp-v1"></script>
-  <script src="calendar.js?v=staff-room-hp-v1"></script>
-  <script src="duty.js?v=staff-room-hp-v1"></script>
-  <script src="form-teachers.js?v=staff-room-hp-v1"></script>
-  <script src="students.js?v=staff-room-hp-v1"></script>
+  <script src="data.js?v=staff-next-discipline-v1"></script>
+  <script src="bells.js?v=staff-next-discipline-v1"></script>
+  <script src="calendar.js?v=staff-next-discipline-v1"></script>
+  <script src="duty.js?v=staff-next-discipline-v1"></script>
+  <script src="form-teachers.js?v=staff-next-discipline-v1"></script>
+  <script src="students.js?v=staff-next-discipline-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -2745,7 +2770,7 @@
   }
 
 
-  /* ===== Classroom trash can: drag student in, return after 5s ===== */
+  /* ===== Classroom 訓導室: drag student in, return after 5s ===== */
   var BIN_RETURN_MS = 5000;
   var DRAG_THRESHOLD_PX = 10;
 
@@ -2755,7 +2780,7 @@
   }
 
   function trashEl() {
-    return document.getElementById('trashCan');
+    return document.getElementById('disciplineDoor');
   }
 
   function pointOverTrash(clientX, clientY) {
@@ -2801,7 +2826,7 @@
     setTrashHot(false);
     flashTrash();
     var name = n.spec.chi || n.spec.label || n.spec.name || '同學';
-    toast(name + ' 掉咗入垃圾桶… 🗑️');
+    toast(name + ' 入咗訓導室… 🚪');
     setTimeout(function () {
       if (!n.el || !n.el.isConnected) return;
       n.el.classList.add('in-bin');
@@ -3361,25 +3386,57 @@
     };
   }
 
-  function splitSitWalk(teachers, rng) {
+  /**
+   * Next lesson period relative to now HKT on today's cycle day (BF Day 5/10 aware).
+   * - before school → 1
+   * - during period P → P+1 (or null if last)
+   * - break / gap / recess / lunch / reading / homeroom → first upcoming period whose start > now
+   * - after school → null
+   */
+  function nextPeriodNumber(cycleDay, slot) {
+    if (cycleDay == null) return null;
+    var maxp = periodsForDay(cycleDay);
+    if (!slot || slot.kind === 'before') return 1;
+    if (slot.kind === 'after') return null;
+    if (slot.kind === 'period' && slot.period != null) {
+      var cur = slot.period | 0;
+      return (cur >= 1 && cur < maxp) ? (cur + 1) : null;
+    }
+    var mins = nowHKTParts().minutes;
+    var sched = scheduleForDay(cycleDay);
+    if (sched && sched.slots) {
+      for (var i = 0; i < sched.slots.length; i++) {
+        var s = sched.slots[i];
+        if (s.period == null) continue;
+        var a = hmToMinutes(s.start);
+        if (a != null && a > mins) return s.period;
+      }
+    }
+    for (var p = 1; p <= maxp; p++) {
+      var bell = periodBell(cycleDay, p);
+      if (!bell || !bell.start) continue;
+      var startM = hmToMinutes(bell.start);
+      if (startM != null && startM > mins) return p;
+    }
+    return null;
+  }
+
+  function teacherNextPeriodHasLesson(t, day, nextP) {
+    if (nextP == null) return false;
+    return teacherHasLesson(t, day, nextP);
+  }
+
+  /**
+   * Seated = next period has a lesson; standing/wandering = next period free (or no next).
+   * Who appears is decided elsewhere; this only assigns sit vs walk.
+   */
+  function splitSitWalk(teachers, day, nextP) {
     var sit = [];
     var walk = [];
-    if (!teachers.length) return { sit: sit, walk: walk };
-    if (teachers.length === 1) {
-      sit.push(teachers[0]);
-      return { sit: sit, walk: walk };
-    }
-    // Prefer seating everyone so all free teachers fit; a few wander.
-    var walkBudget = teachers.length <= 6 ? Math.min(2, teachers.length - 1)
-      : teachers.length <= 16 ? 3
-      : teachers.length <= 28 ? 4
-      : 6;
-    teachers.forEach(function (t, idx) {
-      if (idx < walkBudget * 2 && idx % 3 === 1) walk.push(t);
-      else sit.push(t);
+    (teachers || []).forEach(function (t) {
+      if (teacherNextPeriodHasLesson(t, day, nextP)) sit.push(t);
+      else walk.push(t);
     });
-    if (!sit.length && walk.length) sit.push(walk.pop());
-    while (walk.length > walkBudget) sit.push(walk.pop());
     return { sit: sit, walk: walk };
   }
 
@@ -3787,6 +3844,8 @@
 
   function syncStaffNpcs(mood, ctx) {
     var picked = pickStaffTeachers(ctx, mood);
+    var day = ctx.holiday ? null : (ctx.cycle && ctx.cycle.day);
+    var nextP = nextPeriodNumber(day, ctx.slot);
     var key = [
       'staff',
       picked.mode,
@@ -3795,6 +3854,7 @@
       (ctx.slot && ctx.slot.kind) || '',
       (ctx.slot && ctx.slot.period) || '',
       (ctx.slot && ctx.slot.key) || '',
+      'next' + (nextP == null ? 'x' : nextP),
       picked.teachers.map(function (t) { return t.code; }).join(',')
     ].join('|');
     var hasAny = staffNpcState.seated.length || staffNpcState.walkers.length;
@@ -3822,7 +3882,7 @@
     if (empty) empty.hidden = true;
 
     var rng = picked.rng || mulberry32(picked.seed || 1);
-    var parts = splitSitWalk(picked.teachers, rng);
+    var parts = splitSitWalk(picked.teachers, day, nextP);
     ensureStaffDesks(parts.sit.length);
 
     parts.sit.forEach(function (t, idx) {
@@ -3952,6 +4012,12 @@
       lines.push('明日當值 ' + nShow + ' 位');
     } else if (nShow) {
       lines.push('當值 ' + nShow + ' 位');
+    }
+    var dayChrome = ctx.holiday ? null : (ctx.cycle && ctx.cycle.day);
+    var nextChrome = nextPeriodNumber(dayChrome, ctx.slot);
+    if (nShow && !ctx.holiday) {
+      if (nextChrome != null) lines.push('下一堂 P' + nextChrome + ' · 坐＝有課／行＝空');
+      else lines.push('已冇下一堂 · 全部行開');
     }
     if (board) board.textContent = lines.join('\n');
     if (badge) {
