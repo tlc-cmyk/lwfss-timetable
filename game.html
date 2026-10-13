@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-white-v3-bubbles" />
+  <meta name="game-build" content="classroom-trash-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>模擬遊戲 · 準時到堂 · 劉皇發中學</title>
@@ -691,7 +691,134 @@
     .prop.book { bottom: 36%; left: 50%; }
     .prop.sun { top: 12%; right: 12%; font-size: 1.4rem; }
     .prop.moon { top: 12%; right: 12%; font-size: 1.4rem; }
+
     .prop.star { top: 8%; left: 40%; }
+
+    /* ===== Classroom trash can (pixel cozy) ===== */
+    .trash-can {
+      position: absolute;
+      right: 6%;
+      bottom: 10%;
+      width: 36px;
+      height: 42px;
+      z-index: 9;
+      cursor: default;
+      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .trash-can .trash-lid {
+      position: absolute;
+      top: 0;
+      left: 2px;
+      width: 32px;
+      height: 8px;
+      background: #5a6a72;
+      border: 2px solid #2c3a42;
+      border-radius: 3px 3px 2px 2px;
+      box-sizing: border-box;
+      transform-origin: 20% 80%;
+      transition: transform 0.18s ease;
+    }
+    .trash-can .trash-lid::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: 10px;
+      width: 10px;
+      height: 5px;
+      background: #5a6a72;
+      border: 2px solid #2c3a42;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      box-sizing: border-box;
+    }
+    .trash-can .trash-body {
+      position: absolute;
+      top: 8px;
+      left: 4px;
+      width: 28px;
+      height: 32px;
+      background: linear-gradient(180deg, #7a8a94 0%, #5e6e78 55%, #4a5a64 100%);
+      border: 2px solid #2c3a42;
+      border-radius: 2px 2px 5px 5px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .trash-can .trash-body::before,
+    .trash-can .trash-body::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      background: rgba(44,58,66,0.45);
+    }
+    .trash-can .trash-body::before { left: 7px; }
+    .trash-can .trash-body::after { right: 7px; }
+    .trash-can .trash-hint {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: #2c3a42;
+      background: rgba(255,250,242,0.95);
+      border: 1.5px solid #2c3a42;
+      border-radius: 999px;
+      padding: 2px 7px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      box-shadow: 0 1px 0 rgba(0,0,0,.1);
+    }
+    .trash-can.hot {
+      filter: drop-shadow(0 0 6px rgba(90,160,90,0.55)) drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      transform: scale(1.08);
+    }
+    .trash-can.hot .trash-lid {
+      transform: rotate(-28deg) translateY(-2px);
+    }
+    .trash-can.hot .trash-hint,
+    .trash-can.show-hint .trash-hint {
+      opacity: 1;
+    }
+    .trash-can.flash .trash-body {
+      animation: trashFlash 0.45s ease;
+    }
+    @keyframes trashFlash {
+      0%, 100% { filter: none; }
+      40% { filter: brightness(1.35); }
+    }
+    .npc.dragging {
+      z-index: 40 !important;
+      cursor: grabbing;
+      filter: drop-shadow(0 4px 0 rgba(0,0,0,.2));
+      transition: none !important;
+    }
+    .npc.dragging .npc-label { opacity: 1; }
+    .npc.bin-poof .npc-sprite {
+      animation: binPoof 0.35s ease forwards;
+    }
+    @keyframes binPoof {
+      0% { transform: scale(1); opacity: 1; }
+      60% { transform: scale(0.35) rotate(12deg); opacity: 0.6; }
+      100% { transform: scale(0.05); opacity: 0; }
+    }
+    .npc.in-bin {
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .npc.bin-return .npc-sprite {
+      animation: binReturn 0.45s ease;
+    }
+    @keyframes binReturn {
+      0% { transform: scale(0.2); opacity: 0; }
+      70% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
     .scene-badge {
       position: absolute;
@@ -1351,6 +1478,11 @@
         <span class="prop book" id="propBook" hidden>📖</span>
         <span class="prop sun" id="propSun">☀️</span>
         <span class="prop moon" id="propMoon" hidden>🌙</span>
+        <div class="trash-can" id="trashCan" title="掉入垃圾桶" aria-label="垃圾桶，可將同學拖入">
+          <span class="trash-hint">掉入垃圾桶</span>
+          <div class="trash-lid" aria-hidden="true"></div>
+          <div class="trash-body" aria-hidden="true"></div>
+        </div>
         <span class="scene-badge" id="sceneBadge">課室</span>
       </div>
 
@@ -1398,7 +1530,7 @@
     <div class="hint-card" id="hintCard">
       <strong>玩法：</strong>場景會跟住真實香港時間同校曆循環日自動轉（上課／小息／午飯／放學／假期）。
       可切換<strong>課室／教員室</strong>：上課前／小息／午膳見<strong>今日當值</strong>；課堂見<strong>空堂老師</strong>；放學後見<strong>明日當值</strong>（坐＋行）。
-      撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。
+      撳同學送 <strong>讚賞星 ★</strong> 或 <strong>心心 ♥</strong>（每月排行榜計讚賞星）；撳老師只會打招呼。可<strong>拖動同學掉入垃圾桶</strong>（約 5 秒後會走返出嚟）；老師唔入垃圾桶。
       頂部「準時★」係準時到堂分數，同讚賞星分開。
       喺課堂開始後 <strong>5 分鐘內</strong>撳「準時到堂簽到」可收集準時 ★（每節每日一次）。
     </div>
@@ -1978,7 +2110,9 @@
     npcs: [],
     raf: 0,
     lastTs: 0,
-    started: false
+    started: false,
+    binTimers: [],
+    drag: null
   };
 
   function mulberry32(a) {
@@ -2114,6 +2248,197 @@
     return out;
   }
 
+
+  /* ===== Classroom trash can: drag student in, return after 5s ===== */
+  var BIN_RETURN_MS = 5000;
+  var DRAG_THRESHOLD_PX = 10;
+
+  function clearBinTimers() {
+    (npcState.binTimers || []).forEach(function (t) { clearTimeout(t); });
+    npcState.binTimers = [];
+  }
+
+  function trashEl() {
+    return document.getElementById('trashCan');
+  }
+
+  function pointOverTrash(clientX, clientY) {
+    var bin = trashEl();
+    if (!bin) return false;
+    var r = bin.getBoundingClientRect();
+    var pad = 10;
+    return clientX >= r.left - pad && clientX <= r.right + pad &&
+      clientY >= r.top - pad && clientY <= r.bottom + pad;
+  }
+
+  function setTrashHot(on) {
+    var bin = trashEl();
+    if (!bin) return;
+    bin.classList.toggle('hot', !!on);
+  }
+
+  function flashTrash() {
+    var bin = trashEl();
+    if (!bin) return;
+    bin.classList.remove('flash');
+    void bin.offsetWidth;
+    bin.classList.add('flash');
+    setTimeout(function () { bin.classList.remove('flash'); }, 480);
+  }
+
+  function findNpcEntry(el) {
+    var list = npcState.npcs || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].el === el) return list[i];
+    }
+    return null;
+  }
+
+  function dropStudentInBin(n) {
+    if (!n || !n.spec || n.spec.role !== 'student' || n.inBin) return;
+    n.inBin = true;
+    n.dragging = false;
+    n.savedVx = n.vx;
+    n.vx = 0;
+    n.el.classList.remove('dragging', 'wander-bounce');
+    n.el.classList.add('bin-poof');
+    setTrashHot(false);
+    flashTrash();
+    var name = n.spec.chi || n.spec.label || n.spec.name || '同學';
+    toast(name + ' 掉咗入垃圾桶… 🗑️');
+    setTimeout(function () {
+      if (!n.el || !n.el.isConnected) return;
+      n.el.classList.add('in-bin');
+      n.el.classList.remove('bin-poof');
+    }, 320);
+    var tid = setTimeout(function () {
+      npcState.binTimers = (npcState.binTimers || []).filter(function (x) { return x !== tid; });
+      restoreStudentFromBin(n);
+    }, BIN_RETURN_MS);
+    npcState.binTimers.push(tid);
+  }
+
+  function restoreStudentFromBin(n) {
+    if (!n || !n.el || !n.el.isConnected) return;
+    n.inBin = false;
+    n.el.classList.remove('in-bin', 'bin-poof');
+    // reappear near the bin, then wander again
+    var x = 72 + Math.random() * 12;
+    var y = 8 + Math.random() * 10;
+    n.x = x;
+    n.y = y;
+    n.baseY = y;
+    n.vx = (n.savedVx != null && n.savedVx !== 0)
+      ? -Math.abs(n.savedVx)
+      : -(0.004 + Math.random() * 0.008);
+    n.el.style.left = n.x.toFixed(2) + '%';
+    n.el.style.bottom = n.y.toFixed(2) + '%';
+    n.el.classList.add('facing-left', 'bin-return');
+    if (n.spec.bounce) n.el.classList.add('wander-bounce');
+    n.spec.wander = true;
+    var name = n.spec.chi || n.spec.label || n.spec.name || '同學';
+    toast(name + ' 走返出嚟啦！');
+    setTimeout(function () {
+      if (n.el) n.el.classList.remove('bin-return');
+    }, 500);
+  }
+
+  function clientToScenePercent(clientX, clientY, sceneEl) {
+    var r = sceneEl.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    var left = ((clientX - r.left) / r.width) * 100;
+    var bottom = ((r.bottom - clientY) / r.height) * 100;
+    return {
+      x: Math.max(2, Math.min(94, left)),
+      y: Math.max(2, Math.min(40, bottom))
+    };
+  }
+
+  function bindStudentDrag(el, spec) {
+    if (!spec || spec.role !== 'student') return;
+    el.style.touchAction = 'none';
+    el.addEventListener('pointerdown', function (ev) {
+      if (ev.button != null && ev.button !== 0) return;
+      if (viewMode !== 'classroom') return;
+      var n = findNpcEntry(el);
+      if (!n || n.inBin) return;
+      ev.preventDefault();
+      try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+      npcState.drag = {
+        n: n,
+        pointerId: ev.pointerId,
+        startX: ev.clientX,
+        startY: ev.clientY,
+        moved: false,
+        originX: n.x,
+        originY: n.y,
+        suppressClick: false
+      };
+      n.dragging = false;
+    });
+    el.addEventListener('pointermove', function (ev) {
+      var d = npcState.drag;
+      if (!d || d.n.el !== el || d.pointerId !== ev.pointerId) return;
+      var dx = ev.clientX - d.startX;
+      var dy = ev.clientY - d.startY;
+      if (!d.moved && (dx * dx + dy * dy) < DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX) return;
+      if (!d.moved) {
+        d.moved = true;
+        d.suppressClick = true;
+        d.n.dragging = true;
+        d.n.vx = 0;
+        el.classList.add('dragging');
+        el.classList.remove('wander-bounce');
+        var bin = trashEl();
+        if (bin) bin.classList.add('show-hint');
+      }
+      var scene = document.getElementById('scene');
+      var pos = clientToScenePercent(ev.clientX, ev.clientY, scene);
+      if (pos) {
+        d.n.x = pos.x;
+        d.n.y = pos.y;
+        d.n.baseY = pos.y;
+        el.style.left = pos.x.toFixed(2) + '%';
+        el.style.bottom = pos.y.toFixed(2) + '%';
+        el.style.zIndex = '40';
+      }
+      setTrashHot(pointOverTrash(ev.clientX, ev.clientY));
+    });
+    function endDrag(ev) {
+      var d = npcState.drag;
+      if (!d || d.n.el !== el) return;
+      if (ev && d.pointerId !== ev.pointerId) return;
+      var over = ev ? pointOverTrash(ev.clientX, ev.clientY) : false;
+      var bin = trashEl();
+      if (bin) bin.classList.remove('show-hint');
+      setTrashHot(false);
+      el.classList.remove('dragging');
+      d.n.dragging = false;
+      npcState.drag = null;
+      try { el.releasePointerCapture(d.pointerId); } catch (e2) {}
+      if (d.suppressClick) el._binSuppressClick = true;
+      if (d.moved && over) {
+        dropStudentInBin(d.n);
+        return;
+      }
+      if (d.moved) {
+        // keep drop spot and resume wander
+        if (d.n.spec.wander) {
+          d.n.vx = (Math.random() > 0.5 ? 1 : -1) * (0.004 + Math.random() * 0.008);
+          if (d.n.vx < 0) el.classList.add('facing-left');
+          else el.classList.remove('facing-left');
+        }
+        if (d.n.spec.bounce) el.classList.add('wander-bounce');
+        return;
+      }
+      // tap (preventDefault may suppress click): open praise once
+      el._binSuppressClick = true;
+      onNpcTap(spec, el);
+    }
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+  }
+
   function makeNpcEl(spec) {
     var el = document.createElement('div');
     el.className = 'npc role-' + spec.role + (spec.palette ? (' palette-' + spec.palette) : '');
@@ -2138,6 +2463,10 @@
       '</div>';
     el.addEventListener('click', function (ev) {
       ev.stopPropagation();
+      if (el._binSuppressClick) {
+        el._binSuppressClick = false;
+        return;
+      }
       onNpcTap(spec, el);
     });
     el.addEventListener('keydown', function (ev) {
@@ -2146,6 +2475,7 @@
         onNpcTap(spec, el);
       }
     });
+    if (spec.role === 'student') bindStudentDrag(el, spec);
     return el;
   }
 
@@ -2263,6 +2593,11 @@
   function placeNpcs(roster, rng) {
     var layer = document.getElementById('npcLayer');
     if (!layer) return [];
+    clearBinTimers();
+    npcState.drag = null;
+    setTrashHot(false);
+    var binHint = trashEl();
+    if (binHint) binHint.classList.remove('show-hint', 'flash', 'hot');
     layer.innerHTML = '';
     var placed = [];
     roster.forEach(function (spec, idx) {
@@ -2330,7 +2665,7 @@
     function stepWalkers(list, yMax) {
       for (var i = 0; i < list.length; i++) {
         var n = list[i];
-        if (!n.spec || !n.spec.wander || !n.vx) continue;
+        if (!n.spec || !n.spec.wander || !n.vx || n.inBin || n.dragging) continue;
         n.x += n.vx * dt;
         n.y = n.baseY + Math.sin((ts / 900) + n.phase) * 1.2;
         if (n.x < 6) { n.x = 6; n.vx = Math.abs(n.vx); n.el.classList.remove('facing-left'); }
