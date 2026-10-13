@@ -1089,86 +1089,92 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* ===== Staff room principal office door (pixel cozy) ===== */
+    /* ===== Staff room principal office door (pixel cozy; ~1.8× prior) ===== */
     .principal-door {
       position: absolute;
-      left: 1%;
-      top: 1.5%;
-      width: 28px;
-      height: 46px;
+      left: 0.6%;
+      top: 1%;
+      width: 52px;
+      height: 86px;
       z-index: 9;
       cursor: default;
       filter: drop-shadow(1px 2px 0 rgba(0,0,0,.18));
       touch-action: none;
       -webkit-tap-highlight-color: transparent;
+      perspective: 160px;
     }
     .principal-door .door-frame {
       position: absolute;
       inset: 0;
       background: #6b5344;
       border: 2px solid #3e2a1a;
-      border-radius: 4px 4px 2px 2px;
+      border-radius: 5px 5px 2px 2px;
       box-sizing: border-box;
+      overflow: hidden;
     }
     .principal-door .door-panel {
       position: absolute;
-      left: 4px;
-      right: 4px;
-      top: 4px;
-      bottom: 2px;
+      left: 5px;
+      right: 5px;
+      top: 5px;
+      bottom: 3px;
       background: linear-gradient(180deg, #c49a6c 0%, #a67c52 55%, #8b5e3c 100%);
       border: 2px solid #5c3a22;
-      border-radius: 2px;
+      border-radius: 3px;
       box-sizing: border-box;
+      transform-origin: left center;
+      transition: transform 0.38s cubic-bezier(.4,.1,.2,1), filter 0.25s ease;
+      will-change: transform;
     }
     .principal-door .door-panel::before {
       content: '';
       position: absolute;
-      left: 4px;
-      right: 4px;
-      top: 4px;
-      height: 14px;
-      border: 1.5px solid rgba(62,42,26,0.45);
+      left: 5px;
+      right: 5px;
+      top: 6px;
+      height: 26px;
+      border: 2px solid rgba(62,42,26,0.45);
       border-radius: 2px;
       box-sizing: border-box;
     }
     .principal-door .door-panel::after {
       content: '';
       position: absolute;
-      left: 4px;
-      right: 4px;
-      top: 22px;
-      bottom: 5px;
-      border: 1.5px solid rgba(62,42,26,0.45);
+      left: 5px;
+      right: 5px;
+      top: 38px;
+      bottom: 8px;
+      border: 2px solid rgba(62,42,26,0.45);
       border-radius: 2px;
       box-sizing: border-box;
     }
     .principal-door .door-knob {
       position: absolute;
-      right: 9px;
+      right: 12px;
       top: 50%;
-      width: 6px;
-      height: 6px;
-      margin-top: -3px;
+      width: 8px;
+      height: 8px;
+      margin-top: -4px;
       background: #f0c14b;
       border: 1.5px solid #6b4423;
       border-radius: 50%;
       box-sizing: border-box;
       z-index: 2;
+      transition: opacity 0.25s ease, transform 0.38s ease;
     }
     .principal-door .door-sign {
       position: absolute;
       left: 50%;
-      top: 6px;
+      top: 10px;
       transform: translateX(-50%);
       z-index: 3;
-      font-size: 0.4rem;
+      font-size: 0.55rem;
       font-weight: 900;
       color: #fffaf2;
       background: #8b5e3c;
-      border: 1px solid #3e2a1a;
-      border-radius: 2px;
-      padding: 0 3px;
+      border: 1.5px solid #3e2a1a;
+      border-radius: 3px;
+      padding: 1px 5px;
       white-space: nowrap;
       letter-spacing: 0.02em;
       box-shadow: 0 1px 0 rgba(0,0,0,.15);
@@ -1177,24 +1183,47 @@
     .principal-door .door-hint {
       position: absolute;
       left: 50%;
-      bottom: calc(100% + 4px);
+      bottom: calc(100% + 6px);
       transform: translateX(-50%);
       white-space: nowrap;
-      font-size: 0.62rem;
+      font-size: 0.68rem;
       font-weight: 800;
       color: #3e2a1a;
       background: rgba(255,250,242,0.95);
       border: 1.5px solid #3e2a1a;
       border-radius: 999px;
-      padding: 2px 7px;
+      padding: 3px 9px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.15s ease;
       box-shadow: 0 1px 0 rgba(0,0,0,.1);
     }
+    .principal-door .visit-tag {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 4px);
+      transform: translateX(-50%) translateY(-4px);
+      white-space: nowrap;
+      font-size: 0.58rem;
+      font-weight: 800;
+      color: #5c3a22;
+      background: rgba(255,236,179,0.96);
+      border: 1.5px solid #8b5e3c;
+      border-radius: 999px;
+      padding: 2px 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 1px 0 rgba(0,0,0,.1);
+      z-index: 4;
+    }
+    .principal-door.visiting .visit-tag {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
     .principal-door.hot {
-      filter: drop-shadow(0 0 6px rgba(240,193,75,0.65)) drop-shadow(1px 2px 0 rgba(0,0,0,.18));
-      transform: scale(1.06);
+      filter: drop-shadow(0 0 8px rgba(240,193,75,0.7)) drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      transform: scale(1.05);
     }
     .principal-door.hot .door-panel {
       filter: brightness(1.08);
@@ -1203,12 +1232,54 @@
     .principal-door.show-hint .door-hint {
       opacity: 1;
     }
+    .principal-door.door-open .door-panel {
+      transform: rotateY(-68deg);
+      filter: brightness(0.88);
+    }
+    .principal-door.door-open .door-knob {
+      opacity: 0.25;
+      transform: translateX(-4px);
+    }
+    .principal-door.door-open .door-frame {
+      box-shadow: inset -10px 0 14px rgba(0,0,0,.22);
+    }
     .principal-door.flash .door-panel {
       animation: principalFlash 0.45s ease;
     }
     @keyframes principalFlash {
       0%, 100% { filter: none; }
-      40% { filter: brightness(1.4); }
+      40% { filter: brightness(1.45); }
+    }
+    /* Teacher walk into / out of 校長室 */
+    .npc.principal-enter {
+      z-index: 36 !important;
+      pointer-events: none !important;
+      transition: left 0.45s ease, bottom 0.45s ease !important;
+    }
+    .npc.principal-enter .npc-sprite {
+      animation: principalWalkIn 0.7s ease 0.38s forwards;
+    }
+    .npc.principal-enter .npc-label {
+      transition: opacity 0.25s ease 0.55s;
+      opacity: 0;
+    }
+    @keyframes principalWalkIn {
+      0% { transform: translateX(0) scale(1); opacity: 1; }
+      40% { transform: translateX(-8px) scale(0.9); opacity: 1; }
+      100% { transform: translateX(-24px) scale(0.18); opacity: 0; }
+    }
+    .npc.principal-exit {
+      z-index: 36 !important;
+      pointer-events: none !important;
+      transition: left 0.55s ease 0.35s, bottom 0.55s ease 0.35s !important;
+    }
+    .npc.principal-exit .npc-sprite {
+      animation: principalWalkOut 0.75s ease forwards;
+    }
+    @keyframes principalWalkOut {
+      0% { transform: translateX(-20px) scale(0.22); opacity: 0; }
+      30% { transform: translateX(-2px) scale(0.88); opacity: 1; }
+      100% { transform: translateX(12px) scale(1); opacity: 1; }
     }
 
     .scene-badge {
@@ -2299,6 +2370,7 @@
           <div class="door-panel" aria-hidden="true"></div>
           <span class="door-knob" aria-hidden="true"></span>
           <span class="door-sign">校長室</span>
+          <span class="visit-tag" aria-hidden="true">見緊校長…</span>
         </div>
         <span class="scene-badge" id="staffBadge" style="background:#fff;border-color:#9aa3b2;color:#2c3e50;">教員室</span>
       </div>
@@ -5255,6 +5327,8 @@
     clearPrincipalTimers();
     staffNpcState.drag = null;
     setPrincipalHot(false);
+    setPrincipalDoorOpen(false);
+    setPrincipalVisiting(false);
     var doorHint = principalEl();
     if (doorHint) doorHint.classList.remove('show-hint', 'flash', 'hot');
     var layer = document.getElementById('staffNpcLayer');
@@ -5389,7 +5463,7 @@
     var door = principalEl();
     if (!door) return false;
     var r = door.getBoundingClientRect();
-    var pad = 12;
+    var pad = 16;
     return clientX >= r.left - pad && clientX <= r.right + pad &&
       clientY >= r.top - pad && clientY <= r.bottom + pad;
   }
@@ -5400,6 +5474,18 @@
     door.classList.toggle('hot', !!on);
   }
 
+  function setPrincipalDoorOpen(on) {
+    var door = principalEl();
+    if (!door) return;
+    door.classList.toggle('door-open', !!on);
+  }
+
+  function setPrincipalVisiting(on) {
+    var door = principalEl();
+    if (!door) return;
+    door.classList.toggle('visiting', !!on);
+  }
+
   function flashPrincipal() {
     var door = principalEl();
     if (!door) return;
@@ -5407,6 +5493,11 @@
     void door.offsetWidth;
     door.classList.add('flash');
     setTimeout(function () { door.classList.remove('flash'); }, 480);
+  }
+
+  function principalDoorStaffPercent() {
+    // Drop / exit near the enlarged door (top-left of staff room)
+    return { x: 7.5, y: 58 };
   }
 
   function findStaffNpcEntry(el) {
@@ -5477,17 +5568,35 @@
     n.dragging = false;
     n.savedVx = n.vx;
     n.vx = 0;
-    n.el.classList.remove('dragging', 'wander-bounce');
-    n.el.classList.add('bin-poof');
+    n.el.classList.remove('dragging', 'wander-bounce', 'bin-poof', 'bin-return', 'principal-exit');
     setPrincipalHot(false);
     flashPrincipal();
+    setPrincipalDoorOpen(true);
+    setPrincipalVisiting(true);
+    var doorPos = principalDoorStaffPercent();
+    n.el.style.zIndex = '36';
+    n.el.classList.remove('facing-left');
+    // Enable transition, then slide toward the door from the drop point
+    n.el.classList.add('principal-enter');
+    var approach = setTimeout(function () {
+      if (!n.el || !n.el.isConnected || !n.inPrincipal) return;
+      n.x = doorPos.x + 5;
+      n.y = doorPos.y - 2;
+      n.baseY = n.y;
+      n.el.style.left = n.x.toFixed(2) + '%';
+      n.el.style.bottom = n.y.toFixed(2) + '%';
+    }, 30);
+    staffNpcState.principalTimers.push(approach);
     var name = n.spec.chi || n.spec.label || n.spec.name || '老師';
     toast(name + ' 去咗見校長… 🚪');
-    setTimeout(function () {
+    var enterHide = setTimeout(function () {
       if (!n.el || !n.el.isConnected) return;
       n.el.classList.add('in-bin');
-      n.el.classList.remove('bin-poof');
-    }, 320);
+      n.el.classList.remove('principal-enter');
+      n.el.style.zIndex = '';
+      setPrincipalDoorOpen(false);
+    }, 1150);
+    staffNpcState.principalTimers.push(enterHide);
     var tid = setTimeout(function () {
       staffNpcState.principalTimers = (staffNpcState.principalTimers || []).filter(function (x) { return x !== tid; });
       restoreTeacherFromPrincipal(n);
@@ -5498,20 +5607,19 @@
   function restoreTeacherFromPrincipal(n) {
     if (!n || !n.el || !n.el.isConnected) return;
     n.inPrincipal = false;
-    n.el.classList.remove('in-bin', 'bin-poof');
-    // reappear near the principal door, then wander again
-    var x = 10 + Math.random() * 14;
-    var y = 10 + Math.random() * 16;
-    n.x = x;
-    n.y = y;
-    n.baseY = y;
-    n.vx = (n.savedVx != null && n.savedVx !== 0)
-      ? Math.abs(n.savedVx)
-      : (0.004 + Math.random() * 0.008);
+    n.el.classList.remove('in-bin', 'bin-poof', 'bin-return', 'principal-enter');
+    setPrincipalDoorOpen(true);
+    setPrincipalVisiting(false);
+    var doorPos = principalDoorStaffPercent();
+    // Appear at doorway, walk out, then ease into the staff-room floor
+    n.x = doorPos.x + 2;
+    n.y = doorPos.y - 3;
+    n.baseY = n.y;
     n.el.style.left = n.x.toFixed(2) + '%';
     n.el.style.bottom = n.y.toFixed(2) + '%';
+    n.el.style.zIndex = '36';
     n.el.classList.remove('facing-left');
-    n.el.classList.add('bin-return', 'wander-bounce');
+    n.el.classList.add('principal-exit');
     if (n.spec) {
       n.spec.wander = true;
       n.spec.bounce = true;
@@ -5519,9 +5627,26 @@
     }
     var name = n.spec.chi || n.spec.label || n.spec.name || '老師';
     toast(name + ' 見完校長走返出嚟啦！');
-    setTimeout(function () {
-      if (n.el) n.el.classList.remove('bin-return');
-    }, 500);
+    var stepOut = setTimeout(function () {
+      if (!n.el || !n.el.isConnected) return;
+      n.x = 14 + Math.random() * 14;
+      n.y = 12 + Math.random() * 16;
+      n.baseY = n.y;
+      n.el.style.left = n.x.toFixed(2) + '%';
+      n.el.style.bottom = n.y.toFixed(2) + '%';
+    }, 40);
+    staffNpcState.principalTimers.push(stepOut);
+    var exitDone = setTimeout(function () {
+      if (!n.el || !n.el.isConnected) return;
+      n.el.classList.remove('principal-exit');
+      n.el.style.zIndex = '';
+      setPrincipalDoorOpen(false);
+      n.vx = (n.savedVx != null && n.savedVx !== 0)
+        ? Math.abs(n.savedVx)
+        : (0.004 + Math.random() * 0.008);
+      n.el.classList.add('wander-bounce');
+    }, 950);
+    staffNpcState.principalTimers.push(exitDone);
   }
 
   function bindTeacherPrincipalDrag(el, spec) {
