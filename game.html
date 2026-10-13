@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-compact-decor-v1" />
+  <meta name="game-build" content="playground1-court-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
-  <title>準時到堂 · 課室／教員室 · 劉皇發中學</title>
+  <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
   <style>
     :root {
       --cream: #f7efe3;
@@ -1309,10 +1309,10 @@
     .scene[data-mood="class"] .board { box-shadow: 2px 3px 0 rgba(0,0,0,.15), 0 0 12px rgba(240,193,75,0.25); }
     .scene[data-mood="free"] .board { background: #5a7a68; }
 
-    /* ===== Scene tabs: 課室 | 教員室 ===== */
+    /* ===== Scene tabs: 課室 | 操場 | 教員室 ===== */
     .scene-tabs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
       margin-bottom: 10px;
     }
@@ -1320,14 +1320,15 @@
       appearance: none;
       border: 3px solid var(--wood-deeper);
       border-radius: 12px;
-      padding: 9px 8px;
+      padding: 9px 4px;
       font-family: inherit;
-      font-size: 0.88rem;
+      font-size: clamp(0.68rem, 2.8vw, 0.82rem);
       font-weight: 800;
       cursor: pointer;
       background: var(--card);
       color: var(--muted);
       box-shadow: 0 2px 0 var(--wood-deeper);
+      line-height: 1.2;
     }
     .scene-tab.active {
       background: linear-gradient(180deg, #ffe9c8, #f0d0a0);
@@ -2220,7 +2221,190 @@
       pointer-events: none !important;
     }
 
-    /* ===== Focused UI: teacher + timeline + 課室／教員室 only ===== */
+
+    /* ===== Playground / basketball court (PLAYGROUND1) ===== */
+    .scene-frame.scene-frame--playground {
+      border-color: #3d6b4f;
+      background: #7ec8f0;
+      box-shadow: var(--shadow), inset 0 0 0 2px #c8e8a8;
+      aspect-ratio: auto;
+      height: auto;
+      min-height: 560px;
+      max-height: min(88vh, 920px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scene-frame.scene-frame--playground .scene.playground {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      height: auto;
+      min-height: 720px;
+      background: linear-gradient(180deg, #7ec8f0 0%, #a8d8f0 28%, #6fbf6a 28%, #6fbf6a 42%, #c4a35a 42%, #c4a35a 100%);
+    }
+    .scene.playground .pg-sky {
+      position: absolute; top: 0; left: 0; right: 0; height: 28%;
+      background:
+        radial-gradient(circle at 82% 35%, #fff8c8 0 10%, transparent 11%),
+        linear-gradient(180deg, #5eb0e8, #9ad0f0);
+      z-index: 0;
+    }
+    .scene.playground .pg-fence {
+      position: absolute; left: 0; right: 0; top: 22%; height: 8%;
+      background:
+        repeating-linear-gradient(90deg, #5a6a5a 0 6px, #8a9a7a 6px 14px);
+      border-top: 3px solid #3d4a3d;
+      border-bottom: 3px solid #3d4a3d;
+      opacity: 0.85;
+      z-index: 1;
+    }
+    .scene.playground .pg-grass {
+      position: absolute; left: 0; right: 0; top: 28%; height: 14%;
+      background:
+        repeating-linear-gradient(90deg, #5faf5a 0 18px, #6fbf6a 18px 36px);
+      z-index: 1;
+    }
+    .scene.playground .pg-court {
+      position: absolute;
+      left: 6%; right: 6%;
+      top: 40%; bottom: 6%;
+      background: #c9a45e;
+      border: 4px solid #fff;
+      border-radius: 4px;
+      box-shadow: 0 4px 0 rgba(0,0,0,.18);
+      z-index: 2;
+      overflow: hidden;
+    }
+    .scene.playground .pg-court::before {
+      /* outer lane + center line */
+      content: "";
+      position: absolute; inset: 8%;
+      border: 3px solid rgba(255,255,255,.92);
+      border-radius: 2px;
+      background:
+        linear-gradient(rgba(255,255,255,.92), rgba(255,255,255,.92)) center/3px 100% no-repeat,
+        radial-gradient(circle at center, transparent 0 16%, rgba(255,255,255,.92) 16% 19%, transparent 19%);
+    }
+    .scene.playground .pg-key {
+      position: absolute;
+      width: 28%; height: 36%;
+      border: 3px solid rgba(255,255,255,.92);
+      background: rgba(180, 120, 50, 0.25);
+      z-index: 1;
+    }
+    .scene.playground .pg-key.top {
+      top: 0; left: 50%; transform: translateX(-50%);
+      border-top: none;
+      border-radius: 0 0 40% 40%;
+    }
+    .scene.playground .pg-key.bottom {
+      bottom: 0; left: 50%; transform: translateX(-50%);
+      border-bottom: none;
+      border-radius: 40% 40% 0 0;
+    }
+    .scene.playground .pg-hoop {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 22%;
+      height: 14%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .scene.playground .pg-hoop.top { top: -2%; }
+    .scene.playground .pg-hoop.bottom { bottom: -2%; }
+    .scene.playground .pg-backboard {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: 70%; height: 38%;
+      background: #f2f6fa;
+      border: 3px solid #2c3e50;
+      box-shadow: inset 0 0 0 2px #e74c3c;
+    }
+    .scene.playground .pg-hoop.top .pg-backboard { top: 0; }
+    .scene.playground .pg-hoop.bottom .pg-backboard { bottom: 0; }
+    .scene.playground .pg-rim {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: 36%; height: 22%;
+      border: 3px solid #e67e22;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow: 0 2px 0 rgba(0,0,0,.2);
+    }
+    .scene.playground .pg-hoop.top .pg-rim { top: 34%; }
+    .scene.playground .pg-hoop.bottom .pg-rim { bottom: 34%; }
+    .scene.playground .pg-net {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-size: 0.7rem;
+      line-height: 1;
+      opacity: 0.9;
+      filter: grayscale(0.2);
+    }
+    .scene.playground .pg-hoop.top .pg-net { top: 52%; }
+    .scene.playground .pg-hoop.bottom .pg-net { bottom: 52%; }
+    .scene.playground .pg-ball {
+      position: absolute;
+      right: 14%;
+      bottom: 18%;
+      font-size: 1.35rem;
+      z-index: 4;
+      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.2));
+      animation: pg-ball-bob 2.4s ease-in-out infinite;
+    }
+    @keyframes pg-ball-bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .scene.playground .pg-sign {
+      position: absolute;
+      top: 4%; left: 50%; transform: translateX(-50%);
+      min-width: 42%;
+      max-width: 70%;
+      padding: 6px 10px;
+      background: #2c5f3a;
+      border: 4px solid #1a3a24;
+      border-radius: 6px;
+      color: #e8f5ee;
+      font-size: clamp(0.65rem, 2.8vw, 0.85rem);
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.25;
+      z-index: 5;
+      box-shadow: 2px 3px 0 rgba(0,0,0,.18);
+      white-space: pre-line;
+    }
+    .scene.playground .pg-tree {
+      position: absolute;
+      top: 12%;
+      font-size: 1.4rem;
+      z-index: 2;
+      filter: drop-shadow(1px 1px 0 rgba(0,0,0,.15));
+    }
+    .scene.playground .pg-tree.left { left: 3%; }
+    .scene.playground .pg-tree.right { right: 3%; }
+    .scene.playground .playground-empty {
+      position: absolute;
+      left: 50%; top: 58%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,250,242,.92);
+      border: 3px solid #6b4423;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 800;
+      color: #3e2a1a;
+      z-index: 8;
+      text-align: center;
+      max-width: 80%;
+    }
+    .scene.playground .playground-empty[hidden] { display: none !important; }
+    .scene.playground .scene-badge {
+      background: #e8f5ee;
+      border-color: #3d6b4f;
+      color: #1a3a24;
+    }
+    body.view-playground .wrap { max-width: 480px; }
+
+    /* ===== Focused UI: teacher + timeline + 課室／操場／教員室 only ===== */
     .pick-card { display: none !important; }
     .topbar .change-teacher-btn {
       color: #fff8ee;
@@ -2235,7 +2419,7 @@
       font-family: inherit;
     }
     .topbar .change-teacher-btn:active { transform: translateY(1px); }
-    /* Strip clutter chrome; keep 課室 + 教員室 scenes and tabs */
+    /* Strip clutter chrome; keep 課室 + 操場 + 教員室 scenes and tabs */
     .currency,
     .status-card,
     .hint-card,
@@ -2311,12 +2495,13 @@
         <button type="button" class="timeline-live-btn" id="timelineLiveBtn" disabled title="返到而家香港時間">實時</button>
       </div>
       <div class="timeline-period" id="timelinePeriodLabel">讀取時間線…</div>
-      <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室／教員室" />
+      <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室／操場／教員室" />
       <div class="timeline-marks" id="timelineMarks" role="list"></div>
     </div>
 
     <div class="scene-tabs" role="tablist" aria-label="場景切換">
       <button type="button" class="scene-tab active" id="tabClassroom" role="tab" aria-selected="true" data-view="classroom">🏫 課室</button>
+      <button type="button" class="scene-tab" id="tabPlayground" role="tab" aria-selected="false" data-view="playground" title="PLAYGROUND1 學校操場籃球場">🏀 操場／籃球場</button>
       <button type="button" class="scene-tab" id="tabStaff" role="tab" aria-selected="false" data-view="staff">☕ 教員室</button>
     </div>
 
@@ -2373,6 +2558,33 @@
           <span class="visit-tag" aria-hidden="true">見緊校長…</span>
         </div>
         <span class="scene-badge" id="staffBadge" style="background:#fff;border-color:#9aa3b2;color:#2c3e50;">教員室</span>
+      </div>
+
+      <div class="scene playground" id="scenePlayground" data-mood="before" aria-label="學校操場籃球場 PLAYGROUND1">
+        <div class="pg-sky" aria-hidden="true"></div>
+        <div class="pg-fence" aria-hidden="true"></div>
+        <div class="pg-grass" aria-hidden="true"></div>
+        <span class="pg-tree left" aria-hidden="true">🌳</span>
+        <span class="pg-tree right" aria-hidden="true">🌴</span>
+        <div class="pg-sign" id="playgroundBoardText">操場／籃球場</div>
+        <div class="pg-court" aria-hidden="true">
+          <div class="pg-key top"></div>
+          <div class="pg-key bottom"></div>
+          <div class="pg-hoop top">
+            <div class="pg-backboard"></div>
+            <div class="pg-rim"></div>
+            <span class="pg-net">🥅</span>
+          </div>
+          <div class="pg-hoop bottom">
+            <div class="pg-backboard"></div>
+            <div class="pg-rim"></div>
+            <span class="pg-net">🥅</span>
+          </div>
+          <span class="pg-ball" aria-hidden="true">🏀</span>
+        </div>
+        <div class="npc-layer" id="playgroundNpcLayer" aria-label="操場人物"></div>
+        <div class="playground-empty" id="playgroundEmpty" hidden>而家操場靜靜地～</div>
+        <span class="scene-badge" id="playgroundBadge">操場／籃球場 · PLAYGROUND1</span>
       </div>
     </div>
 
@@ -3358,7 +3570,7 @@
       }).forEach(function (r) {
         var opt = document.createElement('option');
         opt.value = r;
-        opt.textContent = r;
+        opt.textContent = isPlaygroundRoom(r) ? ('操場／籃球場（' + r + '）') : r;
         roomSel.appendChild(opt);
       });
     }
@@ -4476,26 +4688,56 @@
   }
 
   function placeNpcs(roster, rng) {
-    var layer = document.getElementById('npcLayer');
+    var onPlayground = (typeof viewMode !== 'undefined' && viewMode === 'playground');
+    var layer = document.getElementById(onPlayground ? 'playgroundNpcLayer' : 'npcLayer');
     if (!layer) return [];
     var cols = classroomDeskLayout.cols || CLASSROOM_DESK_COLS_DEFAULT;
     var rows = classroomDeskLayout.rows || CLASSROOM_DESK_ROWS_DEFAULT;
     var deskCount = classroomDeskLayout.count || (cols * rows);
-    ensureClassroomDesks(deskCount, cols, rows);
+    if (!onPlayground) ensureClassroomDesks(deskCount, cols, rows);
     clearBinTimers();
     stopClassAmbience(true);
     npcState.drag = null;
     setTrashHot(false);
     var binHint = trashEl();
     if (binHint) binHint.classList.remove('show-hint', 'flash', 'hot');
+    // Clear both venue layers so NPCs do not linger on the hidden scene
+    var classLayer = document.getElementById('npcLayer');
+    var pgLayer = document.getElementById('playgroundNpcLayer');
+    if (classLayer) classLayer.innerHTML = '';
+    if (pgLayer) pgLayer.innerHTML = '';
     layer.innerHTML = '';
     var placed = [];
     var seatIdx = 0;
     roster.forEach(function (spec, idx) {
       var el = makeNpcEl(spec);
       var x, y, vx;
-      var seatedStudent = spec.role === 'student' && (spec.sitting || !spec.wander);
-      if (spec.nearBoard || spec.pace) {
+      var seatedStudent = !onPlayground && spec.role === 'student' && (spec.sitting || !spec.wander);
+      if (onPlayground) {
+        // Court layout: teacher near mid-court; students spread on asphalt (standing / light wander)
+        if (spec.nearBoard || spec.pace || spec.role === 'teacher') {
+          x = 28 + rng() * 44;
+          y = 38 + rng() * 10;
+          vx = spec.pace ? ((0.005 + rng() * 0.007) * (rng() > 0.5 ? 1 : -1)) : 0;
+        } else if (spec.role === 'student') {
+          var colP = seatIdx % 5;
+          var rowP = Math.floor(seatIdx / 5);
+          seatIdx++;
+          x = 14 + colP * 16 + (rng() - 0.5) * 4;
+          y = 12 + (rowP % 6) * 8 + (rng() - 0.5) * 2;
+          vx = (rng() > 0.55) ? ((0.003 + rng() * 0.005) * (rng() > 0.5 ? 1 : -1)) : 0;
+          spec.sitting = false;
+          spec.wander = vx !== 0;
+        } else if (!spec.wander) {
+          x = 16 + (idx % 5) * 15 + rng() * 4;
+          y = 14 + Math.floor(idx / 5) * 10;
+          vx = 0;
+        } else {
+          x = 12 + rng() * 70;
+          y = 10 + rng() * 40;
+          vx = (0.004 + rng() * 0.008) * (rng() > 0.5 ? 1 : -1);
+        }
+      } else if (spec.nearBoard || spec.pace) {
         x = 34 + rng() * 32; // % — along blackboard front
         y = 78 + rng() * 4;  // bottom % — front of elongated room near board
         vx = spec.pace ? ((0.006 + rng() * 0.008) * (rng() > 0.5 ? 1 : -1)) : 0;
@@ -4553,11 +4795,20 @@
   }
 
   function setClassroomEmptyMsg(msg) {
-    var el = document.getElementById('classroomEmpty');
+    var onPg = (typeof viewMode !== 'undefined' && viewMode === 'playground');
+    var el = document.getElementById(onPg ? 'playgroundEmpty' : 'classroomEmpty');
+    var other = document.getElementById(onPg ? 'classroomEmpty' : 'playgroundEmpty');
+    if (other) { other.hidden = true; other.textContent = ''; }
     if (!el) return;
     if (msg) {
+      var shown = String(msg);
+      if (onPg) {
+        shown = shown
+          .replace(/課室/g, '操場')
+          .replace(/入課室/g, '去操場');
+      }
       el.hidden = false;
-      el.textContent = msg;
+      el.textContent = shown;
     } else {
       el.hidden = true;
       el.textContent = '';
@@ -4576,10 +4827,12 @@
       (ctx.slot && ctx.slot.period) || '',
       (ctx.slot && ctx.slot.key) || '',
       lesson ? (lesson.class || lesson.classShort || '') : '',
+      lesson ? (lesson.room || '') : '',
       readingCls,
       state.teacher ? state.teacher.code : '',
       state.pickClass || '',
-      state.pickRoom || ''
+      state.pickRoom || '',
+      (typeof viewMode !== 'undefined' ? viewMode : 'classroom')
     ].join('|');
     // Peek seating fingerprint so chart edits in 座位表 refresh desks
     var peekLayout = null;
@@ -4607,7 +4860,7 @@
     npcState.npcs = placeNpcs(built.roster, built.rng);
     npcState.lastTs = 0;
     setClassroomEmptyMsg(built.emptyMsg || '');
-    if (typeof viewMode === 'undefined' || viewMode === 'classroom') {
+    if (typeof viewMode === 'undefined' || viewMode === 'classroom' || viewMode === 'playground') {
       startClassAmbience();
     }
   }
@@ -4824,7 +5077,7 @@
   }
 
   function maybeStartStudentWalk() {
-    if (document.hidden || viewMode !== 'classroom') return;
+    if (document.hidden || (viewMode !== 'classroom' && viewMode !== 'playground')) return;
     if (isReadingMood()) return; // 閱讀時間：全班坐好睇書，唔行開
     var seated = [];
     var walking = [];
@@ -4856,7 +5109,7 @@
 
   function scheduleClassStudentWalk() {
     clearTimeout(npcState.walkTimer);
-    if (viewMode !== 'classroom') return;
+    if (viewMode !== 'classroom' && viewMode !== 'playground') return;
     var delay = 3500 + Math.floor(Math.random() * 5500);
     npcState.walkTimer = setTimeout(function () {
       maybeStartStudentWalk();
@@ -4873,7 +5126,7 @@
   }
 
   function showClassBubble() {
-    if (document.hidden || viewMode !== 'classroom') return;
+    if (document.hidden || (viewMode !== 'classroom' && viewMode !== 'playground')) return;
     var candidates = (npcState.npcs || []).filter(function (n) {
       return n && n.el && n.spec && n.spec.role === 'student' && !n.inBin && !n.dragging;
     });
@@ -4897,7 +5150,7 @@
 
   function scheduleClassBubble() {
     clearTimeout(npcState.bubbleTimer);
-    if (viewMode !== 'classroom') return;
+    if (viewMode !== 'classroom' && viewMode !== 'playground') return;
     var delay = 3200 + Math.floor(Math.random() * 5200);
     npcState.bubbleTimer = setTimeout(function () {
       showClassBubble();
@@ -4941,7 +5194,25 @@
   }
 
   /* ===== Staff room (教員室) ===== */
-  var viewMode = 'classroom'; // classroom | staff
+
+  /* ===== PLAYGROUND1 / 操場籃球場 venue helpers ===== */
+  function isPlaygroundRoom(room) {
+    var r = String(room || '').toUpperCase().replace(/\s+/g, '');
+    if (!r) return false;
+    return r === 'PLAYGROUND1' || r.indexOf('PLAYGROUND') === 0;
+  }
+  function friendlyRoomLabel(room) {
+    if (isPlaygroundRoom(room)) return '操場／籃球場';
+    return String(room || '');
+  }
+  function lessonRoomOf(ctx) {
+    if (!ctx) return '';
+    if (ctx.lesson && ctx.lesson.room) return String(ctx.lesson.room);
+    return String(state.pickRoom || '');
+  }
+  var venueAutoPlayground = false;
+
+  var viewMode = 'classroom'; // classroom | staff | playground
   var staffNpcState = { key: '', seated: [], walkers: [], bubbleTimer: 0, bubbleHide: 0, principalTimers: [], drag: null };
   var FORM_TEACHER_CODES = (function () {
     var set = {};
@@ -5049,20 +5320,31 @@
     return out;
   }
 
-  function setViewMode(mode) {
-    viewMode = mode === 'staff' ? 'staff' : 'classroom';
+  function setViewMode(mode, opts) {
+    opts = opts || {};
+    if (mode === 'staff') viewMode = 'staff';
+    else if (mode === 'playground') viewMode = 'playground';
+    else viewMode = 'classroom';
+    if (!opts.fromAuto) venueAutoPlayground = false;
     var classScene = document.getElementById('scene');
     var staffScene = document.getElementById('sceneStaff');
+    var pgScene = document.getElementById('scenePlayground');
     var frame = document.querySelector('.scene-frame');
     var tabC = document.getElementById('tabClassroom');
     var tabS = document.getElementById('tabStaff');
+    var tabP = document.getElementById('tabPlayground');
     var hint = document.getElementById('hintCard');
     if (classScene) classScene.classList.toggle('is-active', viewMode === 'classroom');
     if (staffScene) staffScene.classList.toggle('is-active', viewMode === 'staff');
-    if (frame) frame.classList.toggle('scene-frame--staff', viewMode === 'staff');
+    if (pgScene) pgScene.classList.toggle('is-active', viewMode === 'playground');
+    if (frame) {
+      frame.classList.toggle('scene-frame--staff', viewMode === 'staff');
+      frame.classList.toggle('scene-frame--playground', viewMode === 'playground');
+    }
     document.body.classList.toggle('view-staff', viewMode === 'staff');
+    document.body.classList.toggle('view-playground', viewMode === 'playground');
     if (viewMode === 'classroom') ensureClassroomDesks(classroomDeskLayout.count, classroomDeskLayout.cols, classroomDeskLayout.rows);
-    if (hint) hint.hidden = (viewMode === 'staff');
+    if (hint) hint.hidden = (viewMode === 'staff' || viewMode === 'playground');
     if (viewMode === 'staff') {
       stopClassAmbience(true);
       startStaffBubbles();
@@ -5075,11 +5357,34 @@
       tabC.classList.toggle('active', viewMode === 'classroom');
       tabC.setAttribute('aria-selected', viewMode === 'classroom' ? 'true' : 'false');
     }
+    if (tabP) {
+      tabP.classList.toggle('active', viewMode === 'playground');
+      tabP.setAttribute('aria-selected', viewMode === 'playground' ? 'true' : 'false');
+    }
     if (tabS) {
       tabS.classList.toggle('active', viewMode === 'staff');
       tabS.setAttribute('aria-selected', viewMode === 'staff' ? 'true' : 'false');
     }
     try { localStorage.setItem('tt_game_view', viewMode); } catch (e) {}
+    // Force NPC re-place into the active venue layer
+    try {
+      if (npcState) npcState.key = '';
+    } catch (eNpcKey) {}
+  }
+
+  /** Auto-open 操場 when teacher's current lesson is PLAYGROUND1 (do not interrupt 教員室). */
+  function syncPlaygroundVenue(ctx) {
+    if (viewMode === 'staff') return;
+    var room = lessonRoomOf(ctx);
+    if (isPlaygroundRoom(room)) {
+      if (viewMode !== 'playground') {
+        venueAutoPlayground = true;
+        setViewMode('playground', { fromAuto: true });
+      }
+    } else if (viewMode === 'playground' && venueAutoPlayground) {
+      venueAutoPlayground = false;
+      setViewMode('classroom', { fromAuto: true });
+    }
   }
 
   function teacherHasLesson(t, day, period) {
@@ -5969,7 +6274,7 @@
       if (L) {
         mood = 'class';
         boardMsg = (L.subjectShort || L.subject || '課堂') + '\n' + (L.classShort || L.class || '');
-        badgeMsg = '第' + ctx.slot.period + '節 · ' + (L.room || '');
+        badgeMsg = '第' + ctx.slot.period + '節 · ' + (friendlyRoomLabel(L.room) || L.room || '');
       } else {
         mood = 'free';
         boardMsg = '而家空堂';
@@ -5986,9 +6291,37 @@
         boardMsg = (boardMsg ? boardMsg + '\n' : '') + pickBits.join(' · ');
       }
     }
+    syncPlaygroundVenue(ctx);
+
     if (scene) scene.setAttribute('data-mood', mood);
     if (board) board.textContent = boardMsg;
     if (badge) badge.textContent = badgeMsg;
+
+    var pgScene = document.getElementById('scenePlayground');
+    var pgBoard = document.getElementById('playgroundBoardText');
+    var pgBadge = document.getElementById('playgroundBadge');
+    if (pgScene) pgScene.setAttribute('data-mood', mood);
+    var roomNow = lessonRoomOf(ctx);
+    var pgBoardMsg = boardMsg;
+    if (mood === 'class' && ctx.lesson) {
+      pgBoardMsg = (ctx.lesson.subjectShort || ctx.lesson.subject || '課堂') + '\n' +
+        (ctx.lesson.classShort || ctx.lesson.class || '') + '\n🏀 操場／籃球場';
+    } else if (!pgBoardMsg || pgBoardMsg === '歡迎返學') {
+      pgBoardMsg = '操場／籃球場\nPLAYGROUND1';
+    }
+    if (pgBoard) pgBoard.textContent = pgBoardMsg;
+    if (pgBadge) {
+      var pgBadgeMsg = badgeMsg;
+      if (mood === 'class' && ctx.lesson && ctx.lesson.room) {
+        pgBadgeMsg = '第' + ctx.slot.period + '節 · 操場／籃球場';
+      } else if (badgeMsg === '課室') {
+        pgBadgeMsg = '操場／籃球場 · PLAYGROUND1';
+      } else {
+        pgBadgeMsg = badgeMsg.replace(/課室/g, '操場');
+      }
+      pgBadge.textContent = pgBadgeMsg;
+    }
+
     syncNpcs(mood, ctx);
     startNpcLoop();
     syncStaffNpcs(mood, ctx);
@@ -6396,7 +6729,7 @@
   try { resolveTeacher(); } catch (eRt) {}
   try { renderStarBoard(); } catch (eSb) {}
 
-  // Focused UI: 課室 (selected teacher's current room) + 教員室
+  // Focused UI: 課室 / 操場 (teacher venue) + 教員室
   state.pickClass = '';
   state.pickRoom = '';
   try {
@@ -6405,15 +6738,32 @@
   } catch (ePick) {}
   try {
     var savedView = localStorage.getItem('tt_game_view');
-    setViewMode(savedView === 'staff' ? 'staff' : 'classroom');
+    if (savedView === 'staff') setViewMode('staff');
+    else if (savedView === 'playground') setViewMode('playground');
+    else setViewMode('classroom');
   } catch (eView) {
     try { setViewMode('classroom'); } catch (eView2) {}
   }
 
   var tabC = document.getElementById('tabClassroom');
   var tabS = document.getElementById('tabStaff');
-  if (tabC) tabC.addEventListener('click', function () { setViewMode('classroom'); });
-  if (tabS) tabS.addEventListener('click', function () { setViewMode('staff'); });
+  var tabP = document.getElementById('tabPlayground');
+  function afterViewTab() {
+    try { render(); } catch (eTabRender) {}
+  }
+  if (tabC) tabC.addEventListener('click', function () {
+    setViewMode('classroom');
+    // If current lesson is PLAYGROUND1, syncPlaygroundVenue (via paintScene) will reopen playground
+    afterViewTab();
+  });
+  if (tabP) tabP.addEventListener('click', function () {
+    setViewMode('playground');
+    afterViewTab();
+  });
+  if (tabS) tabS.addEventListener('click', function () {
+    setViewMode('staff');
+    afterViewTab();
+  });
 
   var giveStarBtn = document.getElementById('giveStarBtn');
   var giveHeartBtn = document.getElementById('giveHeartBtn');
