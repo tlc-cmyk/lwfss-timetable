@@ -76,7 +76,7 @@
     header.app-header {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: #fff;
-      padding: 16px 16px 20px;
+      padding: 10px 14px 12px;
       position: sticky;
       top: 0;
       z-index: 50;
@@ -84,8 +84,10 @@
       transition: var(--theme-transition);
     }
     header h1 {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
+      line-height: 1.2;
+      margin: 0;
     }
     .wrap { max-width: 720px; margin: 0 auto; padding: 12px 14px; }
 
@@ -318,8 +320,8 @@
 
     /* Consolidated header info card: date + cycle + events + duty + assembly */
     .header-info {
-      margin-top: 10px;
-      border-radius: 12px;
+      margin-top: 6px;
+      border-radius: 10px;
       border: 1.5px solid rgba(255,255,255,.22);
       background: rgba(255,255,255,.14);
       overflow: hidden;
@@ -339,19 +341,19 @@
     .cal-banner-wrap {
       margin-top: 0;
       position: relative;
-      min-height: 48px;
+      min-height: 0;
       -webkit-tap-highlight-color: transparent;
     }
     .cal-banner {
       margin-top: 0;
-      padding: 10px 12px;
+      padding: 7px 10px;
       border-radius: 0;
       background: transparent;
       font-size: 0.88rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
       box-sizing: border-box;
       border: none;
@@ -364,7 +366,7 @@
       font-family: inherit;
       transition: background .15s, transform .1s;
       pointer-events: none; /* taps go to overlay date input */
-      min-height: 48px;
+      min-height: 0;
     }
     .cal-banner-wrap:hover .cal-banner,
     .cal-banner-wrap:focus-within .cal-banner {
@@ -376,38 +378,67 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
     .cal-banner .cal-date-line {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 600;
-      opacity: .9;
+      opacity: .92;
       letter-spacing: .01em;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 6px;
+      gap: 5px 7px;
+    }
+    .cal-banner .cal-date-line .clock-time {
+      font-weight: 800;
+      font-size: 0.88rem;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .02em;
+      opacity: .98;
+    }
+    .cal-banner .cal-date-line .clock-status {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.2);
+    }
+    .cal-banner .cal-date-line .clock-status.is-break {
+      background: rgba(255, 200, 80, .35);
+    }
+    .cal-banner .cal-date-line .clock-status.is-period {
+      background: rgba(220, 60, 50, .45);
+    }
+    .cal-banner .cal-date-text {
+      font-weight: 600;
     }
     .cal-banner .cal-today-pill {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 800;
       padding: 1px 6px;
       border-radius: 999px;
       background: rgba(255,255,255,.28);
     }
-    .cal-banner .cal-main {
-      font-size: 1.05rem;
-      font-weight: 800;
-      line-height: 1.25;
-    }
-    .cal-banner .cal-sub-row {
+    .cal-banner .cal-main-row {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
+      align-items: baseline;
+      gap: 5px 8px;
       margin-top: 1px;
     }
-    .cal-banner .cal-sub { opacity: .85; font-weight: 500; font-size: 0.72rem; }
+    .cal-banner .cal-main {
+      font-size: 1.02rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .cal-banner .cal-sched {
+      opacity: .88;
+      font-weight: 650;
+      font-size: 0.78rem;
+      line-height: 1.2;
+    }
+    .cal-banner .cal-sched:empty { display: none; }
     .tab, button.btn, .day-chip, .card h2, .teacher-banner .code {
       transition: var(--theme-transition);
     }
@@ -462,10 +493,10 @@
 
     .header-info-meta {
       border-top: 1px solid rgba(255,255,255,.18);
-      padding: 8px 12px 9px;
+      padding: 6px 10px 7px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 3px;
     }
     .duty-banner {
       margin: 0;
@@ -1390,44 +1421,14 @@
     }
 
 
-    /* Live HKT clock */
-    .live-clock {
-      margin-top: 6px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      opacity: .92;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: .02em;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-    }
-    .live-clock .clock-time {
-      font-weight: 800;
-      font-size: 0.95rem;
-    }
-    .live-clock .clock-status {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.2);
-    }
-    .live-clock .clock-status.is-break {
-      background: rgba(255, 200, 80, .35);
-    }
-    .live-clock .clock-status.is-period {
-      background: rgba(220, 60, 50, .45);
-    }
 
     /* Calendar day events */
     .cal-banner .cal-events {
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 650;
       opacity: .95;
-      margin-top: 3px;
-      line-height: 1.35;
+      margin-top: 1px;
+      line-height: 1.3;
     }
     .cal-banner .cal-events:empty { display: none; }
     .cal-banner .cal-events-label {
@@ -2060,8 +2061,8 @@
     }
 
     @media (min-width: 600px) {
-      header.app-header { padding: 18px 24px 22px; }
-      header h1 { font-size: 1.45rem; }
+      header.app-header { padding: 12px 20px 14px; }
+      header h1 { font-size: 1.3rem; }
       .wrap { padding: 16px 20px; }
       .day-chips { grid-template-columns: repeat(10, 1fr); }
     }
@@ -2352,22 +2353,21 @@
 <body>
   <header class="app-header">
     <h1>教師時間表</h1>
-    <div class="live-clock" id="liveClock" aria-live="polite">
-      <span>香港時間</span>
-      <span class="clock-time" id="liveClockTime">--:--</span>
-      <span class="clock-status" id="liveClockStatus" hidden></span>
-    </div>
     <div class="header-info" id="headerInfo">
       <div class="cal-banner-wrap" id="calBannerWrap">
         <div class="cal-banner" id="calBanner" aria-hidden="true">
           <span class="cal-banner-body">
-            <span class="cal-date-line" id="calBannerDate">載入中…</span>
-            <span class="cal-main" id="calBannerMain">載入校曆…</span>
-            <span class="cal-events" id="calBannerEvents"></span>
-            <span class="cal-sub-row">
-              <span class="src-tag" id="calBannerSrc" hidden></span>
-              <span class="cal-sub" id="calBannerSub"></span>
+            <span class="cal-date-line" id="calBannerDate" aria-live="polite">
+              <span class="clock-time" id="liveClockTime">--:--</span>
+              <span class="clock-status" id="liveClockStatus" hidden></span>
+              <span class="cal-date-text" id="calBannerDateText">載入中…</span>
             </span>
+            <span class="cal-main-row">
+              <span class="cal-main" id="calBannerMain">載入校曆…</span>
+              <span class="cal-sched" id="calBannerSub"></span>
+              <span class="src-tag" id="calBannerSrc" hidden></span>
+            </span>
+            <span class="cal-events" id="calBannerEvents"></span>
           </span>
           <span class="cal-banner-affordance" aria-hidden="true">
             <span class="cal-icon">📅</span>
@@ -3845,16 +3845,26 @@
     var wd = weekdayLabelHK(ymd);
     var nice = formatYmdZh(ymd);
     var dateLine = nice + (wd ? '（' + wd + '）' : '');
+    var dateTextEl = document.getElementById('calBannerDateText');
+    if (dateTextEl) {
+      dateTextEl.textContent = dateLine;
+    } else if (calBannerDate) {
+      calBannerDate.textContent = dateLine;
+    }
     if (calBannerDate) {
-      calBannerDate.textContent = '';
-      var dateSpan = document.createElement('span');
-      dateSpan.textContent = dateLine;
-      calBannerDate.appendChild(dateSpan);
+      var pill = calBannerDate.querySelector('.cal-today-pill');
       if (isToday) {
-        var pill = document.createElement('span');
-        pill.className = 'cal-today-pill';
-        pill.textContent = '今日';
-        calBannerDate.appendChild(pill);
+        if (!pill) {
+          pill = document.createElement('span');
+          pill.className = 'cal-today-pill';
+          pill.textContent = '今日';
+          calBannerDate.appendChild(pill);
+        } else {
+          pill.hidden = false;
+          pill.textContent = '今日';
+        }
+      } else if (pill) {
+        pill.hidden = true;
       }
     }
     var main = '';
@@ -3907,10 +3917,13 @@
       }
     }
     if (calBannerMain) calBannerMain.textContent = main;
-    if (calBannerSub) calBannerSub.textContent = sub;
+    if (calBannerSub) {
+      calBannerSub.textContent = sub || '';
+      calBannerSub.hidden = !sub;
+    }
     if (calBannerSrc) {
-      calBannerSrc.hidden = false;
-      calBannerSrc.textContent = srcLabel;
+      calBannerSrc.hidden = !srcLabel;
+      calBannerSrc.textContent = srcLabel || '';
     }
     var evEl = document.getElementById('calBannerEvents');
     if (evEl) {
