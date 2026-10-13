@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="playground1-court-v1" />
+  <meta name="game-build" content="morning-assembly-playground-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -2402,6 +2402,53 @@
       border-color: #3d6b4f;
       color: #1a3a24;
     }
+    /* Dense morning-assembly crowd on court */
+    .scene.playground .npc.assembly-crowd {
+      width: 18px;
+      height: 28px;
+    }
+    .scene.playground .npc.assembly-crowd .npc-sprite {
+      width: 16px;
+      height: 26px;
+      margin-left: -8px;
+    }
+    .scene.playground .npc.assembly-crowd .npc-hair {
+      width: 14px; height: 5px;
+    }
+    .scene.playground .npc.assembly-crowd.sex-F .npc-hair {
+      width: 15px; height: 7px;
+    }
+    .scene.playground .npc.assembly-crowd.sex-F .npc-hair::before,
+    .scene.playground .npc.assembly-crowd.sex-F .npc-hair::after {
+      height: 10px; width: 4px;
+    }
+    .scene.playground .npc.assembly-crowd .npc-head {
+      width: 12px; height: 12px;
+    }
+    .scene.playground .npc.assembly-crowd .npc-body {
+      width: 12px; height: 11px;
+    }
+    .scene.playground .npc.assembly-crowd .npc-skirt {
+      width: 14px; height: 6px;
+    }
+    .scene.playground .npc.assembly-crowd .npc-label {
+      font-size: 0.42rem;
+      padding: 0 2px;
+      max-width: 52px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.9;
+    }
+    .scene.playground .npc.assembly-crowd.role-teacher .npc-label {
+      font-size: 0.55rem;
+      font-weight: 800;
+      opacity: 1;
+    }
+    .scene.playground[data-mood="assembly"] .pg-sign {
+      background: #1a4a2e;
+      border-color: #0d2818;
+    }
     body.view-playground .wrap { max-width: 480px; }
 
     /* ===== Focused UI: teacher + timeline + 課室／操場／教員室 only ===== */
@@ -2650,6 +2697,7 @@
   <script src="calendar.js?v=live-scene-init-fix-v1"></script>
   <script src="duty.js?v=live-scene-init-fix-v1"></script>
   <script src="form-teachers.js?v=live-scene-init-fix-v1"></script>
+  <script src="assembly.js?v=morning-assembly-v1"></script>
   <script src="students.js?v=live-scene-init-fix-v1"></script>
   <script src="groups.js?v=live-scene-init-fix-v1"></script>
   <script src="seating.js?v=live-scene-init-fix-v1"></script>
@@ -2922,7 +2970,9 @@
         var label = s.label || '';
         if (s.key === 'recess') label = '小息中';
         else if (s.key === 'lunch') label = '午飯中';
-        else if (s.key === 'homeroom') label = '班主任／早會中';
+        else if (s.key === 'homeroom') {
+          label = isMorningAssemblyMinutes(mins) ? '早會中（全校操場）' : '班主任時間';
+        }
         else if (s.key === 'reading') label = '閱讀時間中';
         else label = label ? (label + '中') : '休息中';
         return { kind: 'break', period: null, key: s.key, label: label, slot: s };
@@ -3038,7 +3088,13 @@
             btn.title = (s.label || '') + ' ' + (s.start || '') + '–' + (s.end || '');
             var mid = hmToMinutes(s.start);
             var endM = hmToMinutes(s.end);
-            if (mid != null && endM != null) mid = Math.floor((mid + endM) / 2);
+            if (s.key === 'homeroom') {
+              // Scrub into 早會 window 07:55–08:05 (not mid of whole 07:55–08:30 slot)
+              mid = 8 * 60; // 08:00
+              btn.title = '早會 07:55–08:05（全校操場）· 班主任至 08:30';
+            } else if (mid != null && endM != null) {
+              mid = Math.floor((mid + endM) / 2);
+            }
             if (mid == null) mid = range.min;
             btn.addEventListener('click', function () {
               applyTimelineScrub(mid);
@@ -4297,6 +4353,7 @@
     if (spec.sex) el.dataset.sex = spec.sex;
     if (spec.sitting) el.classList.add('sitting', 'idle-bob');
     if (spec.reading) el.classList.add('reading');
+    if (spec.assemblyCrowd) el.classList.add('assembly-crowd');
     el.innerHTML =
       '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 8 : 8)) + '</div>' +
       '<div class="npc-sprite">' +
@@ -4374,7 +4431,9 @@
         nearBoard: false,
         sitting: !!opts.sitting,
         reading: !!opts.reading,
-        wander: opts.wander !== false && !opts.sitting
+        wander: opts.wander !== false && !opts.sitting,
+        assemblyCrowd: !!opts.assemblyCrowd,
+        formationClass: opts.formationClass || s.class || ''
       });
     }
     function addTeacher(t, opts) {
@@ -4512,6 +4571,55 @@
       // Not a teaching period in this classroom — keep it quiet; faculty room shows peers
       if (player) addTeacher(player, { wander: true, bounce: true });
       emptyMsg = mood === 'lunch' ? '午飯時間 · 課室休息中' : '小息時間 · 課室休息中';
+    } else if (mood === 'assembly') {
+      // 早會 07:55–08:05：全校學生喺操場（抽樣佈局，視覺上像全校）
+      var asmStuds = sampleAssemblyStudents(rng, ASSEMBLY_CROWD_MAX);
+      asmStuds.forEach(function (s) {
+        addStudent(s, {
+          bounce: false,
+          wander: false,
+          sitting: false,
+          assemblyCrowd: true,
+          formationClass: s.class || ''
+        });
+      });
+      var dutyAsm = dutyTeachersFor(ymd);
+      var seenT = {};
+      dutyAsm.forEach(function (t) {
+        if (!t) return;
+        var c = String(t.code || '').toUpperCase();
+        if (c) seenT[c] = true;
+        addTeacher(t, { nearBoard: true, wander: false, pace: false });
+      });
+      // 班主任代表（每級抽 1 位）企前排協助；唔重複當值老師
+      var formCodes = Object.keys(FORM_CLASS_BY_TEACHER || {});
+      var formAdded = 0;
+      var formCap = 6;
+      // shuffle copy with rng
+      var formPool = formCodes.slice();
+      for (var fi = formPool.length - 1; fi > 0; fi--) {
+        var fj = Math.floor(rng() * (fi + 1));
+        var ft = formPool[fi]; formPool[fi] = formPool[fj]; formPool[fj] = ft;
+      }
+      for (var fk = 0; fk < formPool.length && formAdded < formCap; fk++) {
+        var fcode = formPool[fk];
+        if (seenT[fcode]) continue;
+        var ftObj = lookupTeacher(fcode);
+        if (!ftObj) continue;
+        seenT[fcode] = true;
+        addTeacher(ftObj, { nearBoard: true, wander: false, pace: false });
+        formAdded++;
+      }
+      if (player) {
+        var pc = String(player.code || '').toUpperCase();
+        if (!pc || !seenT[pc]) {
+          addTeacher(player, { nearBoard: true, wander: false, pace: true });
+        }
+      }
+      var asmThemeNote = assemblyThemeForDay(day);
+      lessonNote = '早會 · 全校操場' + (asmThemeNote ? (' · ' + asmThemeNote) : '') +
+        ' · ' + asmStuds.length + '人（抽樣）';
+      emptyMsg = asmStuds.length ? '' : '早會 · 暫未有學生名單';
     } else if (mood === 'before') {
       if (player) addTeacher(player, { wander: true });
       emptyMsg = '上課前 · 準備入課室';
@@ -4688,7 +4796,9 @@
   }
 
   function placeNpcs(roster, rng) {
-    var onPlayground = (typeof viewMode !== 'undefined' && viewMode === 'playground');
+    var hasAssemblyCrowd = (roster || []).some(function (s) { return s && s.assemblyCrowd; });
+    // 早會 crowd always lands on the court layer (even if temporarily viewing 教員室)
+    var onPlayground = (typeof viewMode !== 'undefined' && viewMode === 'playground') || hasAssemblyCrowd;
     var layer = document.getElementById(onPlayground ? 'playgroundNpcLayer' : 'npcLayer');
     if (!layer) return [];
     var cols = classroomDeskLayout.cols || CLASSROOM_DESK_COLS_DEFAULT;
@@ -4709,13 +4819,65 @@
     layer.innerHTML = '';
     var placed = [];
     var seatIdx = 0;
+    // Formation index per class for 早會 lines (1A–6D blocks)
+    var classOrder = [];
+    var classSeat = {};
+    if (hasAssemblyCrowd) {
+      (roster || []).forEach(function (s) {
+        if (!s || s.role !== 'student') return;
+        var cid = String(s.formationClass || s.class || '');
+        if (!cid) return;
+        if (!classSeat[cid]) {
+          classSeat[cid] = 0;
+          classOrder.push(cid);
+        }
+      });
+      classOrder.sort(function (a, b) {
+        var ma = String(a).match(/^(\d+)([A-D])$/i);
+        var mb = String(b).match(/^(\d+)([A-D])$/i);
+        if (ma && mb) {
+          return (parseInt(ma[1], 10) * 10 + (ma[2].toUpperCase().charCodeAt(0) - 65)) -
+            (parseInt(mb[1], 10) * 10 + (mb[2].toUpperCase().charCodeAt(0) - 65));
+        }
+        return String(a).localeCompare(String(b));
+      });
+    }
+    var teacherAsmIdx = 0;
     roster.forEach(function (spec, idx) {
       var el = makeNpcEl(spec);
       var x, y, vx;
       var seatedStudent = !onPlayground && spec.role === 'student' && (spec.sitting || !spec.wander);
       if (onPlayground) {
-        // Court layout: teacher near mid-court; students spread on asphalt (standing / light wander)
-        if (spec.nearBoard || spec.pace || spec.role === 'teacher') {
+        if (hasAssemblyCrowd && spec.assemblyCrowd && spec.role === 'student') {
+          // Class blocks: 6 form rows × 4 streams (A–D), mini-grid inside each block
+          var cid = String(spec.formationClass || spec.class || '');
+          var cIndex = classOrder.indexOf(cid);
+          if (cIndex < 0) cIndex = 0;
+          var formRow = Math.floor(cIndex / 4); // 0..5 (S1–S6)
+          var formCol = cIndex % 4;             // 0..3 (A–D)
+          var local = classSeat[cid] || 0;
+          classSeat[cid] = local + 1;
+          var localCols = 4;
+          var lx = local % localCols;
+          var ly = Math.floor(local / localCols);
+          // Court: left 10–90%, bottom 8–42% (standing facing front / grass)
+          var blockW = 18;
+          var blockH = 5.2;
+          var originX = 12 + formCol * (blockW + 2);
+          var originY = 8 + (5 - formRow) * (blockH + 0.6); // S1 nearer front (higher bottom%)
+          x = originX + lx * (blockW / localCols) + (rng() - 0.5) * 1.2;
+          y = originY + Math.min(3, ly) * 1.35 + (rng() - 0.5) * 0.6;
+          vx = 0;
+          spec.sitting = false;
+          spec.wander = false;
+        } else if (hasAssemblyCrowd && (spec.nearBoard || spec.pace || spec.role === 'teacher')) {
+          // Teachers along front of court (near grass / mid-top of asphalt)
+          x = 18 + (teacherAsmIdx % 8) * 8 + (rng() - 0.5) * 2;
+          y = 44 + Math.floor(teacherAsmIdx / 8) * 4 + (rng() - 0.5) * 1.5;
+          teacherAsmIdx++;
+          vx = spec.pace ? ((0.004 + rng() * 0.005) * (rng() > 0.5 ? 1 : -1)) : 0;
+        } else if (spec.nearBoard || spec.pace || spec.role === 'teacher') {
+          // Court layout: teacher near mid-court; students spread on asphalt (standing / light wander)
           x = 28 + rng() * 44;
           y = 38 + rng() * 10;
           vx = spec.pace ? ((0.005 + rng() * 0.007) * (rng() > 0.5 ? 1 : -1)) : 0;
@@ -4832,7 +4994,8 @@
       state.teacher ? state.teacher.code : '',
       state.pickClass || '',
       state.pickRoom || '',
-      (typeof viewMode !== 'undefined' ? viewMode : 'classroom')
+      (typeof viewMode !== 'undefined' ? viewMode : 'classroom'),
+      isMorningAssemblyMinutes(ctx.minutes) ? 'asm' : 'noasm'
     ].join('|');
     // Peek seating fingerprint so chart edits in 座位表 refresh desks
     var peekLayout = null;
@@ -5205,6 +5368,93 @@
     if (isPlaygroundRoom(room)) return '操場／籃球場';
     return String(room || '');
   }
+
+  /* ===== 早會 07:55–08:05 HKT：全校學生喺操場（PLAYGROUND1）===== */
+  var ASSEMBLY_START_MIN = 7 * 60 + 55; // 07:55
+  var ASSEMBLY_END_MIN = 8 * 60 + 5;    // 08:05 inclusive
+  var ASSEMBLY_CROWD_MAX = 192;         // ~8 per class × 24 — dense but performant
+
+  function isMorningAssemblyMinutes(mins) {
+    if (mins == null || isNaN(mins)) return false;
+    mins = mins | 0;
+    return mins >= ASSEMBLY_START_MIN && mins <= ASSEMBLY_END_MIN;
+  }
+
+  /** True when school day + effective clock (live or scrubbed) is in 早會 window. */
+  function isMorningAssembly(ctx) {
+    if (!ctx || ctx.holiday) return false;
+    if (ctx.cycle == null || ctx.cycle.day == null) return false;
+    var mins = ctx.minutes;
+    if (mins == null) {
+      try { mins = getEffectiveNowParts().minutes; } catch (e) { return false; }
+    }
+    return isMorningAssemblyMinutes(mins);
+  }
+
+  function assemblyThemeForDay(cycleDay) {
+    var AD = window.ASSEMBLY_DATA;
+    if (!AD || !AD.days || cycleDay == null) return '';
+    var row = AD.days[String(cycleDay)];
+    if (!row) return '';
+    var bits = [];
+    if (row.theme) bits.push(row.theme);
+    if (row.flagCeremony) bits.push('升國旗');
+    return bits.join(' · ');
+  }
+
+  /** Deterministic sample of whole-school roster (one block per class). */
+  function sampleAssemblyStudents(rng, maxN) {
+    maxN = maxN || ASSEMBLY_CROWD_MAX;
+    var classIds = Object.keys(studentsByClass || {}).sort(function (a, b) {
+      var ma = String(a).match(/^(\d+)([A-D])$/i);
+      var mb = String(b).match(/^(\d+)([A-D])$/i);
+      if (ma && mb) {
+        var na = (parseInt(ma[1], 10) * 10) + (ma[2].toUpperCase().charCodeAt(0) - 65);
+        var nb = (parseInt(mb[1], 10) * 10) + (mb[2].toUpperCase().charCodeAt(0) - 65);
+        return na - nb;
+      }
+      return String(a).localeCompare(String(b));
+    });
+    if (!classIds.length) return [];
+    var per = Math.max(4, Math.ceil(maxN / classIds.length));
+    var out = [];
+    classIds.forEach(function (cid) {
+      var list = (studentsByClass[cid] || []).slice().sort(function (a, b) {
+        return Number(a.no) - Number(b.no);
+      });
+      if (!list.length) return;
+      // Prefer evenly spaced sample so whole class feels represented
+      var take = Math.min(per, list.length);
+      if (take >= list.length) {
+        list.forEach(function (s) { out.push(s); });
+        return;
+      }
+      var step = list.length / take;
+      for (var i = 0; i < take; i++) {
+        var idx = Math.min(list.length - 1, Math.floor(i * step + (rng() * 0.35)));
+        out.push(list[idx]);
+      }
+    });
+    // Dedupe by class|no (even spacing can collide)
+    var seen = {};
+    var uniq = [];
+    out.forEach(function (s) {
+      var k = String(s.class || '') + '|' + String(s.no || '');
+      if (seen[k]) return;
+      seen[k] = true;
+      uniq.push(s);
+    });
+    if (uniq.length > maxN) {
+      // Trim evenly across list
+      var trimmed = [];
+      var step2 = uniq.length / maxN;
+      for (var j = 0; j < maxN; j++) {
+        trimmed.push(uniq[Math.min(uniq.length - 1, Math.floor(j * step2))]);
+      }
+      return trimmed;
+    }
+    return uniq;
+  }
   function lessonRoomOf(ctx) {
     if (!ctx) return '';
     if (ctx.lesson && ctx.lesson.room) return String(ctx.lesson.room);
@@ -5372,11 +5622,12 @@
     } catch (eNpcKey) {}
   }
 
-  /** Auto-open 操場 when teacher's current lesson is PLAYGROUND1 (do not interrupt 教員室). */
+  /** Auto-open 操場 for PLAYGROUND1 PE or 早會 07:55–08:05 (do not interrupt 教員室). */
   function syncPlaygroundVenue(ctx) {
     if (viewMode === 'staff') return;
     var room = lessonRoomOf(ctx);
-    if (isPlaygroundRoom(room)) {
+    var assembly = isMorningAssembly(ctx);
+    if (assembly || isPlaygroundRoom(room)) {
       if (viewMode !== 'playground') {
         venueAutoPlayground = true;
         setViewMode('playground', { fromAuto: true });
@@ -5494,7 +5745,11 @@
         mode = 'duty-today';
         if (bk === 'lunch') labelHint = '午膳 · 今日當值';
         else if (bk === 'gap') labelHint = '轉堂 · 今日當值';
-        else if (bk === 'homeroom') labelHint = '早會 · 今日當值';
+        else if (bk === 'homeroom') {
+          labelHint = isMorningAssemblyMinutes(getEffectiveNowParts().minutes)
+            ? '早會 · 今日當值（學生喺操場）'
+            : '班主任時間 · 今日當值';
+        }
         else labelHint = (ctx.slot.label || '休息') + ' · 今日當值';
         list = dutyTeachersFor(ymd);
       }
@@ -6234,6 +6489,12 @@
       boardMsg = '今日假期\n好好休息';
       badgeMsg = '假期';
       setPropHidden('propSun', false);
+    } else if (isMorningAssembly(ctx)) {
+      // 早會 07:55–08:05：全校喺操場（優先於一般 before／homeroom 判斷）
+      mood = 'assembly';
+      var asmTheme0 = assemblyThemeForDay(ctx.cycle && ctx.cycle.day);
+      boardMsg = asmTheme0 ? ('早會\n' + asmTheme0) : '早會\n全校操場';
+      badgeMsg = '早會 · 操場';
     } else if (!ctx.slot || ctx.slot.kind === 'before') {
       mood = 'before';
       boardMsg = '早晨！\n準備上課';
@@ -6261,9 +6522,17 @@
         badgeMsg = '閱讀時間';
         setPropHidden('propBook', false);
       } else if (key === 'homeroom') {
-        mood = 'class';
-        boardMsg = '早會／班主任';
-        badgeMsg = '早會';
+        if (isMorningAssemblyMinutes(ctx.minutes)) {
+          mood = 'assembly';
+          var asmTheme = assemblyThemeForDay(ctx.cycle && ctx.cycle.day);
+          boardMsg = asmTheme ? ('早會\n' + asmTheme) : '早會\n全校操場';
+          badgeMsg = '早會 · 操場';
+        } else {
+          // 08:06–08:30 班主任時段（早會已完）
+          mood = 'before';
+          boardMsg = '班主任時間\n返回課室';
+          badgeMsg = '班主任';
+        }
       } else {
         mood = 'recess';
         boardMsg = ctx.slot.label || '休息中';
@@ -6303,7 +6572,10 @@
     if (pgScene) pgScene.setAttribute('data-mood', mood);
     var roomNow = lessonRoomOf(ctx);
     var pgBoardMsg = boardMsg;
-    if (mood === 'class' && ctx.lesson) {
+    if (mood === 'assembly') {
+      var asmThemePg = assemblyThemeForDay(ctx.cycle && ctx.cycle.day);
+      pgBoardMsg = '🏫 早會 07:55–08:05' + (asmThemePg ? ('\n' + asmThemePg) : '') + '\n全校 · 操場／籃球場';
+    } else if (mood === 'class' && ctx.lesson) {
       pgBoardMsg = (ctx.lesson.subjectShort || ctx.lesson.subject || '課堂') + '\n' +
         (ctx.lesson.classShort || ctx.lesson.class || '') + '\n🏀 操場／籃球場';
     } else if (!pgBoardMsg || pgBoardMsg === '歡迎返學') {
@@ -6312,7 +6584,9 @@
     if (pgBoard) pgBoard.textContent = pgBoardMsg;
     if (pgBadge) {
       var pgBadgeMsg = badgeMsg;
-      if (mood === 'class' && ctx.lesson && ctx.lesson.room) {
+      if (mood === 'assembly') {
+        pgBadgeMsg = '早會 · 全校操場 · PLAYGROUND1';
+      } else if (mood === 'class' && ctx.lesson && ctx.lesson.room) {
         pgBadgeMsg = '第' + ctx.slot.period + '節 · 操場／籃球場';
       } else if (badgeMsg === '課室') {
         pgBadgeMsg = '操場／籃球場 · PLAYGROUND1';
