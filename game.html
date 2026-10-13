@@ -323,12 +323,6 @@
       opacity: 0.85;
       font-variant-numeric: tabular-nums;
     }
-    .timeline-hint {
-      margin-top: 6px;
-      font-size: 0.72rem;
-      color: var(--muted);
-      line-height: 1.35;
-    }
 
 
     /* ===== Pixel classroom scene ===== */
@@ -2170,13 +2164,6 @@
       font-family: inherit;
     }
     .topbar .change-teacher-btn:active { transform: translateY(1px); }
-    .timeline-hint {
-      display: block;
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 6px;
-      line-height: 1.35;
-    }
     /* Strip clutter chrome; keep 課室 + 教員室 scenes and tabs */
     .currency,
     .status-card,
@@ -2186,9 +2173,7 @@
     .footer-note,
     .actions,
     .praise-backdrop,
-    .praise-sheet,
-    .teacher-hp-backdrop,
-    .teacher-hp-sheet { display: none !important; }
+    .praise-sheet { display: none !important; }
     body.view-staff .wrap { max-width: 480px; }
 
   </style>
@@ -2257,7 +2242,6 @@
       <div class="timeline-period" id="timelinePeriodLabel">讀取時間線…</div>
       <input type="range" class="timeline-scrubber" id="timelineScrubber" min="455" max="935" step="1" value="480" aria-label="拖曳時間線預覽課室／教員室" />
       <div class="timeline-marks" id="timelineMarks" role="list"></div>
-      <div class="timeline-hint">拖曳睇「當時」課室／教員室；撳「實時」返到而家。課室跟所選老師而家所在班房。</div>
     </div>
 
     <div class="scene-tabs" role="tablist" aria-label="場景切換">
@@ -2374,7 +2358,7 @@
       <span class="thp-pct" id="thpPct"></span>
     </div>
     <div class="thp-lessons" id="thpLessons"></div>
-    <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn"></button>
+    <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn">關閉</button>
   </div>
 
   <script src="data.js?v=live-scene-init-fix-v1"></script>
@@ -5335,9 +5319,6 @@
   }
 
   function openTeacherHpSheet(spec) {
-    return; // HP popup chrome removed
-  }
-  function openTeacherHpSheet_DISABLED(spec) {
     if (!spec || spec.role !== 'teacher') return;
     var ctx = getContext();
     var t = spec.teacherRef || lookupTeacher(spec.code);
