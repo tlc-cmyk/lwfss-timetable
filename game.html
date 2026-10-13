@@ -2227,6 +2227,7 @@
   <script src="form-teachers.js?v=staff-recess-all-v1"></script>
   <script src="students.js?v=house-sex-v1"></script>
   <script src="groups.js?v=house-sex-groups-v1"></script>
+  <script src="seating.js?v=game-desks-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -3603,6 +3604,16 @@
       resolved.students.forEach(function (s) {
         addStudent(s, { bounce: false, wander: false, sitting: true });
       });
+      var classStudents = roster.filter(function (s) { return s.role === 'student'; });
+      var seatLayout = lookupSeatingLayout({
+        groupCode: resolved.groupCode || '',
+        classes: resolved.classes || [],
+        teacherCode: (state.teacher && state.teacher.code) || (lesson && lesson.teacher) || ''
+      });
+      assignStudentDesks(classStudents, seatLayout, rng);
+      if (seatLayout) {
+        lessonNote = (lessonNote ? lessonNote + ' · ' : '') + '座位表';
+      }
       addTeacher(player, { nearBoard: true, wander: false, pace: true });
       if (!resolved.students.length) {
         emptyMsg = lessonNote || '課室暫時只有老師';
@@ -3621,12 +3632,20 @@
         allStuds.forEach(function (s) {
           addStudent(s, { bounce: false, wander: false, sitting: true, reading: true });
         });
+        var readingStudents = roster.filter(function (s) { return s.role === 'student'; });
+        var readingLayout = lookupSeatingLayout({
+          classId: rClass,
+          classes: [rClass],
+          teacherCode: (state.teacher && state.teacher.code) || ''
+        });
+        assignStudentDesks(readingStudents, readingLayout, rng);
         var cts = resolveFormTeacherObjs(rClass);
         if (!cts.length && player) cts = [player];
         cts.forEach(function (t) {
           addTeacher(t, { nearBoard: true, wander: false, pace: true });
         });
-        lessonNote = '閱讀時間 · ' + rClass + ' · 班主任睇班';
+        lessonNote = '閱讀時間 · ' + rClass + ' · 班主任睇班' +
+          (readingLayout ? ' · 座位表' : '');
         if (!allStuds.length) emptyMsg = '班別 ' + rClass + ' 暫未有同學名單';
       } else {
         if (player) addTeacher(player, { wander: true });
@@ -3653,22 +3672,153 @@
     return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
   }
 
-  var CLASSROOM_DESK_COUNT = 40; // exactly 40 desks (5 cols × 8 rows)
-  var CLASSROOM_DESK_COLS = 5;
-  var CLASSROOM_DESK_ROWS = 8;
+  // Default classroom grid when no 座位表 layout (5 wide × 8 deep = 40)
+  var CLASSROOM_DESK_COLS_DEFAULT = 5;
+  var CLASSROOM_DESK_ROWS_DEFAULT = 8;
+  var classroomDeskLayout = {
+    cols: CLASSROOM_DESK_COLS_DEFAULT,
+    rows: CLASSROOM_DESK_ROWS_DEFAULT,
+    count: CLASSROOM_DESK_COLS_DEFAULT * CLASSROOM_DESK_ROWS_DEFAULT,
+    fromSeating: false,
+    seatingKey: ''
+  };
 
-  function ensureClassroomDesks(count) {
+  function studentKeyFromNpc(s) {
+    if (!s) return '';
+    if (typeof window.studentSeatKey === 'function') {
+      return window.studentSeatKey({ class: s.class, no: s.no });
+    }
+    return String(s.class || '') + '|' + String(s.no || '');
+  }
+
+  /**
+   * Match saved 座位表 (localStorage tt_seating_*) for class or subject group.
+   * Prefers teacher-keyed layout, then shared.
+   */
+  function lookupSeatingLayout(opts) {
+    opts = opts || {};
+    if (typeof window.loadSeatingLayoutFor !== 'function') return null;
+    var teacherCode = opts.teacherCode || (state.teacher && state.teacher.code) || '';
+    var groupCode = opts.groupCode || '';
+    if (groupCode) {
+      var g = window.loadSeatingLayoutFor({
+        mode: 'group',
+        id: groupCode,
+        teacherCode: teacherCode
+      });
+      if (g) return g;
+    }
+    var classes = opts.classes || [];
+    for (var i = 0; i < classes.length; i++) {
+      var c = window.loadSeatingLayoutFor({
+        mode: 'class',
+        id: classes[i],
+        teacherCode: teacherCode
+      });
+      if (c) return c;
+    }
+    if (opts.classId) {
+      return window.loadSeatingLayoutFor({
+        mode: 'class',
+        id: opts.classId,
+        teacherCode: teacherCode
+      });
+    }
+    return null;
+  }
+
+  /**
+   * Assign desk indices: follow saved seating chart seats[] when present;
+   * otherwise (or for leftover students) Fisher–Yates onto empty desks.
+   * Mutates student specs with .deskIdx; returns layout used for desks.
+   */
+  function assignStudentDesks(students, layout, rng) {
+    var cols = layout ? layout.cols : CLASSROOM_DESK_COLS_DEFAULT;
+    var rows = layout ? layout.rows : CLASSROOM_DESK_ROWS_DEFAULT;
+    var deskCount = Math.max(1, cols * rows);
+    var byKey = {};
+    (students || []).forEach(function (s) {
+      var k = studentKeyFromNpc(s);
+      if (k) byKey[k] = s;
+    });
+    var usedStudent = {};
+    var usedDesk = {};
+
+    if (layout && Array.isArray(layout.seats)) {
+      for (var i = 0; i < layout.seats.length && i < deskCount; i++) {
+        var sk = layout.seats[i];
+        if (!sk || !byKey[sk] || usedStudent[sk]) continue;
+        byKey[sk].deskIdx = i;
+        usedStudent[sk] = true;
+        usedDesk[i] = true;
+      }
+    }
+
+    var remaining = (students || []).filter(function (s) {
+      return !usedStudent[studentKeyFromNpc(s)];
+    });
+    // Randomize leftover / all-when-no-layout
+    for (var a = remaining.length - 1; a > 0; a--) {
+      var b = Math.floor(rng() * (a + 1));
+      var tmp = remaining[a];
+      remaining[a] = remaining[b];
+      remaining[b] = tmp;
+    }
+    var empty = [];
+    for (var d = 0; d < deskCount; d++) {
+      if (!usedDesk[d]) empty.push(d);
+    }
+    for (var a2 = empty.length - 1; a2 > 0; a2--) {
+      var b2 = Math.floor(rng() * (a2 + 1));
+      var tmp2 = empty[a2];
+      empty[a2] = empty[b2];
+      empty[b2] = tmp2;
+    }
+    for (var r = 0; r < remaining.length && r < empty.length; r++) {
+      remaining[r].deskIdx = empty[r];
+    }
+    // Overflow beyond desk count: pack sequentially after last used
+    var next = 0;
+    for (var o = empty.length; o < remaining.length; o++) {
+      while (usedDesk[next] && next < deskCount + remaining.length) next++;
+      remaining[o].deskIdx = next;
+      usedDesk[next] = true;
+      next++;
+    }
+
+    classroomDeskLayout = {
+      cols: cols,
+      rows: rows,
+      count: deskCount,
+      fromSeating: !!(layout && layout.key),
+      seatingKey: layout && layout.key ? (layout.key + '|' + (layout.updated || '')) : ''
+    };
+    return classroomDeskLayout;
+  }
+
+  function ensureClassroomDesks(count, cols, rows) {
     var wrap = document.getElementById('classDesks');
     var scene = document.getElementById('scene');
     if (!wrap) return 0;
-    count = Math.max(0, count | 0);
-    var existing = wrap.querySelectorAll('.class-desk-slot').length;
-    var roomH = Math.max(820, 200 + CLASSROOM_DESK_ROWS * 78);
+    cols = Math.max(1, (cols != null ? cols : classroomDeskLayout.cols) | 0);
+    rows = Math.max(1, (rows != null ? rows : classroomDeskLayout.rows) | 0);
+    count = Math.max(0, count != null ? (count | 0) : (cols * rows));
+    classroomDeskLayout.cols = cols;
+    classroomDeskLayout.rows = rows;
+    classroomDeskLayout.count = count;
+    wrap.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+    wrap.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
+    var roomH = Math.max(640, 180 + rows * 88);
     if (scene) {
       scene.style.minHeight = roomH + 'px';
       scene.style.height = roomH + 'px';
     }
-    if (existing === count) return count;
+    var existing = wrap.querySelectorAll('.class-desk-slot').length;
+    var sameGrid = wrap.getAttribute('data-desk-cols') === String(cols) &&
+      wrap.getAttribute('data-desk-rows') === String(rows);
+    if (existing === count && sameGrid) return count;
+    wrap.setAttribute('data-desk-cols', String(cols));
+    wrap.setAttribute('data-desk-rows', String(rows));
     wrap.innerHTML = '';
     for (var i = 0; i < count; i++) {
       var slot = document.createElement('div');
@@ -3683,7 +3833,10 @@
   function placeNpcs(roster, rng) {
     var layer = document.getElementById('npcLayer');
     if (!layer) return [];
-    ensureClassroomDesks(CLASSROOM_DESK_COUNT);
+    var cols = classroomDeskLayout.cols || CLASSROOM_DESK_COLS_DEFAULT;
+    var rows = classroomDeskLayout.rows || CLASSROOM_DESK_ROWS_DEFAULT;
+    var deskCount = classroomDeskLayout.count || (cols * rows);
+    ensureClassroomDesks(deskCount, cols, rows);
     clearBinTimers();
     stopClassAmbience(true);
     npcState.drag = null;
@@ -3693,8 +3846,6 @@
     layer.innerHTML = '';
     var placed = [];
     var seatIdx = 0;
-    var cols = CLASSROOM_DESK_COLS;
-    var rows = CLASSROOM_DESK_ROWS;
     roster.forEach(function (spec, idx) {
       var el = makeNpcEl(spec);
       var x, y, vx;
@@ -3704,10 +3855,19 @@
         y = 78 + rng() * 4;  // bottom % — front of elongated room near board
         vx = spec.pace ? ((0.006 + rng() * 0.008) * (rng() > 0.5 ? 1 : -1)) : 0;
       } else if (seatedStudent) {
-        var deskIdx = Math.min(seatIdx, CLASSROOM_DESK_COUNT - 1);
-        seatIdx++;
+        var deskIdx = spec.deskIdx;
+        if (deskIdx == null || deskIdx < 0) {
+          deskIdx = Math.min(seatIdx, deskCount - 1);
+          seatIdx++;
+        }
+        deskIdx = Math.max(0, deskIdx | 0);
         var col = deskIdx % cols;
         var row = Math.floor(deskIdx / cols); // 0 = front (near teacher/board)
+        if (row >= rows) {
+          // overflow packed beyond grid: keep in last row visually
+          row = rows - 1;
+          col = Math.min(cols - 1, col);
+        }
         x = 6 + (col + 0.5) * (88 / cols) + (rng() - 0.5) * 1.2;
         // Higher bottom % = closer to board; front row ~70%, back row ~6%
         var frontBottom = 70;
@@ -3774,6 +3934,26 @@
       readingCls,
       state.teacher ? state.teacher.code : ''
     ].join('|');
+    // Peek seating fingerprint so chart edits in 座位表 refresh desks
+    var peekLayout = null;
+    if (mood === 'class' && lesson) {
+      var peekResolved = resolveLessonStudents(lesson, 1, function () { return 0; });
+      peekLayout = lookupSeatingLayout({
+        groupCode: peekResolved.groupCode || '',
+        classes: peekResolved.classes || [],
+        teacherCode: state.teacher ? state.teacher.code : ''
+      });
+    } else if (mood === 'reading' && readingCls) {
+      peekLayout = lookupSeatingLayout({
+        classId: readingCls,
+        classes: [readingCls],
+        teacherCode: state.teacher ? state.teacher.code : ''
+      });
+    }
+    var seatingFp = peekLayout
+      ? (peekLayout.key + '|' + (peekLayout.updated || '') + '|' + peekLayout.rows + 'x' + peekLayout.cols)
+      : 'random';
+    key += '|' + seatingFp;
     if (key === npcState.key) return;
     npcState.key = key;
     var built = buildNpcRoster(mood, ctx);
@@ -4234,7 +4414,7 @@
     if (staffScene) staffScene.classList.toggle('is-active', viewMode === 'staff');
     if (frame) frame.classList.toggle('scene-frame--staff', viewMode === 'staff');
     document.body.classList.toggle('view-staff', viewMode === 'staff');
-    if (viewMode === 'classroom') ensureClassroomDesks(CLASSROOM_DESK_COUNT);
+    if (viewMode === 'classroom') ensureClassroomDesks(classroomDeskLayout.count, classroomDeskLayout.cols, classroomDeskLayout.rows);
     if (hint) hint.hidden = (viewMode === 'staff');
     if (viewMode === 'staff') {
       stopClassAmbience(true);

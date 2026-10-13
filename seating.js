@@ -823,6 +823,49 @@
     else renderAll();
   }
 
+  /**
+   * Read a saved 座位表 layout for game.html / other consumers.
+   * Tries teacher-keyed storage first, then shared (no teacher).
+   * @param {{ mode?: 'class'|'group', id: string, teacherCode?: string }} options
+   * @returns {{ key: string, mode: string, id: string, rows: number, cols: number, seats: (string|null)[], teacherCode: string, updated?: string }|null}
+   */
+  function loadSeatingLayoutFor(options) {
+    options = options || {};
+    var m = options.mode === 'group' ? 'group' : 'class';
+    var id = String(options.id || '').trim();
+    var teacher = String(options.teacherCode || '').trim().toUpperCase();
+    if (!id) return null;
+    var base = LS_PREFIX + m + ':' + id;
+    var keys = [];
+    if (teacher) keys.push(base + ':t:' + teacher);
+    keys.push(base);
+    for (var i = 0; i < keys.length; i++) {
+      try {
+        var raw = localStorage.getItem(keys[i]);
+        if (!raw) continue;
+        var data = JSON.parse(raw);
+        if (!data || !Array.isArray(data.seats)) continue;
+        var hasAny = data.seats.some(function (k) { return !!k; });
+        if (!hasAny) continue;
+        var r = parseIntClamp(data.rows, 1, 12, DEFAULT_ROWS);
+        var c = parseIntClamp(data.cols, 1, 12, DEFAULT_COLS);
+        return {
+          key: keys[i],
+          mode: m,
+          id: id,
+          rows: r,
+          cols: c,
+          seats: data.seats.slice(),
+          teacherCode: teacher || '',
+          updated: data.updated || ''
+        };
+      } catch (e) { /* ignore */ }
+    }
+    return null;
+  }
+
   global.initSeatingChart = initSeatingChart;
   global.renderSeatingChart = renderSeatingChart;
+  global.loadSeatingLayoutFor = loadSeatingLayoutFor;
+  global.studentSeatKey = studentKey;
 })(typeof window !== 'undefined' ? window : this);
