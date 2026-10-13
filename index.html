@@ -244,17 +244,21 @@
     }
 
     /* Day picker chips */
+    .day-picker-card {
+      padding: 8px;
+      margin-bottom: 10px;
+    }
     .day-chips {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 0;
     }
     .day-chip {
       border: 1.5px solid var(--border);
       background: #fff;
       border-radius: 10px;
-      padding: 10px 4px;
+      padding: 8px 4px;
       text-align: center;
       font-weight: 700;
       font-size: 0.9rem;
@@ -275,17 +279,6 @@
       margin-top: 1px;
     }
     .day-chip.active.has-today-mark::after { color: #cce0ff; }
-
-    .cycle-today-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .cycle-today-bar select { width: auto; min-width: 100px; padding: 6px 8px; font-size: 0.85rem; }
 
     .date-pick-row {
       display: flex;
@@ -2439,13 +2432,8 @@
 
     <!-- Day view -->
     <section class="panel active" id="panel-day">
-      <div class="card" id="dayPickerCard" hidden>
-        <h2>選擇循環日</h2>
-        <p class="hint" style="margin-bottom:8px;">日期、循環日、鐘聲類型見頂部。此處只揀要睇嘅 Day 課表。</p>
+      <div class="card day-picker-card" id="dayPickerCard" hidden>
         <div class="day-chips" id="dayChips"></div>
-        <div class="cycle-today-bar" id="gotoTodayBar" hidden>
-          <button class="btn btn-ghost btn-sm" id="gotoTodayBtn" type="button">跳至今日循環日</button>
-        </div>
       </div>
       <div class="card" id="dayLessonsCard" hidden>
         <div class="day-title">
@@ -3109,8 +3097,6 @@
   var lessonList = document.getElementById('lessonList');
   var dayTitle = document.getElementById('dayTitle');
   var dayLessonCount = document.getElementById('dayLessonCount');
-  var gotoTodayBtn = document.getElementById('gotoTodayBtn');
-  var gotoTodayBar = document.getElementById('gotoTodayBar');
   var dutyBanner = document.getElementById('dutyBanner');
   var dutyBannerMain = document.getElementById('dutyBannerMain');
   var dutyUpcomingList = document.getElementById('dutyUpcomingList');
@@ -3999,10 +3985,6 @@
       var d = parseInt(chip.dataset.day, 10);
       chip.classList.toggle('has-today-mark', r.day === d);
     });
-    // Show "jump to today" only when viewing a different cycle day chip
-    var showJump = r.day != null && state.day !== r.day;
-    if (gotoTodayBar) gotoTodayBar.hidden = !showJump;
-    if (gotoTodayBtn) gotoTodayBtn.hidden = !showJump;
   }
 
   function buildDayChips() {
@@ -4093,9 +4075,6 @@
       chip.classList.toggle('active', parseInt(chip.dataset.day, 10) === d);
     });
     var rJump = resolveTodayCycle();
-    var showJump = rJump.day != null && d !== rJump.day;
-    if (gotoTodayBar) gotoTodayBar.hidden = !showJump;
-    if (gotoTodayBtn) gotoTodayBtn.hidden = !showJump;
     Array.prototype.forEach.call(dayChips.querySelectorAll('.day-chip'), function (chip) {
       var dd = parseInt(chip.dataset.day, 10);
       chip.classList.toggle('has-today-mark', rJump.day === dd);
@@ -6433,16 +6412,6 @@
     applyResolvedDayToUI();
     if (state.teacher) renderDayView();
   });
-  if (gotoTodayBtn) {
-    gotoTodayBtn.addEventListener('click', function () {
-      var c = getStoredCycle();
-      if (c) {
-        state.day = c;
-        renderDayView();
-      }
-    });
-  }
-
   if (adminSaveBtn) {
     adminSaveBtn.addEventListener('click', function () {
       var pin = (adminPin && adminPin.value) || '';
