@@ -656,6 +656,10 @@
     }
     .npc.role-teacher .npc-body { background: #8b5e3c; }
     .npc.role-teacher .npc-head { background: #e8c4a0; }
+    /* Today's duty teachers: red clothing */
+    .npc.duty-red .npc-body,
+    .npc.duty-red .npc-skirt { background: #e23b3b !important; }
+    .npc.duty-red.role-teacher .npc-body { background: #e23b3b !important; }
     /* Legacy random palettes (teachers / fallback) */
     .npc.palette-o .npc-body { background: #f0a060; }
     .npc.palette-g .npc-body { background: #6bb89a; }
@@ -728,6 +732,33 @@
     .npc.role-teacher .npc-label {
       background: #fff3e0;
       border-color: #8b5e3c;
+    }
+    /* Staff room: next-period prep head label */
+    .npc .npc-status {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 14px);
+      transform: translateX(-50%);
+      padding: 1px 5px;
+      background: #ffe082;
+      border: 1.5px solid #c49000;
+      border-radius: 4px;
+      font-size: 0.5rem;
+      font-weight: 900;
+      line-height: 1.15;
+      color: #6b4a00;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 1px 0 rgba(0,0,0,.12);
+      z-index: 3;
+    }
+    #sceneStaff .npc.sitting .npc-status {
+      font-size: 0.42rem;
+      bottom: calc(100% + 12px);
+      padding: 0 3px;
+    }
+    #sceneStaff .npc.sitting.has-status .npc-label {
+      bottom: calc(100% + 1px);
     }
     .npc .npc-zzz {
       position: absolute;
@@ -4937,9 +4968,11 @@
     el.className = 'npc role-' + spec.role
       + (spec.palette ? (' palette-' + spec.palette) : '')
       + (spec.house ? (' house-' + spec.house) : '')
-      + (spec.sex ? (' sex-' + spec.sex) : '');
+      + (spec.sex ? (' sex-' + spec.sex) : '')
+      + (spec.dutyRed ? ' duty-red' : '');
     if (spec.sleep) el.classList.add('sleep');
     if (spec.bounce) el.classList.add('wander-bounce');
+    if (spec.statusLabel) el.classList.add('has-status');
     el.setAttribute('role', 'button');
     el.setAttribute('tabindex', '0');
     el.dataset.role = spec.role;
@@ -4953,6 +4986,9 @@
     if (spec.reading) el.classList.add('reading');
     if (spec.assemblyCrowd) el.classList.add('assembly-crowd');
     el.innerHTML =
+      (spec.statusLabel
+        ? ('<div class="npc-status">' + escapeHtml(spec.statusLabel) + '</div>')
+        : '') +
       '<div class="npc-label">' + escapeHtml(shortLabel(spec.label || spec.name, spec.role === 'teacher' ? 8 : 8)) + '</div>' +
       '<div class="npc-sprite">' +
         '<div class="npc-hair" style="background:' + (spec.hair || '#3e2a1a') + '"></div>' +
@@ -6090,7 +6126,7 @@
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden) {
         npcState.lastTs = 0;
-        if (viewMode === 'staff') scheduleStaffBubble();
+        if (viewMode === 'staff') startStaffBubbles();
         else startClassAmbience();
       } else {
         stopStaffBubbles();
@@ -6862,7 +6898,7 @@
   }
 
   var viewMode = 'classroom'; // classroom | staff | playground
-  var staffNpcState = { key: '', seated: [], walkers: [], bubbleTimer: 0, bubbleHide: 0, principalTimers: [], drag: null };
+  var staffNpcState = { key: '', seated: [], walkers: [], bubbleTimer: 0, bubbleHide: 0, walkTimer: 0, principalTimers: [], drag: null };
   var FORM_TEACHER_CODES = (function () {
     var set = {};
     var FT = window.FORM_TEACHERS_DATA;
@@ -7104,7 +7140,7 @@
    * - before / lunch (+ other breaks): today's duty only
    * - lesson periods: 空堂 teachers
    * - after school: tomorrow's duty (next duty-roster school day)
-   * Sit vs wander is assigned later by next-period lesson/free.
+   * Sit/prep/wander: all sit by default; next-period lesson → 備課中; free may wander occasionally.
    */
   function pickStaffTeachers(ctx, mood) {
     var day = ctx.cycle && ctx.cycle.day;
@@ -7224,17 +7260,36 @@
   }
 
   /**
-   * Seated = next period has a lesson; standing/wandering = next period free (or no next).
-   * Who appears is decided elsewhere; this only assigns sit vs walk.
+   * Staff room pose rules:
+   * - Everyone sits at a desk by default.
+   * - Next period has a lesson → prep (備課中 head label); stay seated.
+   * - Next period free / no next → free; mostly seated; a few may wander occasionally (ambience).
+   * Who appears is decided elsewhere; this only classifies prep vs free.
    */
   function splitSitWalk(teachers, day, nextP) {
     var sit = [];
     var walk = [];
+    var prep = [];
+    var free = [];
     (teachers || []).forEach(function (t) {
-      if (teacherNextPeriodHasLesson(t, day, nextP)) sit.push(t);
-      else walk.push(t);
+      if (teacherNextPeriodHasLesson(t, day, nextP)) {
+        prep.push(t);
+        sit.push(t);
+      } else {
+        free.push(t);
+        sit.push(t); // free colleagues also sit; ambience picks occasional wanderers
+      }
     });
-    return { sit: sit, walk: walk };
+    return { sit: sit, walk: walk, prep: prep, free: free };
+  }
+
+  function todayDutyCodeSet(ymd) {
+    var set = {};
+    dutyTeachersFor(ymd).forEach(function (t) {
+      var c = String((t && t.code) || '').toUpperCase();
+      if (c) set[c] = true;
+    });
+    return set;
   }
 
   /** Fixed faculty seats (= teacher count in data.json). */
@@ -7288,6 +7343,7 @@
 
   function clearStaffSeats() {
     clearPrincipalTimers();
+    clearStaffWanderTimers();
     staffNpcState.drag = null;
     setPrincipalHot(false);
     setPrincipalDoorOpen(false);
@@ -7308,6 +7364,7 @@
   function makeStaffTeacherSpec(t, opts, rng) {
     opts = opts || {};
     var label = teacherDisplayName(t);
+    var prep = !!opts.prep;
     return {
       role: 'teacher',
       name: label,
@@ -7321,6 +7378,9 @@
       bounce: !!opts.wander,
       nearBoard: false,
       sleep: false,
+      prep: prep,
+      statusLabel: prep ? '備課中' : '',
+      dutyRed: !!opts.dutyRed,
       teacherRef: t
     };
   }
@@ -7496,6 +7556,7 @@
     var cx = rect.left + rect.width / 2;
     var cy = rect.top + rect.height * 0.7;
     var pos = clientToStaffPercent(cx, cy);
+    if (n.desk != null && n.homeDesk == null) n.homeDesk = n.desk;
     n.el.classList.remove('sitting', 'idle-bob');
     var legs = n.el.querySelector('.npc-legs');
     if (legs) legs.remove();
@@ -7524,8 +7585,119 @@
     }
   }
 
+  /** Reseat a staff NPC back at their home desk (after ambient wander / principal). */
+  function reseatStaffNpc(n) {
+    if (!n || !n.el || !n.el.isConnected) return;
+    var deskIdx = (n.homeDesk != null) ? n.homeDesk : n.desk;
+    if (deskIdx == null) return;
+    clearTimeout(n._returnTimer);
+    n._returnTimer = 0;
+    n.ambientWander = false;
+    n.inPrincipal = false;
+    n.dragging = false;
+    n.vx = 0;
+    if (n.spec) {
+      n.spec.sitting = true;
+      n.spec.wander = false;
+      n.spec.bounce = false;
+    }
+    var desk = document.getElementById('staffDesk' + deskIdx);
+    if (!desk) return;
+    n.el.classList.remove('wander-bounce', 'facing-left', 'dragging', 'principal-enter', 'principal-exit', 'in-bin', 'bin-poof', 'bin-return');
+    n.el.classList.add('sitting', 'idle-bob');
+    n.el.style.left = '';
+    n.el.style.bottom = '';
+    n.el.style.transform = '';
+    n.el.style.zIndex = '';
+    var sprite = n.el.querySelector('.npc-sprite');
+    if (sprite && !sprite.querySelector('.npc-legs')) {
+      var legs = document.createElement('div');
+      legs.className = 'npc-legs';
+      sprite.appendChild(legs);
+    }
+    desk.appendChild(n.el);
+    n.desk = deskIdx;
+    n.homeDesk = deskIdx;
+    n.x = null;
+    n.y = null;
+    n.baseY = null;
+    staffNpcState.walkers = (staffNpcState.walkers || []).filter(function (x) { return x !== n; });
+    if ((staffNpcState.seated || []).indexOf(n) < 0) staffNpcState.seated.push(n);
+  }
+
+  function standStaffAmbient(n) {
+    if (!n || !n.el || n.inPrincipal || n.dragging) return;
+    if (n.spec && n.spec.prep) return; // 備課中 stay at desk
+    ensureStaffWalker(n);
+    n.ambientWander = true;
+    n.vx = (0.004 + Math.random() * 0.007) * (Math.random() > 0.5 ? 1 : -1);
+    n.phase = Math.random() * Math.PI * 2;
+    if (n.baseY == null) n.baseY = n.y || 14;
+    n.el.classList.add('wander-bounce');
+    if (n.vx < 0) n.el.classList.add('facing-left');
+    else n.el.classList.remove('facing-left');
+  }
+
+  function clearStaffWanderTimers() {
+    clearTimeout(staffNpcState.walkTimer);
+    staffNpcState.walkTimer = 0;
+    function clearOne(n) {
+      if (n && n._returnTimer) {
+        clearTimeout(n._returnTimer);
+        n._returnTimer = 0;
+      }
+    }
+    (staffNpcState.seated || []).forEach(clearOne);
+    (staffNpcState.walkers || []).forEach(clearOne);
+  }
+
+  function maybeStartStaffWander() {
+    if (document.hidden || viewMode !== 'staff') return;
+    var seatedFree = [];
+    var walking = [];
+    (staffNpcState.seated || []).forEach(function (n) {
+      if (!n || !n.el || n.inPrincipal || n.dragging) return;
+      if (n.spec && n.spec.prep) return;
+      seatedFree.push(n);
+    });
+    (staffNpcState.walkers || []).forEach(function (n) {
+      if (!n || !n.el || n.inPrincipal || n.dragging) return;
+      if (n.ambientWander) walking.push(n);
+    });
+    // Occasionally send a wanderer back to their seat
+    if (walking.length && Math.random() < 0.55) {
+      reseatStaffNpc(walking[Math.floor(Math.random() * walking.length)]);
+      walking = walking.filter(function (n) { return n.ambientWander; });
+    }
+    // Keep at most 1–2 free colleagues wandering
+    if (walking.length >= 2 || !seatedFree.length) return;
+    if (walking.length === 1 && Math.random() > 0.4) return;
+    var pick = seatedFree[Math.floor(Math.random() * seatedFree.length)];
+    standStaffAmbient(pick);
+    var retDelay = 6000 + Math.floor(Math.random() * 10000);
+    clearTimeout(pick._returnTimer);
+    pick._returnTimer = setTimeout(function () {
+      if (pick.ambientWander && !pick.inPrincipal && !pick.dragging) {
+        reseatStaffNpc(pick);
+      }
+    }, retDelay);
+  }
+
+  function scheduleStaffWander() {
+    clearTimeout(staffNpcState.walkTimer);
+    if (viewMode !== 'staff') return;
+    var delay = 4500 + Math.floor(Math.random() * 6500);
+    staffNpcState.walkTimer = setTimeout(function () {
+      maybeStartStaffWander();
+      scheduleStaffWander();
+    }, delay);
+  }
+
   function dropTeacherInPrincipal(n) {
     if (!n || !n.spec || n.spec.role !== 'teacher' || n.inPrincipal) return;
+    clearTimeout(n._returnTimer);
+    n._returnTimer = 0;
+    n.ambientWander = false;
     ensureStaffWalker(n);
     n.inPrincipal = true;
     n.dragging = false;
@@ -7570,11 +7742,12 @@
   function restoreTeacherFromPrincipal(n) {
     if (!n || !n.el || !n.el.isConnected) return;
     n.inPrincipal = false;
+    n.ambientWander = false;
     n.el.classList.remove('in-bin', 'bin-poof', 'bin-return', 'principal-enter');
     setPrincipalDoorOpen(true);
     setPrincipalVisiting(false);
     var doorPos = principalDoorStaffPercent();
-    // Appear at doorway, walk out, then ease into the staff-room floor
+    // Appear at doorway, walk out, then return to desk (or floor if no desk)
     n.x = doorPos.x + 2;
     n.y = doorPos.y - 3;
     n.baseY = n.y;
@@ -7604,6 +7777,10 @@
       n.el.classList.remove('principal-exit');
       n.el.style.zIndex = '';
       setPrincipalDoorOpen(false);
+      if (n.homeDesk != null) {
+        reseatStaffNpc(n);
+        return;
+      }
       n.vx = (n.savedVx != null && n.savedVx !== 0)
         ? Math.abs(n.savedVx)
         : (0.004 + Math.random() * 0.008);
@@ -7622,6 +7799,9 @@
       if (!n || n.inPrincipal) return;
       ev.preventDefault();
       try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+      clearTimeout(n._returnTimer);
+      n._returnTimer = 0;
+      n.ambientWander = false;
       staffNpcState.drag = {
         n: n,
         pointerId: ev.pointerId,
@@ -7680,6 +7860,11 @@
         return;
       }
       if (d.moved) {
+        // Prefer seat: colleagues sit; ambience will occasionally wander free ones again
+        if (d.n.homeDesk != null) {
+          reseatStaffNpc(d.n);
+          return;
+        }
         if (d.n.spec && d.n.spec.wander) {
           d.n.vx = (Math.random() > 0.5 ? 1 : -1) * (0.004 + Math.random() * 0.008);
           if (d.n.vx < 0) el.classList.add('facing-left');
@@ -7740,31 +7925,47 @@
 
     var rng = picked.rng || mulberry32(picked.seed || 1);
     var parts = splitSitWalk(picked.teachers, day, nextP);
-    // Sit = next period has a lesson; wander = next free / no next. Desks stay fixed at 65.
+    var ymd = ctx.ymd || todayYmdHK();
+    var dutyCodes = todayDutyCodeSet(ymd);
+    // All colleagues sit; next-period lesson → 備課中; free may wander via ambience.
+    // Desks stay fixed at 65. Overflow (rare) stands in the aisle.
     var sitters = parts.sit.slice(0, STAFF_DESK_COUNT);
     var overflow = parts.sit.slice(STAFF_DESK_COUNT);
-    if (overflow.length) parts.walk = parts.walk.concat(overflow);
 
     sitters.forEach(function (t, idx) {
       var desk = document.getElementById('staffDesk' + idx);
       if (!desk) return;
-      var spec = makeStaffTeacherSpec(t, { sitting: true, wander: false }, rng);
+      var code = String(t.code || '').toUpperCase();
+      var isPrep = teacherNextPeriodHasLesson(t, day, nextP);
+      var spec = makeStaffTeacherSpec(t, {
+        sitting: true,
+        wander: false,
+        prep: isPrep,
+        dutyRed: !!dutyCodes[code]
+      }, rng);
       var el = makeNpcEl(spec);
       bindTeacherPrincipalDrag(el, spec);
       desk.appendChild(el);
-      staffNpcState.seated.push({ el: el, spec: spec, desk: idx });
+      staffNpcState.seated.push({ el: el, spec: spec, desk: idx, homeDesk: idx });
     });
 
     var layer = document.getElementById('staffNpcLayer');
-    parts.walk.forEach(function (t) {
+    overflow.forEach(function (t) {
       if (!layer) return;
-      var spec = makeStaffTeacherSpec(t, { sitting: false, wander: true }, rng);
+      var code = String(t.code || '').toUpperCase();
+      var isPrep = teacherNextPeriodHasLesson(t, day, nextP);
+      var spec = makeStaffTeacherSpec(t, {
+        sitting: false,
+        wander: !isPrep,
+        prep: isPrep,
+        dutyRed: !!dutyCodes[code]
+      }, rng);
       var el = makeNpcEl(spec);
       bindTeacherPrincipalDrag(el, spec);
-      el.classList.add('wander-bounce');
+      if (!isPrep) el.classList.add('wander-bounce');
       var x = 8 + rng() * 80;
       var y = 6 + rng() * 42;
-      var vx = (0.004 + rng() * 0.007) * (rng() > 0.5 ? 1 : -1);
+      var vx = isPrep ? 0 : ((0.004 + rng() * 0.007) * (rng() > 0.5 ? 1 : -1));
       el.style.left = x + '%';
       el.style.bottom = y + '%';
       if (vx < 0) el.classList.add('facing-left');
@@ -7776,7 +7977,8 @@
         y: y,
         vx: vx,
         baseY: y,
-        phase: rng() * Math.PI * 2
+        phase: rng() * Math.PI * 2,
+        ambientWander: !isPrep
       });
     });
     if (viewMode === 'staff') startStaffBubbles();
@@ -7848,12 +8050,18 @@
 
   function startStaffBubbles() {
     scheduleStaffBubble();
+    scheduleStaffWander();
   }
 
   function stopStaffBubbles() {
     clearTimeout(staffNpcState.bubbleTimer);
     clearTimeout(staffNpcState.bubbleHide);
     clearStaffBubbles();
+    clearStaffWanderTimers();
+    // Reseat ambient wanderers when leaving the staff view
+    (staffNpcState.walkers || []).slice().forEach(function (n) {
+      if (n && n.ambientWander && n.homeDesk != null) reseatStaffNpc(n);
+    });
   }
 
   function updateStaffChrome(mood, ctx, picked) {
