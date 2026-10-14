@@ -5086,9 +5086,8 @@
         if (!resolved2.students.length) emptyMsg = lessonNote || '課室暫時只有老師';
       }
     } else if (mood === 'free') {
-      // Teacher free this period: empty-ish classroom + clear message (not school-wide students)
-      addTeacher(player, { sleep: true, nearBoard: true, wander: false });
-      emptyMsg = '而家空堂';
+      // Teacher free this period: in 教員室 only — never show them in the classroom
+      emptyMsg = '而家空堂 · 老師喺教員室';
     } else if (mood === 'reading') {
       // 閱讀時間：班主任返課室睇住全班靜心閱讀（bells.js slot key=reading）
       var rClass = state.pickClass || readingClassForTeacher(player);
@@ -7649,8 +7648,8 @@
         badgeMsg = '第' + ctx.slot.period + '節 · ' + (friendlyRoomLabel(L.room) || L.room || '');
       } else {
         mood = 'free';
-        boardMsg = '而家空堂';
-        badgeMsg = '空堂 · P' + ctx.slot.period;
+        boardMsg = '而家空堂\n老師喺教員室';
+        badgeMsg = '空堂 · P' + ctx.slot.period + ' · 教員室';
       }
     }
 
@@ -7851,8 +7850,8 @@
           ' · ' + (state.teacher ? state.teacher.code : '') + '</span>';
       } else {
         lessonLine.innerHTML =
-          '<strong>空堂</strong> · 第' + ctx.slot.period + '節<br />' +
-          '<span class="muted">' + (ctx.slot.slot.start || '') + '–' + (ctx.slot.slot.end || '') + ' · 休息／備課</span>';
+          '<strong>空堂</strong> · 第' + ctx.slot.period + '節 · 教員室<br />' +
+          '<span class="muted">' + (ctx.slot.slot.start || '') + '–' + (ctx.slot.slot.end || '') + ' · 休息／備課（唔喺課室）</span>';
       }
     } else {
       slotLabel.textContent = (ctx.scrubbed ? '預覽：' : '') + ctx.slot.label;
