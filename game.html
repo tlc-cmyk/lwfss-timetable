@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-mp-tea-cats-v1" />
+  <meta name="game-build" content="staff-cute-cats-v2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -1801,51 +1801,236 @@
     #sceneStaff .coffee-bar.hot .tea-hint,
     #sceneStaff .coffee-bar.show-hint .tea-hint { opacity: 1; }
 
-    /* staff room cats — pet for MP */
+    /* staff room cats — cute twins, wander + meow, pet for MP */
     #sceneStaff .staff-cat {
       position: absolute;
       z-index: 14;
-      font-size: clamp(1.15rem, 4.2vw, 1.55rem);
-      line-height: 1;
+      width: clamp(2.4rem, 9vw, 3.1rem);
+      height: clamp(2.2rem, 8.2vw, 2.85rem);
       cursor: pointer;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.16));
       user-select: none;
-      transition: transform .12s ease;
-      animation: catIdle 2.8s ease-in-out infinite;
+      transition: left 3.2s cubic-bezier(.4,.1,.3,1), bottom 3.2s cubic-bezier(.4,.1,.3,1), transform .12s ease;
       appearance: none;
       -webkit-appearance: none;
       background: transparent;
       border: none;
-      padding: 4px;
+      padding: 0;
       margin: 0;
       color: inherit;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
     }
-    #sceneStaff .staff-cat:active { transform: scale(1.18) rotate(-8deg); }
-    #sceneStaff .staff-cat.petting {
+    #sceneStaff .staff-cat .cat-sprite {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      animation: catIdle 2.6s ease-in-out infinite;
+      transform-origin: 50% 90%;
+    }
+    #sceneStaff .staff-cat.facing-left .cat-sprite {
+      animation: catIdleFlip 2.6s ease-in-out infinite;
+    }
+    #sceneStaff .staff-cat .cat-body {
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      bottom: 8%;
+      height: 58%;
+      background: radial-gradient(ellipse at 50% 35%, #ffd7a8 0%, #f0b478 55%, #e09a5a 100%);
+      border-radius: 55% 55% 48% 48%;
+      box-shadow: inset 0 -3px 0 rgba(180,100,40,.18);
+    }
+    #sceneStaff .staff-cat .cat-head {
+      position: absolute;
+      left: 16%;
+      right: 16%;
+      top: 2%;
+      height: 62%;
+      background: radial-gradient(ellipse at 50% 40%, #ffe0b8 0%, #f4bc82 60%, #e6a05e 100%);
+      border-radius: 50%;
+      z-index: 2;
+      box-shadow: inset 0 -2px 0 rgba(180,100,40,.12);
+    }
+    #sceneStaff .staff-cat .cat-ear {
+      position: absolute;
+      top: -18%;
+      width: 34%;
+      height: 38%;
+      background: linear-gradient(160deg, #f0b478 0%, #e09a5a 100%);
+      border-radius: 8% 70% 20% 70%;
+      z-index: 1;
+    }
+    #sceneStaff .staff-cat .cat-ear::after {
+      content: '';
+      position: absolute;
+      inset: 28% 28% 18% 22%;
+      background: #ffb6c8;
+      border-radius: 20% 60% 30% 60%;
+      opacity: .9;
+    }
+    #sceneStaff .staff-cat .cat-ear.l {
+      left: 2%;
+      transform: rotate(-18deg);
+      border-radius: 70% 8% 70% 20%;
+    }
+    #sceneStaff .staff-cat .cat-ear.l::after {
+      inset: 28% 22% 18% 28%;
+      border-radius: 60% 20% 60% 30%;
+    }
+    #sceneStaff .staff-cat .cat-ear.r {
+      right: 2%;
+      transform: rotate(18deg);
+    }
+    #sceneStaff .staff-cat .cat-eye {
+      position: absolute;
+      top: 42%;
+      width: 14%;
+      height: 18%;
+      background: #3a2a1a;
+      border-radius: 50%;
+      z-index: 3;
+      box-shadow: 0 0 0 1.5px #fff6e8;
+    }
+    #sceneStaff .staff-cat .cat-eye::after {
+      content: '';
+      position: absolute;
+      top: 18%;
+      left: 22%;
+      width: 42%;
+      height: 42%;
+      background: #fff;
+      border-radius: 50%;
+    }
+    #sceneStaff .staff-cat .cat-eye.l { left: 24%; }
+    #sceneStaff .staff-cat .cat-eye.r { right: 24%; }
+    #sceneStaff .staff-cat .cat-nose {
+      position: absolute;
+      top: 58%;
+      left: 50%;
+      width: 12%;
+      height: 9%;
+      transform: translateX(-50%);
+      background: #f08aa0;
+      border-radius: 40% 40% 55% 55%;
+      z-index: 3;
+    }
+    #sceneStaff .staff-cat .cat-blush {
+      position: absolute;
+      top: 56%;
+      width: 16%;
+      height: 10%;
+      background: #ff9eb5;
+      border-radius: 50%;
+      opacity: .55;
+      z-index: 2;
+      filter: blur(0.5px);
+    }
+    #sceneStaff .staff-cat .cat-blush.l { left: 10%; }
+    #sceneStaff .staff-cat .cat-blush.r { right: 10%; }
+    #sceneStaff .staff-cat .cat-tail {
+      position: absolute;
+      right: -6%;
+      bottom: 28%;
+      width: 28%;
+      height: 12%;
+      background: #e6a05e;
+      border-radius: 40% 60% 60% 40%;
+      transform: rotate(-25deg);
+      transform-origin: left center;
+      animation: catTail 2.2s ease-in-out infinite;
+      z-index: 0;
+    }
+    #sceneStaff .staff-cat.facing-left .cat-tail {
+      right: auto;
+      left: -6%;
+      transform: rotate(25deg);
+      transform-origin: right center;
+      animation-name: catTailFlip;
+    }
+    #sceneStaff .staff-cat .cat-meow {
+      position: absolute;
+      left: 50%;
+      bottom: 108%;
+      transform: translateX(-50%) scale(.6);
+      padding: 2px 6px;
+      background: #fff8f0;
+      border: 1.5px solid #e0b888;
+      border-radius: 10px;
+      font-size: clamp(0.55rem, 2.2vw, 0.72rem);
+      font-weight: 900;
+      color: #c45a2a;
+      line-height: 1.2;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 5;
+      box-shadow: 0 1px 0 rgba(0,0,0,.06);
+      transition: opacity .2s ease, transform .25s ease;
+    }
+    #sceneStaff .staff-cat .cat-meow::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -5px;
+      width: 8px;
+      height: 8px;
+      background: #fff8f0;
+      border-right: 1.5px solid #e0b888;
+      border-bottom: 1.5px solid #e0b888;
+      transform: translateX(-50%) rotate(45deg);
+    }
+    #sceneStaff .staff-cat.meowing .cat-meow {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+    #sceneStaff .staff-cat:active { transform: scale(1.12); }
+    #sceneStaff .staff-cat.petting .cat-sprite {
       animation: catPet 0.55s ease;
     }
+    #sceneStaff .staff-cat.facing-left.petting .cat-sprite {
+      animation: catPetFlip 0.55s ease;
+    }
     #sceneStaff .staff-cat.cat-a {
-      left: 18%;
+      left: 16%;
       bottom: 3.5%;
-      animation-delay: 0s;
     }
     #sceneStaff .staff-cat.cat-b {
-      right: 22%;
+      left: 62%;
       bottom: 5%;
-      left: auto;
-      animation-delay: -1.2s;
     }
+    #sceneStaff .staff-cat.cat-b .cat-sprite { animation-delay: -1.1s; }
+    #sceneStaff .staff-cat.cat-b .cat-tail { animation-delay: -0.7s; }
     @keyframes catIdle {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-3px); }
     }
+    @keyframes catIdleFlip {
+      0%, 100% { transform: scaleX(-1) translateY(0); }
+      50% { transform: scaleX(-1) translateY(-3px); }
+    }
+    @keyframes catTail {
+      0%, 100% { transform: rotate(-25deg); }
+      50% { transform: rotate(-8deg); }
+    }
+    @keyframes catTailFlip {
+      0%, 100% { transform: rotate(25deg); }
+      50% { transform: rotate(8deg); }
+    }
     @keyframes catPet {
       0% { transform: scale(1) rotate(0); }
-      35% { transform: scale(1.25) rotate(-12deg); }
-      70% { transform: scale(1.1) rotate(8deg); }
+      35% { transform: scale(1.22) rotate(-10deg); }
+      70% { transform: scale(1.08) rotate(8deg); }
       100% { transform: scale(1) rotate(0); }
+    }
+    @keyframes catPetFlip {
+      0% { transform: scaleX(-1) scale(1) rotate(0); }
+      35% { transform: scaleX(-1) scale(1.22) rotate(10deg); }
+      70% { transform: scaleX(-1) scale(1.08) rotate(-8deg); }
+      100% { transform: scaleX(-1) scale(1) rotate(0); }
     }
     #sceneStaff .whiteboard {
       position: absolute;
@@ -3167,8 +3352,34 @@
           <span class="drink d2">🍵</span>
           <span class="drink d3">💧</span>
         </div>
-        <button type="button" class="staff-cat cat-a" id="staffCatA" title="摸摸貓 · +2% MP" aria-label="教員室貓 A，點擊摸摸可回復 2% MP">🐱</button>
-        <button type="button" class="staff-cat cat-b" id="staffCatB" title="摸摸貓 · +2% MP" aria-label="教員室貓 B，點擊摸摸可回復 2% MP">🐈</button>
+        <button type="button" class="staff-cat cat-a" id="staffCatA" title="摸摸貓 · +2% MP" aria-label="教員室貓，點擊摸摸可回復 2% MP"><span class="cat-meow" aria-hidden="true">喵</span>
+          <span class="cat-sprite" aria-hidden="true">
+            <span class="cat-ear l"></span>
+            <span class="cat-ear r"></span>
+            <span class="cat-head">
+              <span class="cat-eye l"></span>
+              <span class="cat-eye r"></span>
+              <span class="cat-nose"></span>
+              <span class="cat-blush l"></span>
+              <span class="cat-blush r"></span>
+            </span>
+            <span class="cat-body"></span>
+            <span class="cat-tail"></span>
+          </span></button>
+        <button type="button" class="staff-cat cat-b" id="staffCatB" title="摸摸貓 · +2% MP" aria-label="教員室貓，點擊摸摸可回復 2% MP"><span class="cat-meow" aria-hidden="true">喵</span>
+          <span class="cat-sprite" aria-hidden="true">
+            <span class="cat-ear l"></span>
+            <span class="cat-ear r"></span>
+            <span class="cat-head">
+              <span class="cat-eye l"></span>
+              <span class="cat-eye r"></span>
+              <span class="cat-nose"></span>
+              <span class="cat-blush l"></span>
+              <span class="cat-blush r"></span>
+            </span>
+            <span class="cat-body"></span>
+            <span class="cat-tail"></span>
+          </span></button>
         <div class="staff-desks" id="staffDesks" aria-hidden="true"></div>
         <div class="npc-layer" id="staffNpcLayer" aria-label="教員室老師"></div>
         <div class="staff-empty" id="staffEmpty" hidden>而家教員室靜靜地～</div>
@@ -8165,6 +8376,83 @@
     }, 900);
   }
 
+  var staffCatState = {
+    started: false,
+    cats: [],
+    meowTimer: 0,
+    wanderTimers: {}
+  };
+
+  function staffCatRand(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function moveStaffCat(cat) {
+    if (!cat || !cat.el || !cat.el.isConnected) return;
+    if (cat.el.classList.contains('petting')) {
+      staffCatState.wanderTimers[cat.id] = setTimeout(function () { moveStaffCat(cat); }, 700);
+      return;
+    }
+    var nextX = staffCatRand(6, 78);
+    var nextY = staffCatRand(2.2, 11.5);
+    var prevX = cat.x != null ? cat.x : parseFloat(cat.el.style.left) || 16;
+    cat.el.classList.toggle('facing-left', nextX < prevX);
+    cat.x = nextX;
+    cat.y = nextY;
+    cat.el.style.left = nextX.toFixed(2) + '%';
+    cat.el.style.bottom = nextY.toFixed(2) + '%';
+    var delay = staffCatRand(2800, 5200);
+    staffCatState.wanderTimers[cat.id] = setTimeout(function () { moveStaffCat(cat); }, delay);
+  }
+
+  function showStaffCatMeow(cat) {
+    var el = cat && cat.el ? cat.el : cat;
+    if (!el || !el.isConnected) return;
+    el.classList.add('meowing');
+    clearTimeout(el._meowHide);
+    el._meowHide = setTimeout(function () {
+      el.classList.remove('meowing');
+    }, 1100);
+  }
+
+  function scheduleStaffCatMeow() {
+    clearTimeout(staffCatState.meowTimer);
+    var wait = staffCatRand(3500, 7500);
+    staffCatState.meowTimer = setTimeout(function () {
+      var list = staffCatState.cats.filter(function (c) { return c.el && c.el.isConnected; });
+      if (list.length) {
+        var pick = list[Math.floor(Math.random() * list.length)];
+        showStaffCatMeow(pick);
+        // sometimes both meow in a little duet
+        if (list.length > 1 && Math.random() < 0.28) {
+          var other = list[0] === pick ? list[1] : list[0];
+          setTimeout(function () { showStaffCatMeow(other); }, 380);
+        }
+      }
+      scheduleStaffCatMeow();
+    }, wait);
+  }
+
+  function startStaffCats() {
+    if (staffCatState.started) return;
+    staffCatState.started = true;
+    var specs = [
+      { id: 'staffCatA', x: 16, y: 3.5 },
+      { id: 'staffCatB', x: 62, y: 5 }
+    ];
+    staffCatState.cats = [];
+    specs.forEach(function (s, idx) {
+      var el = document.getElementById(s.id);
+      if (!el) return;
+      el.style.left = s.x + '%';
+      el.style.bottom = s.y + '%';
+      var cat = { id: s.id, el: el, x: s.x, y: s.y };
+      staffCatState.cats.push(cat);
+      setTimeout(function () { moveStaffCat(cat); }, 900 + idx * 700);
+    });
+    scheduleStaffCatMeow();
+  }
+
   function bindStaffMpInteractives() {
     var bar = teaBarEl();
     if (bar && !bar._mpBound) {
@@ -8196,6 +8484,7 @@
         cat.classList.remove('petting');
         void cat.offsetWidth;
         cat.classList.add('petting');
+        showStaffCatMeow(cat);
         setTimeout(function () { cat.classList.remove('petting'); }, 560);
         var focus = _mpFocusSpec || state.teacher;
         var ok = applyMpCatPet(key, focus);
@@ -8212,6 +8501,7 @@
     }
     bindCat('staffCatA', 'catA');
     bindCat('staffCatB', 'catB');
+    startStaffCats();
   }
 
   function bindTeacherPrincipalDrag(el, spec) {
