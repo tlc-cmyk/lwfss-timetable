@@ -5009,6 +5009,72 @@
       });
     }
 
+    // 操場：只顯示而家真正喺 PLAYGROUND* 嘅老師同學生（唔跟選定老師課堂）。
+    // 早會 07:55–08:05 仍用下面全校 assembly 邏輯。
+    if (typeof viewMode !== 'undefined' && viewMode === 'playground' && mood !== 'assembly') {
+      if (ctx.slot && ctx.slot.kind === 'period' && day != null && period != null) {
+        var pgEntries = collectPlaygroundLessons(day, period);
+        if (pgEntries.length) {
+          var seenStudPg = {};
+          var classBits = [];
+          var subjBits = [];
+          var roomBits = [];
+          pgEntries.forEach(function (entry) {
+            var Lp = entry.lesson;
+            if (Lp.classShort || Lp.class) classBits.push(Lp.classShort || Lp.class);
+            if (Lp.subjectShort || Lp.subject) subjBits.push(Lp.subjectShort || Lp.subject);
+            if (Lp.room) roomBits.push(String(Lp.room));
+            Object.keys(entry.teachers || {}).forEach(function (code) {
+              addTeacher(entry.teachers[code], { nearBoard: true, wander: false, pace: true });
+            });
+            var resolvedPg = resolveLessonStudents(Lp, Number.POSITIVE_INFINITY, rng);
+            (resolvedPg.students || []).forEach(function (s) {
+              var sk = String(s.class || '') + '|' + String(s.no || '');
+              if (seenStudPg[sk]) return;
+              seenStudPg[sk] = true;
+              addStudent(s, { bounce: false, wander: true, sitting: false });
+            });
+          });
+          function uniqBits(arr) {
+            var seenB = {};
+            var outB = [];
+            (arr || []).forEach(function (x) {
+              var k = String(x || '');
+              if (!k || seenB[k]) return;
+              seenB[k] = true;
+              outB.push(k);
+            });
+            return outB;
+          }
+          classBits = uniqBits(classBits);
+          subjBits = uniqBits(subjBits);
+          roomBits = uniqBits(roomBits);
+          lessonNote = (subjBits.join('、') || 'PE') +
+            (classBits.length ? (' · ' + classBits.join('、')) : '') +
+            (roomBits.length ? (' · ' + roomBits.join('、')) : '');
+          if (!roster.some(function (r) { return r.role === 'student'; })) {
+            emptyMsg = lessonNote || '操場暫時只有老師';
+          }
+        } else {
+          emptyMsg = '呢節操場冇課 · PLAYGROUND1';
+          lessonNote = 'PLAYGROUND1';
+        }
+      } else if (mood === 'recess' || mood === 'lunch') {
+        emptyMsg = mood === 'lunch' ? '午飯時間 · 操場休息中' : '小息時間 · 操場休息中';
+      } else if (mood === 'reading') {
+        emptyMsg = '閱讀時間 · 同學喺課室';
+      } else if (mood === 'before') {
+        emptyMsg = '上課前 · 操場未開課';
+      } else if (mood === 'after') {
+        emptyMsg = '放學後 · 操場已結束';
+      } else if (mood === 'holiday') {
+        emptyMsg = '今日假期 · 操場休息';
+      } else {
+        emptyMsg = '而家操場靜靜地～';
+      }
+      return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
+    }
+
     // Classroom tracks the *searched teacher's* current lesson — never fill with random school-wide kids.
     // Optional pickClass / pickRoom narrow which class/room scene is shown.
     if (mood === 'class') {
@@ -5532,6 +5598,13 @@
     var readingCls = (mood === 'reading' && state.teacher)
       ? (readingClassForTeacher(state.teacher) || '')
       : '';
+    var pgFp = '';
+    if ((typeof viewMode !== 'undefined' ? viewMode : '') === 'playground' &&
+        mood !== 'assembly' &&
+        ctx.slot && ctx.slot.kind === 'period' &&
+        ctx.cycle && ctx.cycle.day != null) {
+      pgFp = playgroundLessonsFingerprint(ctx.cycle.day, ctx.slot.period);
+    }
     var key = [
       mood,
       ctx.ymd || '',
@@ -5545,7 +5618,8 @@
       state.pickClass || '',
       state.pickRoom || '',
       (typeof viewMode !== 'undefined' ? viewMode : 'classroom'),
-      isMorningAssemblyMinutes(ctx.minutes) ? 'asm' : 'noasm'
+      isMorningAssemblyMinutes(ctx.minutes) ? 'asm' : 'noasm',
+      pgFp
     ].join('|');
     // Peek seating fingerprint so chart edits in 座位表 refresh desks
     var peekLayout = null;
@@ -5917,6 +5991,50 @@
   function friendlyRoomLabel(room) {
     if (isPlaygroundRoom(room)) return '操場／籃球場';
     return String(room || '');
+  }
+
+  /**
+   * All timetable lessons whose room is PLAYGROUND* for this cycle day + period.
+   * Dedupes co-taught cells (same class/subject/room/teacher field) and unions teachers.
+   * Used by 操場 roster — independent of the selected teacher.
+   */
+  function collectPlaygroundLessons(day, period) {
+    var out = [];
+    var seen = {};
+    if (day == null || period == null) return out;
+    (DATA.teachers || []).forEach(function (t) {
+      if (!t || !t.schedule) return;
+      var daySched = t.schedule[String(day)] || {};
+      var L = daySched[String(period)];
+      if (!L || !isPlaygroundRoom(L.room)) return;
+      var key = [
+        String(L.class || ''),
+        String(L.subject || L.subjectShort || ''),
+        String(L.room || ''),
+        String(L.teacher || '')
+      ].join('|');
+      if (!seen[key]) {
+        seen[key] = { lesson: L, teachers: {} };
+        out.push(seen[key]);
+        // Co-teachers listed on the cell
+        String(L.teacher || '').split(/[,，、\/\s]+/).forEach(function (c) {
+          c = String(c || '').trim().toUpperCase();
+          if (!c) return;
+          var tobj = lookupTeacher(c);
+          if (tobj) seen[key].teachers[String(tobj.code || '').toUpperCase()] = tobj;
+        });
+      }
+      if (t.code) seen[key].teachers[String(t.code).toUpperCase()] = t;
+    });
+    return out;
+  }
+
+  function playgroundLessonsFingerprint(day, period) {
+    return collectPlaygroundLessons(day, period).map(function (e) {
+      var codes = Object.keys(e.teachers || {}).sort().join(',');
+      var L = e.lesson || {};
+      return (L.class || '') + '@' + (L.room || '') + ':' + codes;
+    }).join(';');
   }
 
   /* ===== 早會 07:55–08:05 HKT：全校學生喺操場（PLAYGROUND1）===== */
@@ -7674,12 +7792,38 @@
     if (pgScene) pgScene.setAttribute('data-mood', mood);
     var roomNow = lessonRoomOf(ctx);
     var pgBoardMsg = boardMsg;
+    var pgOcc = null;
+    if (mood !== 'assembly' && ctx.slot && ctx.slot.kind === 'period' && ctx.cycle && ctx.cycle.day != null) {
+      pgOcc = collectPlaygroundLessons(ctx.cycle.day, ctx.slot.period);
+    }
     if (mood === 'assembly') {
       var asmThemePg = assemblyThemeForDay(ctx.cycle && ctx.cycle.day);
       pgBoardMsg = '🏫 早會 07:55–08:05' + (asmThemePg ? ('\n' + asmThemePg) : '') + '\n全校 · 操場／籃球場';
-    } else if (mood === 'class' && ctx.lesson) {
-      pgBoardMsg = (ctx.lesson.subjectShort || ctx.lesson.subject || '課堂') + '\n' +
-        (ctx.lesson.classShort || ctx.lesson.class || '') + '\n🏀 操場／籃球場';
+    } else if (pgOcc && pgOcc.length) {
+      var pgL0 = pgOcc[0].lesson || {};
+      var pgClasses = [];
+      var pgSubj = [];
+      pgOcc.forEach(function (e) {
+        var Lx = e.lesson || {};
+        if (Lx.classShort || Lx.class) pgClasses.push(Lx.classShort || Lx.class);
+        if (Lx.subjectShort || Lx.subject) pgSubj.push(Lx.subjectShort || Lx.subject);
+      });
+      function uniqPg(arr) {
+        var s = {}, o = [];
+        (arr || []).forEach(function (x) {
+          var k = String(x || '');
+          if (!k || s[k]) return;
+          s[k] = 1;
+          o.push(k);
+        });
+        return o;
+      }
+      pgClasses = uniqPg(pgClasses);
+      pgSubj = uniqPg(pgSubj);
+      pgBoardMsg = (pgSubj.join('、') || pgL0.subjectShort || pgL0.subject || 'PE') + '\n' +
+        (pgClasses.join('、') || '') + '\n🏀 操場／籃球場';
+    } else if (ctx.slot && ctx.slot.kind === 'period') {
+      pgBoardMsg = '操場／籃球場\n呢節冇課';
     } else if (!pgBoardMsg || pgBoardMsg === '歡迎返學') {
       pgBoardMsg = '操場／籃球場\nPLAYGROUND1';
     }
@@ -7688,8 +7832,10 @@
       var pgBadgeMsg = badgeMsg;
       if (mood === 'assembly') {
         pgBadgeMsg = '早會 · 全校操場 · PLAYGROUND1';
-      } else if (mood === 'class' && ctx.lesson && ctx.lesson.room) {
+      } else if (pgOcc && pgOcc.length && ctx.slot && ctx.slot.period != null) {
         pgBadgeMsg = '第' + ctx.slot.period + '節 · 操場／籃球場';
+      } else if (ctx.slot && ctx.slot.kind === 'period') {
+        pgBadgeMsg = '第' + ctx.slot.period + '節 · 操場冇課';
       } else if (badgeMsg === '課室') {
         pgBadgeMsg = '操場／籃球場 · PLAYGROUND1';
       } else {
