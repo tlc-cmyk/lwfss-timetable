@@ -212,6 +212,21 @@
     .game-deadline-hint a { color: #c2410c; font-weight: 800; text-decoration: none; }
     .game-deadline-hint.is-overdue { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
     .game-deadline-hint.is-today { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .game-attendance-hint {
+      margin: 6px 12px 0;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: #eef6ff;
+      border: 1px solid #bfdbfe;
+      font-size: 0.78rem;
+      font-weight: 650;
+      line-height: 1.35;
+      color: #1e3a8a;
+      display: none;
+    }
+    .game-attendance-hint.show { display: block; }
+    .game-attendance-hint a { color: #1d4ed8; font-weight: 800; text-decoration: none; }
+
     /* ===== School-day timeline scrubber (課室 + 教員室) ===== */
     .timeline-card {
       background: var(--card);
@@ -3318,6 +3333,7 @@
     </div>
 
     <div class="game-deadline-hint" id="gameDeadlineHint" hidden></div>
+    <div class="game-attendance-hint" id="gameAttendanceHint" hidden></div>
 
     <div class="scene-tabs" role="tablist" aria-label="場景切換">
       <button type="button" class="scene-tab active" id="tabClassroom" role="tab" aria-selected="true" data-view="classroom">🏫 課室</button>
@@ -3551,6 +3567,7 @@
   <script src="students.js?v=live-scene-init-fix-v1"></script>
   <script src="groups.js?v=live-scene-init-fix-v1"></script>
   <script src="seating.js?v=live-scene-init-fix-v1"></script>
+  <script src="attendance.js?v=att-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -3782,6 +3799,50 @@
     el.classList.add('show');
     if (mode === 'today') el.classList.add('is-today');
     if (mode === 'overdue') el.classList.add('is-overdue');
+  }
+
+  function paintGameAttendanceHint() {
+    var el = document.getElementById('gameAttendanceHint');
+    if (!el) return;
+    var U = window.AttendanceUtil;
+    if (!U) {
+      el.hidden = true;
+      el.classList.remove('show');
+      return;
+    }
+    var raw = U.loadRawFromStorage();
+    if (!raw) {
+      el.hidden = true;
+      el.classList.remove('show');
+      el.innerHTML = '';
+      return;
+    }
+    var parsed = U.parseCsvText(raw);
+    if (!parsed.records.length) {
+      el.hidden = true;
+      el.classList.remove('show');
+      return;
+    }
+    var today = typeof todayYmdHK === 'function' ? todayYmdHK() : U.todayYmdHK();
+    var focus = (parsed.dates.indexOf(today) !== -1) ? today : (parsed.dates.length ? parsed.dates[parsed.dates.length - 1] : '');
+    var day = U.filterByDate(parsed.records, focus);
+    var sum = U.summarize(day);
+    if (!sum.arrived) {
+      el.hidden = true;
+      el.classList.remove('show');
+      return;
+    }
+    var dateLabel = '';
+    if (focus) {
+      var p = focus.split('-');
+      dateLabel = parseInt(p[2], 10) + '/' + parseInt(p[1], 10);
+    }
+    var last = sum.lastTap ? (' · 最後 ' + U.shortTime(sum.lastTap)) : '';
+    el.innerHTML = '<strong>今日拍卡</strong>：已到 ' + sum.arrived +
+      (dateLabel ? '（' + dateLabel + '）' : '') + last +
+      ' · <a href="index.html#attendance">詳情</a>';
+    el.hidden = false;
+    el.classList.add('show');
   }
 
   /* ===== Timeline scrubber: live HKT vs preview minutes (課室 + 教員室) ===== */
@@ -9221,7 +9282,10 @@
   }
 
   function render() {
-    try { paintGameDeadlineHint(); } catch (eDl) {}
+    try {
+      paintGameDeadlineHint();
+      paintGameAttendanceHint();
+    } catch (eDl) {}
     var ctx = getContext();
     var clockEl = document.getElementById('clockHm');
     if (clockEl) clockEl.textContent = ctx.hm + (ctx.scrubbed ? ' 預覽' : '');

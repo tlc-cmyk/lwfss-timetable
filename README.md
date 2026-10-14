@@ -20,6 +20,7 @@
    - **當值**：職責說明同即將當值列表（當日當值見頂部；點一列可改頂部日期）。
    - **早會**：十日循環早會主題（Day 1–10）；當日早會見頂部；可展開注意事項（時限、3X 頒獎日、升國旗）。
    - **班主任**：26/27 班別網格（S1–S6 × A–D）與非班主任名單；可搜班別或教師代碼／姓名；點有時間表嘅教師開啟課表。
+   - **今日拍卡**：上載 eClass「完整拍卡紀錄」原始數據 CSV（UTF-16／UTF-8、Tab 分隔）；顯示今日已到人數、按班／名單、最後拍卡時間；資料存本機 `localStorage`（可載入示例）。匯出方法見下方。
    - **座位表**：老師揀班別（1A–6D，`students.js`）或中四至中六科組（`groups.js`）製作座位表；預設 5×8（約 40 座位，行列可調）；可**隨機編排**；可**拖拉**學生到座位／換位／拖回未編排區（雙擊座位亦可移出）；拖動時自動暫存本機 `localStorage`；亦可撳「**儲存**」並命名佈局，從「已存佈局」列表載入／刪除，儲存後會顯示成功提示（按班別／科組，可選教師代碼分開儲存）。無電郵。
    - **房間預約**：即將推出。
    - **會員付費**（`game.html`；與全站同一密碼 `6`／`localStorage`）：精簡模擬。解鎖後保留：**換老師**、**實時＋時間線 scrubber**（拖曳預覽／撳「實時」返 HKT）、**課室**（跟所選老師而家所在班房／同學）、**操場／籃球場（PLAYGROUND1）**同**教員室**分頁；三個場景會跟香港時間／時間線顯示**早／午／晚／夜**天色與窗光。狀態卡／讚賞星／簽到等 chrome 已隱藏，但 HKT 時鐘與場景初始化仍會正常跑。
@@ -134,6 +135,8 @@ python3 -m http.server 8765
 | `groups.js` / `groups.json` | 中四至中六科組→學生（含 Sex＋House，由 class register 合併；無電郵；key=`TEACHER|form|sheetSubject`，由 S4/S5/S6 Excel 產生） |
 | `game.html` | 會員付費 · 準時到堂（全站密碼閘；揀老師；實時＋時間線；課室＝老師而家班房；教員室） |
 | `form-teachers.js` / `form-teachers.json` | 26/27 班主任／非班主任 |
+| `attendance.js` | eClass 拍卡 CSV 解析／本機暫存 |
+| `attendance-sample.csv` | 今日拍卡示例（UTF-8 TSV） |
 | `cycle-config.json` | 可選全校覆寫 |
 | `README.md` | 說明 |
 
@@ -185,6 +188,8 @@ Sheet 格式：每行一位教師；欄位 `ShortName, EngName, ChiName`，其�
 | `scripts/build_data.py` | 由 Sheet 匯出重建時間表 |
 | `scripts/build_calendar.py` | 由校曆文字重建 calendar 檔 |
 | `scripts/build_duty.py` | 由當值表文字重建 duty 檔 |
+| `attendance.js` | 拍卡 CSV 解析與 localStorage |
+| `attendance-sample.csv` | 拍卡示例資料（UTF-8） |
 | `README.md` | 本說明 |
 
 ## 當值老師
@@ -221,6 +226,21 @@ python3 scripts/build_duty.py /path/to/duty-roster.txt
 | 假期／無上課 | 粉紅 |
 
 點選格子會更新頂部橫幅的瀏覽日期與循環日（與其他分頁共用）。
+
+
+## 今日拍卡（eClass 完整拍卡紀錄）
+
+老師可喺 eClass 匯出當日拍卡原始數據，上載到本站「今日拍卡」分頁（資料只存該瀏覽器 `localStorage`，唔會上傳伺服器）。
+
+### 老師如何重新匯出
+
+1. 登入 **eClass**
+2. 進入 **考勤管理 → 報告 → 完整拍卡紀錄**
+3. 選擇日期範圍（通常揀今日）後 **匯出原始數據**
+4. 下載得到 CSV（多數為 **UTF-16**、**Tab 分隔**；欄位：`日期`、`班別`、`學號`、`學生姓名`，其後為多個 `記錄時間`）
+5. 開啟本站 → **今日拍卡** → **上載 CSV**
+
+網站亦提供 `attendance-sample.csv` 作示範（「載入示例」）。`game.html` 若本機已有拍卡資料，會顯示一行已到人數摘要。
 
 ## 注意事項
 

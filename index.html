@@ -1315,6 +1315,150 @@
 
 
 
+
+    /* 今日拍卡 */
+    .att-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      align-items: baseline;
+      margin: 4px 0 10px;
+      padding: 8px 10px;
+      background: var(--primary-soft);
+      border: 1px solid var(--free-border);
+      border-radius: 10px;
+    }
+    .att-summary .att-big {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+    .att-summary .att-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .att-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .att-toolbar input[type="file"] { display: none; }
+    .att-class-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: 0 0 10px;
+    }
+    .att-class-chips button {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.78rem;
+      font-weight: 650;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .att-class-chips button.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .att-class-chips button .att-n {
+      opacity: 0.85;
+      font-weight: 700;
+      margin-left: 2px;
+    }
+    .att-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-height: min(52vh, 420px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .att-row {
+      display: grid;
+      grid-template-columns: 2.2rem 1fr auto;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.86rem;
+    }
+    .att-row:last-child { border-bottom: none; }
+    .att-row .att-no {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.78rem;
+    }
+    .att-row .att-name {
+      font-weight: 650;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .att-row .att-time {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+    .att-class-block { margin-bottom: 10px; }
+    .att-class-block h3 {
+      font-size: 0.88rem;
+      margin: 0 0 4px;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .att-class-block h3 .att-n {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .att-empty-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      padding: 8px 2px;
+      line-height: 1.45;
+    }
+    .att-export-path {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-top: 8px;
+    }
+    .att-view-toggle {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .att-view-toggle button {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      font-weight: 650;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .att-view-toggle button.active {
+      background: var(--primary-soft);
+      border-color: var(--free-border);
+      color: var(--primary-dark);
+    }
+
     /* Site-wide password gate (client-side only; localStorage) */
     .site-gate-screen {
       position: fixed; inset: 0;
@@ -2574,6 +2718,7 @@
       <button class="tab" data-tab="duty" type="button">當值</button>
       <button class="tab" data-tab="assembly" type="button">早會</button>
       <button class="tab" data-tab="formteachers" type="button">班主任</button>
+      <button class="tab" data-tab="attendance" type="button">今日拍卡</button>
       <button class="tab" data-tab="seating" type="button">座位表</button>
       <button class="tab" data-tab="rooms" type="button">房間預約</button>
       <button class="tab" data-tab="training" type="button">教師進修申請</button>
@@ -2856,6 +3001,32 @@
       </div>
     </section>
 
+
+
+    <section class="panel" id="panel-attendance">
+      <div class="card">
+        <h2>今日拍卡</h2>
+        <p class="hint" style="margin-bottom:8px;">載入 eClass「完整拍卡紀錄」原始數據（UTF-16／UTF-8、Tab 分隔）。資料只存本機瀏覽器。</p>
+        <div class="att-toolbar">
+          <button class="btn btn-sm" type="button" id="attUploadBtn">上載 CSV</button>
+          <input type="file" id="attFileInput" accept=".csv,text/csv,text/plain,.txt" />
+          <button class="btn btn-ghost btn-sm" type="button" id="attSampleBtn">載入示例</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="attClearBtn">清除</button>
+          <div class="att-view-toggle" role="group" aria-label="顯示方式">
+            <button type="button" class="active" data-att-view="byclass" id="attViewByClass">按班</button>
+            <button type="button" data-att-view="list" id="attViewList">名單</button>
+          </div>
+        </div>
+        <div class="att-summary" id="attSummary" hidden>
+          <span class="att-big" id="attArrivedCount">—</span>
+          <span class="att-meta" id="attSummaryMeta"></span>
+        </div>
+        <div class="att-class-chips" id="attClassChips" hidden></div>
+        <div id="attBody"></div>
+        <p class="att-empty-hint" id="attEmptyHint">尚未載入拍卡資料。請上載 CSV，或撳「載入示例」睇今日示範。</p>
+        <p class="att-export-path">eClass 匯出路徑：考勤管理 → 報告 → 完整拍卡紀錄 → 匯出原始數據</p>
+      </div>
+    </section>
 
     <section class="panel" id="panel-seating">
       <div class="card">
@@ -3197,6 +3368,7 @@
   <script src="students.js?v=seating-v1"></script>
   <script src="groups.js?v=house-sex-groups-v1"></script>
   <script src="seating.js?v=game-desks-v1"></script>
+  <script src="attendance.js?v=att-v1"></script>
   <script>
 (function () {
   'use strict';
@@ -4911,6 +5083,9 @@
     if (name === 'deadlines') {
       renderDeadlinesPanel(state.browseDate || todayYmdHK());
     }
+    if (name === 'attendance' && typeof renderAttendancePanel === 'function') {
+      renderAttendancePanel();
+    }
   }
 
   function esc(s) {
@@ -4960,6 +5135,276 @@
     suggestBox.classList.add('show');
   }
 
+
+
+  // --- 今日拍卡 (eClass EntryLog CSV) ---
+  var attState = {
+    raw: '',
+    records: [],
+    dates: [],
+    view: 'byclass', // byclass | list
+    classFilter: '', // '' = all
+    source: '' // storage | upload | sample
+  };
+
+  function attEsc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function attDisplayName(r) {
+    var n = r.name || '';
+    // eClass often embeds "(1A-1)" — trim for compact list if class/no already shown
+    return n.replace(/\s*\([0-9]+[A-Za-z]-[0-9]+\)\s*$/, '').trim() || n;
+  }
+
+  function attPickFocusDate(dates) {
+    var today = (typeof todayYmdHK === 'function') ? todayYmdHK() : (window.AttendanceUtil && AttendanceUtil.todayYmdHK());
+    if (today && dates.indexOf(today) !== -1) return today;
+    if (dates.length === 1) return dates[0];
+    if (dates.length) return dates[dates.length - 1];
+    return today || '';
+  }
+
+  function attApplyParsed(parsed, raw, source) {
+    if (parsed.error && !parsed.records.length) {
+      attState.raw = '';
+      attState.records = [];
+      attState.dates = [];
+      attState.source = '';
+      return parsed.error;
+    }
+    attState.raw = raw || '';
+    attState.records = parsed.records;
+    attState.dates = parsed.dates || [];
+    attState.source = source || '';
+    attState.classFilter = '';
+    return null;
+  }
+
+  function attLoadFromStorage() {
+    var U = window.AttendanceUtil;
+    if (!U) return;
+    var raw = U.loadRawFromStorage();
+    if (!raw) return;
+    var parsed = U.parseCsvText(raw);
+    attApplyParsed(parsed, raw, 'storage');
+  }
+
+  function renderAttendancePanel() {
+    var U = window.AttendanceUtil;
+    var summaryEl = document.getElementById('attSummary');
+    var arrivedEl = document.getElementById('attArrivedCount');
+    var metaEl = document.getElementById('attSummaryMeta');
+    var chipsEl = document.getElementById('attClassChips');
+    var bodyEl = document.getElementById('attBody');
+    var emptyEl = document.getElementById('attEmptyHint');
+    if (!bodyEl) return;
+
+    if (!U) {
+      bodyEl.innerHTML = '';
+      if (emptyEl) {
+        emptyEl.hidden = false;
+        emptyEl.textContent = '拍卡模組未載入。';
+      }
+      if (summaryEl) summaryEl.hidden = true;
+      if (chipsEl) chipsEl.hidden = true;
+      return;
+    }
+
+    if (!attState.records.length) {
+      bodyEl.innerHTML = '';
+      if (summaryEl) summaryEl.hidden = true;
+      if (chipsEl) { chipsEl.hidden = true; chipsEl.innerHTML = ''; }
+      if (emptyEl) {
+        emptyEl.hidden = false;
+        emptyEl.textContent = '尚未載入拍卡資料。請上載 CSV，或撳「載入示例」睇示範。';
+      }
+      return;
+    }
+    if (emptyEl) emptyEl.hidden = true;
+
+    var focusDate = attPickFocusDate(attState.dates);
+    var dayRecords = U.filterByDate(attState.records, focusDate);
+    var sum = U.summarize(dayRecords);
+    var roster = U.rosterTotals();
+    var totalStudents = roster && roster.studentCount ? roster.studentCount : 0;
+
+    if (summaryEl) summaryEl.hidden = false;
+    if (arrivedEl) arrivedEl.textContent = '已到 ' + sum.arrived;
+    var metaParts = [];
+    if (focusDate) {
+      var parts = focusDate.split('-');
+      metaParts.push(parseInt(parts[2], 10) + '/' + parseInt(parts[1], 10) + '/' + parts[0]);
+    }
+    if (totalStudents) metaParts.push('全校約 ' + totalStudents + ' 人');
+    metaParts.push(sum.classOrder.length + ' 班有紀錄');
+    if (sum.lastTap) metaParts.push('最後 ' + U.shortTime(sum.lastTap));
+    if (attState.source === 'sample') metaParts.push('示例');
+    else if (attState.source === 'upload') metaParts.push('已上載');
+    else if (attState.source === 'storage') metaParts.push('本機');
+    if (metaEl) metaEl.textContent = metaParts.join(' · ');
+
+    // class chips
+    if (chipsEl) {
+      chipsEl.hidden = false;
+      chipsEl.innerHTML = '';
+      var allBtn = document.createElement('button');
+      allBtn.type = 'button';
+      allBtn.className = !attState.classFilter ? 'active' : '';
+      allBtn.innerHTML = '全部<span class="att-n">' + sum.arrived + '</span>';
+      allBtn.addEventListener('click', function () {
+        attState.classFilter = '';
+        renderAttendancePanel();
+      });
+      chipsEl.appendChild(allBtn);
+      sum.classOrder.forEach(function (c) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = attState.classFilter === c ? 'active' : '';
+        btn.innerHTML = attEsc(c) + '<span class="att-n">' + sum.byClass[c].count + '</span>';
+        btn.addEventListener('click', function () {
+          attState.classFilter = c;
+          renderAttendancePanel();
+        });
+        chipsEl.appendChild(btn);
+      });
+    }
+
+    // view toggle active state
+    document.querySelectorAll('[data-att-view]').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-att-view') === attState.view);
+    });
+
+    var classesToShow = attState.classFilter
+      ? (sum.byClass[attState.classFilter] ? [attState.classFilter] : [])
+      : sum.classOrder.slice();
+
+    if (!classesToShow.length) {
+      bodyEl.innerHTML = '<p class="att-empty-hint">此篩選無拍卡紀錄。</p>';
+      return;
+    }
+
+    function rowHtml(r) {
+      return '<div class="att-row">' +
+        '<span class="att-no">' + attEsc(r.no) + '</span>' +
+        '<span class="att-name">' + attEsc(attDisplayName(r)) + '</span>' +
+        '<span class="att-time" title="首次 ' + attEsc(U.shortTime(r.firstTap)) + '">' +
+        attEsc(U.shortTime(r.lastTap)) + '</span></div>';
+    }
+
+    if (attState.view === 'list') {
+      var flat = [];
+      classesToShow.forEach(function (c) {
+        (sum.byClass[c].students || []).forEach(function (r) { flat.push(r); });
+      });
+      // sort by last tap desc then class/no
+      flat.sort(function (a, b) {
+        if (a.lastTap !== b.lastTap) return a.lastTap < b.lastTap ? 1 : -1;
+        if (a.className !== b.className) return String(a.className).localeCompare(String(b.className));
+        return (parseInt(a.no, 10) || 0) - (parseInt(b.no, 10) || 0);
+      });
+      bodyEl.innerHTML = '<div class="att-list">' + flat.map(rowHtml).join('') + '</div>' +
+        '<p class="hint" style="margin-top:6px;">名單按最後拍卡時間由新至舊；右側為最後拍卡。</p>';
+    } else {
+      var htmlParts = [];
+      classesToShow.forEach(function (c) {
+        var block = sum.byClass[c];
+        var classTotal = roster && roster.classes && roster.classes[c] ? roster.classes[c] : null;
+        var countLabel = classTotal
+          ? (block.count + '／' + classTotal)
+          : String(block.count);
+        htmlParts.push(
+          '<div class="att-class-block">' +
+          '<h3>' + attEsc(c) + '<span class="att-n">已到 ' + attEsc(countLabel) + '</span></h3>' +
+          '<div class="att-list">' + block.students.map(rowHtml).join('') + '</div></div>'
+        );
+      });
+      bodyEl.innerHTML = htmlParts.join('') +
+        '<p class="hint" style="margin-top:4px;">右側時間為最後拍卡（香港時間格式）。</p>';
+    }
+  }
+
+  function attHandleFile(file) {
+    var U = window.AttendanceUtil;
+    if (!U || !file) return;
+    U.readFileAsBuffer(file).then(function (buf) {
+      var text = U.decodeBuffer(buf);
+      var parsed = U.parseCsvText(text);
+      var err = attApplyParsed(parsed, text, 'upload');
+      if (err) {
+        alert(err);
+        renderAttendancePanel();
+        return;
+      }
+      // Persist UTF-8 text for reload
+      if (!U.saveRawToStorage(text)) {
+        alert('已載入，但本機儲存失敗（可能空間不足）。重新整理後需再上載。');
+      }
+      renderAttendancePanel();
+    }).catch(function (e) {
+      alert('讀取檔案失敗：' + (e && e.message ? e.message : e));
+    });
+  }
+
+  function attLoadSample() {
+    var U = window.AttendanceUtil;
+    if (!U) return;
+    var btn = document.getElementById('attSampleBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '載入中…'; }
+    U.fetchSampleText().then(function (text) {
+      var parsed = U.parseCsvText(text);
+      var err = attApplyParsed(parsed, text, 'sample');
+      if (err) {
+        alert(err);
+      } else {
+        U.saveRawToStorage(text);
+      }
+      renderAttendancePanel();
+    }).catch(function () {
+      alert('無法載入示例（需經 HTTP 開啟網站，或請直接上載 CSV）。');
+    }).then(function () {
+      if (btn) { btn.disabled = false; btn.textContent = '載入示例'; }
+    });
+  }
+
+  function initAttendanceUI() {
+    attLoadFromStorage();
+    var uploadBtn = document.getElementById('attUploadBtn');
+    var fileInput = document.getElementById('attFileInput');
+    var sampleBtn = document.getElementById('attSampleBtn');
+    var clearBtn = document.getElementById('attClearBtn');
+    if (uploadBtn && fileInput) {
+      uploadBtn.addEventListener('click', function () { fileInput.click(); });
+      fileInput.addEventListener('change', function () {
+        var f = fileInput.files && fileInput.files[0];
+        if (f) attHandleFile(f);
+        fileInput.value = '';
+      });
+    }
+    if (sampleBtn) sampleBtn.addEventListener('click', attLoadSample);
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        var U = window.AttendanceUtil;
+        if (U) U.clearStorage();
+        attState.raw = '';
+        attState.records = [];
+        attState.dates = [];
+        attState.source = '';
+        attState.classFilter = '';
+        renderAttendancePanel();
+      });
+    }
+    document.querySelectorAll('[data-att-view]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        attState.view = b.getAttribute('data-att-view') || 'byclass';
+        renderAttendancePanel();
+      });
+    });
+  }
 
   // --- Site-wide password gate (client-side only; localStorage) ---
   var SITE_GATE_KEY = 'lwfssSiteUnlocked';
@@ -7747,8 +8192,12 @@
     } catch (e) {}
     refreshCycleUI();
     try {
+      if (typeof initAttendanceUI === 'function') initAttendanceUI();
+    } catch (eAtt) {}
+    try {
       var hash = (location.hash || '').replace(/^#/, '');
       if (hash === 'deadlines') switchTab('deadlines');
+      if (hash === 'attendance') switchTab('attendance');
     } catch (eHash) {}
   }
 
