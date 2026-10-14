@@ -2845,6 +2845,35 @@
       font-family: inherit;
     }
     .topbar .change-teacher-btn:active { transform: translateY(1px); }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .topbar .change-room-btn {
+      color: #fff8ee;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+      border: 2px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      max-width: 7.5em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .topbar .change-room-btn:active { transform: translateY(1px); }
+    .topbar .change-room-btn.is-picked {
+      background: rgba(255,248,238,0.28);
+      border-color: rgba(255,248,238,0.55);
+    }
+    .teacher-pick-sheet .tp-actions.tp-actions-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
     /* Strip clutter chrome; keep 課室 + 操場 + 教員室 scenes and tabs */
     .currency,
     .status-card,
@@ -2900,7 +2929,10 @@
       <div class="code" id="topCode">TLC</div>
       <div class="sub" id="topNames">載入中…</div>
     </div>
-    <button type="button" class="change-teacher-btn" id="changeTeacherBtn" title="搜尋／更換老師">換老師</button>
+    <div class="topbar-actions">
+      <button type="button" class="change-teacher-btn" id="changeTeacherBtn" title="搜尋／更換老師">換老師</button>
+      <button type="button" class="change-room-btn" id="changeRoomBtn" title="搜尋／更換課室">換課室</button>
+    </div>
   </header>
 
   <main class="wrap">
@@ -3067,6 +3099,21 @@
     <div class="tp-actions">
       <button type="button" class="btn ghost" id="teacherPickCloseBtn">取消</button>
       <button type="button" class="btn primary" id="teacherPickApplyBtn">套用</button>
+    </div>
+  </div>
+
+  <div class="teacher-pick-backdrop" id="roomPickBackdrop" hidden></div>
+  <div class="teacher-pick-sheet" id="roomPickSheet" role="dialog" aria-modal="true" aria-labelledby="rpTitle" hidden>
+    <h2 id="rpTitle">揀課室</h2>
+    <p class="tp-hint">輸入房間編號（例如 604）或名稱，睇嗰間房而家邊堂課／邊位老師同學。留空或揀「跟老師今節」即返老師視角。</p>
+    <div class="tp-row">
+      <input type="text" id="roomPickInput" placeholder="604／MUSIC ROOM…" autocomplete="off" />
+    </div>
+    <div class="tp-suggest" id="roomPickSuggest" aria-label="課室搜尋結果"></div>
+    <div class="tp-actions tp-actions-3">
+      <button type="button" class="btn ghost" id="roomPickClearBtn">跟老師</button>
+      <button type="button" class="btn ghost" id="roomPickCloseBtn">取消</button>
+      <button type="button" class="btn primary" id="roomPickApplyBtn">套用</button>
     </div>
   </div>
 
@@ -5075,11 +5122,78 @@
       return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
     }
 
+    // Room pick: show that classroom's occupancy at current period (students + teachers),
+    // independent of the selected teacher — same idea as 操場 PLAYGROUND* roster.
+    var pickR = state.pickRoom || '';
+    var onClassroomView = (typeof viewMode === 'undefined' || viewMode === 'classroom');
+    if (pickR && onClassroomView && !isPlaygroundRoom(pickR) &&
+        (mood === 'class' || mood === 'free') &&
+        ctx.slot && ctx.slot.kind === 'period' && day != null && period != null) {
+      var roomEntries = collectRoomLessons(day, period, pickR);
+      if (roomEntries.length) {
+        var seenStudRm = {};
+        var classBitsR = [];
+        var subjBitsR = [];
+        var teachCodesR = [];
+        roomEntries.forEach(function (entry) {
+          var Lr = entry.lesson;
+          if (Lr.classShort || Lr.class) classBitsR.push(Lr.classShort || Lr.class);
+          if (Lr.subjectShort || Lr.subject) subjBitsR.push(Lr.subjectShort || Lr.subject);
+          Object.keys(entry.teachers || {}).forEach(function (code) {
+            teachCodesR.push(code);
+            addTeacher(entry.teachers[code], { nearBoard: true, wander: false, pace: true });
+          });
+          var resolvedRm = resolveLessonStudents(Lr, Number.POSITIVE_INFINITY, rng);
+          (resolvedRm.students || []).forEach(function (s) {
+            var sk = String(s.class || '') + '|' + String(s.no || '');
+            if (seenStudRm[sk]) return;
+            seenStudRm[sk] = true;
+            addStudent(s, { bounce: false, wander: false, sitting: true });
+          });
+        });
+        function uniqBitsR(arr) {
+          var seenB = {};
+          var outB = [];
+          (arr || []).forEach(function (x) {
+            var k = String(x || '');
+            if (!k || seenB[k]) return;
+            seenB[k] = true;
+            outB.push(k);
+          });
+          return outB;
+        }
+        classBitsR = uniqBitsR(classBitsR);
+        subjBitsR = uniqBitsR(subjBitsR);
+        teachCodesR = uniqBitsR(teachCodesR);
+        var classStudentsRm = roster.filter(function (s) { return s.role === 'student'; });
+        var primaryLesson = roomEntries[0].lesson || {};
+        var primaryResolved = resolveLessonStudents(primaryLesson, 1, function () { return 0; });
+        var seatLayoutRm = lookupSeatingLayout({
+          groupCode: primaryResolved.groupCode || '',
+          classId: classBitsR.length === 1 ? normalizeClassId(classBitsR[0]) : '',
+          classes: primaryResolved.classes || classBitsR.map(normalizeClassId).filter(Boolean),
+          teacherCode: teachCodesR[0] || ''
+        });
+        assignStudentDesks(classStudentsRm, seatLayoutRm, rng);
+        lessonNote = (subjBitsR.join('、') || '課堂') +
+          (classBitsR.length ? (' · ' + classBitsR.join('、')) : '') +
+          ' · ' + (friendlyRoomLabel(pickR) || pickR) +
+          (teachCodesR.length ? (' · ' + teachCodesR.join('、')) : '') +
+          (seatLayoutRm ? ' · 座位表' : '');
+        if (!classStudentsRm.length) {
+          emptyMsg = lessonNote || ('課室 ' + (friendlyRoomLabel(pickR) || pickR) + ' 暫時只有老師');
+        }
+      } else {
+        emptyMsg = '房間 ' + (friendlyRoomLabel(pickR) || pickR) + ' · 而家冇課';
+        lessonNote = friendlyRoomLabel(pickR) || pickR;
+      }
+      return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
+    }
+
     // Classroom tracks the *searched teacher's* current lesson — never fill with random school-wide kids.
-    // Optional pickClass / pickRoom narrow which class/room scene is shown.
+    // Optional pickClass narrows which class scene is shown when following the teacher.
     if (mood === 'class') {
       var pickC = state.pickClass || '';
-      var pickR = state.pickRoom || '';
       var useLesson = lesson && lessonMatchesPick(lesson);
       if (useLesson) {
         var resolved = resolveLessonStudents(lesson, Number.POSITIVE_INFINITY, rng);
@@ -5093,7 +5207,6 @@
         }
         lessonNote = resolved.note || '';
         if (pickC) lessonNote = (lessonNote ? lessonNote + ' · ' : '') + pickC;
-        if (pickR) lessonNote = (lessonNote ? lessonNote + ' · ' : '') + pickR;
         studs.forEach(function (s) {
           addStudent(s, { bounce: false, wander: false, sitting: true });
         });
@@ -5127,13 +5240,9 @@
         });
         assignStudentDesks(roster.filter(function (s) { return s.role === 'student'; }), pickSeat, rng);
         addTeacher(player, { nearBoard: true, wander: false, pace: true });
-        lessonNote = pickC + (pickR ? (' · ' + pickR) : '') + ' · 非老師今節班';
+        lessonNote = pickC + ' · 非老師今節班';
         if (pickSeat) lessonNote += ' · 座位表';
         if (!pickStuds.length) emptyMsg = '班別 ' + pickC + ' 暫未有同學名單';
-      } else if (pickR) {
-        addTeacher(player, { nearBoard: true, wander: false, pace: true });
-        emptyMsg = '房間 ' + pickR + ' · 而家唔係呢位老師嘅課';
-        lessonNote = pickR;
       } else {
         var resolved2 = resolveLessonStudents(lesson, Number.POSITIVE_INFINITY, rng);
         lessonNote = resolved2.note || '';
@@ -5153,7 +5262,9 @@
       }
     } else if (mood === 'free') {
       // Teacher free this period: in 教員室 only — never show them in the classroom
-      emptyMsg = '而家空堂 · 老師喺教員室';
+      emptyMsg = pickR
+        ? ('房間 ' + (friendlyRoomLabel(pickR) || pickR) + ' · 而家冇課')
+        : '而家空堂 · 老師喺教員室';
     } else if (mood === 'reading') {
       // 閱讀時間：班主任返課室睇住全班靜心閱讀（bells.js slot key=reading）
       var rClass = state.pickClass || readingClassForTeacher(player);
@@ -5605,6 +5716,13 @@
         ctx.cycle && ctx.cycle.day != null) {
       pgFp = playgroundLessonsFingerprint(ctx.cycle.day, ctx.slot.period);
     }
+    var roomFp = '';
+    if (state.pickRoom &&
+        mood !== 'assembly' &&
+        ctx.slot && ctx.slot.kind === 'period' &&
+        ctx.cycle && ctx.cycle.day != null) {
+      roomFp = roomLessonsFingerprint(ctx.cycle.day, ctx.slot.period, state.pickRoom);
+    }
     var key = [
       mood,
       ctx.ymd || '',
@@ -5619,7 +5737,8 @@
       state.pickRoom || '',
       (typeof viewMode !== 'undefined' ? viewMode : 'classroom'),
       isMorningAssemblyMinutes(ctx.minutes) ? 'asm' : 'noasm',
-      pgFp
+      pgFp,
+      roomFp
     ].join('|');
     // Peek seating fingerprint so chart edits in 座位表 refresh desks
     var peekLayout = null;
@@ -6037,6 +6156,73 @@
     }).join(';');
   }
 
+  /** Unique room codes from all teacher schedules (sorted). */
+  function listAllRooms() {
+    var rooms = {};
+    (DATA.teachers || []).forEach(function (t) {
+      Object.keys(t.schedule || {}).forEach(function (d) {
+        Object.keys(t.schedule[d] || {}).forEach(function (p) {
+          var L = t.schedule[d][p];
+          if (L && L.room) rooms[String(L.room)] = true;
+        });
+      });
+    });
+    return Object.keys(rooms).sort(function (a, b) {
+      var na = parseInt(a, 10), nb = parseInt(b, 10);
+      if (!isNaN(na) && !isNaN(nb) && String(na) === a && String(nb) === b) return na - nb;
+      if (!isNaN(na) && String(na) === a) return -1;
+      if (!isNaN(nb) && String(nb) === b) return 1;
+      return a.localeCompare(b, 'zh-HK');
+    });
+  }
+
+  function roomsMatch(a, b) {
+    return String(a || '').toUpperCase().replace(/\s+/g, '') ===
+      String(b || '').toUpperCase().replace(/\s+/g, '');
+  }
+
+  /**
+   * All timetable lessons in a given room for this cycle day + period.
+   * Independent of the selected teacher (same idea as collectPlaygroundLessons).
+   */
+  function collectRoomLessons(day, period, room) {
+    var out = [];
+    var seen = {};
+    if (day == null || period == null || !room) return out;
+    (DATA.teachers || []).forEach(function (t) {
+      if (!t || !t.schedule) return;
+      var daySched = t.schedule[String(day)] || {};
+      var L = daySched[String(period)];
+      if (!L || !roomsMatch(L.room, room)) return;
+      var key = [
+        String(L.class || ''),
+        String(L.subject || L.subjectShort || ''),
+        String(L.room || ''),
+        String(L.teacher || '')
+      ].join('|');
+      if (!seen[key]) {
+        seen[key] = { lesson: L, teachers: {} };
+        out.push(seen[key]);
+        String(L.teacher || '').split(/[,，、\/\s]+/).forEach(function (c) {
+          c = String(c || '').trim().toUpperCase();
+          if (!c) return;
+          var tobj = lookupTeacher(c);
+          if (tobj) seen[key].teachers[String(tobj.code || '').toUpperCase()] = tobj;
+        });
+      }
+      if (t.code) seen[key].teachers[String(t.code).toUpperCase()] = t;
+    });
+    return out;
+  }
+
+  function roomLessonsFingerprint(day, period, room) {
+    return collectRoomLessons(day, period, room).map(function (e) {
+      var codes = Object.keys(e.teachers || {}).sort().join(',');
+      var L = e.lesson || {};
+      return (L.class || '') + '@' + (L.room || '') + ':' + codes;
+    }).join(';');
+  }
+
   /* ===== 早會 07:55–08:05 HKT：全校學生喺操場（PLAYGROUND1）===== */
   var ASSEMBLY_START_MIN = 7 * 60 + 55; // 07:55
   var ASSEMBLY_END_MIN = 8 * 60 + 5;    // 08:05 inclusive
@@ -6318,8 +6504,9 @@
   }
   function lessonRoomOf(ctx) {
     if (!ctx) return '';
+    if (state.pickRoom) return String(state.pickRoom);
     if (ctx.lesson && ctx.lesson.room) return String(ctx.lesson.room);
-    return String(state.pickRoom || '');
+    return '';
   }
   var venueAutoPlayground = false;
 
@@ -7760,7 +7947,39 @@
       }
     } else if (ctx.slot.kind === 'period') {
       var L = ctx.lesson;
-      if (L) {
+      var pickRPaint = state.pickRoom || '';
+      var roomOccPaint = [];
+      if (pickRPaint && ctx.cycle && ctx.cycle.day != null) {
+        roomOccPaint = collectRoomLessons(ctx.cycle.day, ctx.slot.period, pickRPaint);
+      }
+      if (pickRPaint && roomOccPaint.length) {
+        mood = 'class';
+        var classBitsP = [];
+        var subjBitsP = [];
+        roomOccPaint.forEach(function (e) {
+          var Lx = e.lesson || {};
+          if (Lx.classShort || Lx.class) classBitsP.push(Lx.classShort || Lx.class);
+          if (Lx.subjectShort || Lx.subject) subjBitsP.push(Lx.subjectShort || Lx.subject);
+        });
+        function uniqPaint(arr) {
+          var s = {}, o = [];
+          (arr || []).forEach(function (x) {
+            var k = String(x || '');
+            if (!k || s[k]) return;
+            s[k] = 1;
+            o.push(k);
+          });
+          return o;
+        }
+        classBitsP = uniqPaint(classBitsP);
+        subjBitsP = uniqPaint(subjBitsP);
+        boardMsg = (subjBitsP.join('、') || '課堂') + '\n' + (classBitsP.join('、') || '');
+        badgeMsg = '第' + ctx.slot.period + '節 · ' + (friendlyRoomLabel(pickRPaint) || pickRPaint);
+      } else if (pickRPaint) {
+        mood = 'free';
+        boardMsg = '而家空堂\n' + (friendlyRoomLabel(pickRPaint) || pickRPaint);
+        badgeMsg = '空堂 · ' + (friendlyRoomLabel(pickRPaint) || pickRPaint);
+      } else if (L) {
         mood = 'class';
         boardMsg = (L.subjectShort || L.subject || '課堂') + '\n' + (L.classShort || L.class || '');
         badgeMsg = '第' + ctx.slot.period + '節 · ' + (friendlyRoomLabel(L.room) || L.room || '');
@@ -7771,13 +7990,10 @@
       }
     }
 
-    // Apply classroom / room pick onto board label
-    if (state.pickClass || state.pickRoom) {
-      var pickBits = [];
-      if (state.pickClass) pickBits.push(state.pickClass);
-      if (state.pickRoom) pickBits.push(state.pickRoom);
+    // Apply class pick onto board label (room pick already reflected above)
+    if (state.pickClass && !state.pickRoom) {
       if (mood === 'class' || mood === 'free' || mood === 'reading') {
-        boardMsg = (boardMsg ? boardMsg + '\n' : '') + pickBits.join(' · ');
+        boardMsg = (boardMsg ? boardMsg + '\n' : '') + state.pickClass;
       }
     }
     syncPlaygroundVenue(ctx);
@@ -8180,6 +8396,7 @@
   }
 
   function openTeacherPick() {
+    try { closeRoomPick(); } catch (eCloseRm) {}
     var sheet = document.getElementById('teacherPickSheet');
     var backdrop = document.getElementById('teacherPickBackdrop');
     var input = document.getElementById('teacherPickInput');
@@ -8228,6 +8445,185 @@
     if (backdrop) backdrop.addEventListener('click', closeTeacherPick);
   })();
 
+  /* ===== Room picker（換課室）===== */
+  var _allRoomsCache = null;
+  var roomPickPending = null;
+
+  function allRoomsCached() {
+    if (!_allRoomsCache) _allRoomsCache = listAllRooms();
+    return _allRoomsCache;
+  }
+
+  function updateChangeRoomBtnLabel() {
+    var btn = document.getElementById('changeRoomBtn');
+    if (!btn) return;
+    if (state.pickRoom) {
+      var lab = friendlyRoomLabel(state.pickRoom) || state.pickRoom;
+      btn.textContent = lab.length > 10 ? (lab.slice(0, 9) + '…') : lab;
+      btn.title = '課室：' + lab + '（撳改／取消）';
+      btn.classList.add('is-picked');
+    } else {
+      btn.textContent = '換課室';
+      btn.title = '搜尋／更換課室';
+      btn.classList.remove('is-picked');
+    }
+  }
+
+  function findRoomsByQuery(q) {
+    q = String(q || '').trim().toUpperCase().replace(/\s+/g, '');
+    var rooms = allRoomsCached();
+    if (!q) return rooms.slice(0, 16);
+    var exact = [];
+    var prefix = [];
+    var fuzzy = [];
+    rooms.forEach(function (r) {
+      var ru = String(r).toUpperCase().replace(/\s+/g, '');
+      var label = String(friendlyRoomLabel(r) || '').toUpperCase().replace(/\s+/g, '');
+      if (ru === q) exact.push(r);
+      else if (ru.indexOf(q) === 0 || label.indexOf(q) === 0) prefix.push(r);
+      else if (ru.indexOf(q) !== -1 || label.indexOf(q) !== -1) fuzzy.push(r);
+    });
+    return exact.concat(prefix, fuzzy).slice(0, 16);
+  }
+
+  function applyRoomSelection(room, opts) {
+    opts = opts || {};
+    var next = room ? String(room) : '';
+    // validate against known rooms when non-empty
+    if (next) {
+      var hit = allRoomsCached().filter(function (r) { return roomsMatch(r, next); })[0];
+      if (!hit) {
+        toast('搵唔到呢個課室');
+        return false;
+      }
+      next = hit;
+    }
+    state.pickRoom = next;
+    try {
+      if (next) localStorage.setItem(LS_PICK_ROOM, next);
+      else localStorage.removeItem(LS_PICK_ROOM);
+    } catch (e) {}
+    updateChangeRoomBtnLabel();
+    npcState.key = '';
+    if (next && isPlaygroundRoom(next)) {
+      try { setViewMode('playground'); } catch (ePg) {}
+    } else if (next) {
+      try { setViewMode('classroom'); } catch (eCls) {}
+    }
+    render();
+    if (opts.silent) return true;
+    if (next) toast('已切換至課室 ' + (friendlyRoomLabel(next) || next));
+    else toast('課室：跟老師今節');
+    return true;
+  }
+
+  function closeRoomPick() {
+    var sheet = document.getElementById('roomPickSheet');
+    var backdrop = document.getElementById('roomPickBackdrop');
+    if (sheet) sheet.hidden = true;
+    if (backdrop) backdrop.hidden = true;
+    roomPickPending = null;
+  }
+
+  function renderRoomPickSuggest(q) {
+    var box = document.getElementById('roomPickSuggest');
+    if (!box) return;
+    var matches = findRoomsByQuery(q);
+    box.innerHTML = '';
+    if (!matches.length) {
+      box.innerHTML = '<div class="tp-empty">搵唔到「' + escapeHtml(q) + '」</div>';
+      roomPickPending = null;
+      return;
+    }
+    matches.forEach(function (r, idx) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      var label = friendlyRoomLabel(r) || r;
+      var extra = isPlaygroundRoom(r) && label !== r ? (' · ' + r) : '';
+      btn.innerHTML = '<strong>' + escapeHtml(label) + '</strong>' +
+        (extra ? escapeHtml(extra) : (label !== r ? (' · ' + escapeHtml(r)) : ''));
+      btn.addEventListener('click', function () {
+        roomPickPending = r;
+        var input = document.getElementById('roomPickInput');
+        if (input) input.value = r;
+        Array.prototype.forEach.call(box.querySelectorAll('button'), function (b) {
+          b.style.borderColor = '';
+          b.style.background = '';
+        });
+        btn.style.borderColor = 'var(--wood-dark, #5c3a22)';
+        btn.style.background = '#fff6e8';
+      });
+      if (idx === 0) {
+        roomPickPending = r;
+        btn.style.borderColor = 'var(--wood-dark, #5c3a22)';
+        btn.style.background = '#fff6e8';
+      }
+      if (state.pickRoom && roomsMatch(state.pickRoom, r)) {
+        roomPickPending = r;
+        btn.style.borderColor = 'var(--wood-dark, #5c3a22)';
+        btn.style.background = '#fff6e8';
+      }
+      box.appendChild(btn);
+    });
+  }
+
+  function openRoomPick() {
+    closeTeacherPick();
+    var sheet = document.getElementById('roomPickSheet');
+    var backdrop = document.getElementById('roomPickBackdrop');
+    var input = document.getElementById('roomPickInput');
+    if (!sheet) return;
+    if (backdrop) backdrop.hidden = false;
+    sheet.hidden = false;
+    if (input) {
+      input.value = state.pickRoom || '';
+      renderRoomPickSuggest(input.value);
+      setTimeout(function () {
+        try { input.focus(); input.select(); } catch (e) {}
+      }, 0);
+    } else {
+      renderRoomPickSuggest('');
+    }
+  }
+
+  var changeRoomBtnEl = document.getElementById('changeRoomBtn');
+  if (changeRoomBtnEl) changeRoomBtnEl.addEventListener('click', openRoomPick);
+  (function bindRoomPick() {
+    var input = document.getElementById('roomPickInput');
+    var applyBtn = document.getElementById('roomPickApplyBtn');
+    var clearBtn = document.getElementById('roomPickClearBtn');
+    var closeBtn = document.getElementById('roomPickCloseBtn');
+    var backdrop = document.getElementById('roomPickBackdrop');
+    if (input) {
+      input.addEventListener('input', function () {
+        renderRoomPickSuggest(input.value);
+      });
+      input.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          var r = roomPickPending || findRoomsByQuery(input.value)[0] || input.value;
+          if (applyRoomSelection(r)) closeRoomPick();
+        } else if (ev.key === 'Escape') {
+          closeRoomPick();
+        }
+      });
+    }
+    if (applyBtn) {
+      applyBtn.addEventListener('click', function () {
+        var q = input ? input.value : '';
+        var r = roomPickPending || findRoomsByQuery(q)[0] || q;
+        if (applyRoomSelection(r)) closeRoomPick();
+      });
+    }
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        if (applyRoomSelection('')) closeRoomPick();
+      });
+    }
+    if (closeBtn) closeBtn.addEventListener('click', closeRoomPick);
+    if (backdrop) backdrop.addEventListener('click', closeRoomPick);
+  })();
+
   function tick() {
     if (!timelineState.live) {
       // preview: keep scrubbed scene; only refresh live clock badge if we add one later
@@ -8274,16 +8670,19 @@
   try { resolveTeacher(); } catch (eRt) {}
   try { renderStarBoard(); } catch (eSb) {}
 
-  // Focused UI: 課室 / 操場 (teacher venue) + 教員室
+  // Focused UI: 課室 / 操場 (teacher venue) + 教員室；課室揀選可記住
   state.pickClass = '';
-  state.pickRoom = '';
+  try { localStorage.removeItem(LS_PICK_CLASS); } catch (ePickC) {}
   try {
-    localStorage.removeItem(LS_PICK_CLASS);
-    localStorage.removeItem(LS_PICK_ROOM);
-  } catch (ePick) {}
+    state.pickRoom = localStorage.getItem(LS_PICK_ROOM) || '';
+  } catch (ePickR) {
+    state.pickRoom = '';
+  }
+  try { updateChangeRoomBtnLabel(); } catch (eRmBtn) {}
   try {
     var savedView = localStorage.getItem('tt_game_view');
-    if (savedView === 'staff') setViewMode('staff');
+    if (state.pickRoom && isPlaygroundRoom(state.pickRoom)) setViewMode('playground');
+    else if (savedView === 'staff') setViewMode('staff');
     else if (savedView === 'playground') setViewMode('playground');
     else setViewMode('classroom');
   } catch (eView) {
@@ -8329,6 +8728,7 @@
       closePraiseSheet();
       closeTeacherHpSheet();
       closeTeacherPick();
+      closeRoomPick();
     }
   });
 
