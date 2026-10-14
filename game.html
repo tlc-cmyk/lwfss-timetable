@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="tod-pg-basketball-flick-v1" />
+  <meta name="game-build" content="staff-mp-tea-cats-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -1727,28 +1727,126 @@
     #sceneStaff .bookshelf .book.b8 { height: 24%; background: #2980b9; bottom: 4%; }
     #sceneStaff .bookshelf .book.b9,
     #sceneStaff .bookshelf .book.b10 { display: none; }
-    /* white coffee / drinks bar — half size */
+    /* tea / drinks bar — interactive MP restore */
     #sceneStaff .coffee-bar {
       position: absolute;
-      top: 4%;
-      right: 3%;
-      width: 6%;
-      height: 2.8%;
-      background: #f7f8fa;
+      top: 2.8%;
+      right: 1.5%;
+      width: 16%;
+      min-width: 72px;
+      height: 9.5%;
+      min-height: 44px;
+      background: linear-gradient(180deg, #fffdf8 0%, #f0e6d8 100%);
       border: 2px solid #9aa3b2;
-      border-radius: 2px;
-      z-index: 4;
+      border-radius: 6px;
+      z-index: 12;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 2px 0 rgba(90,100,120,0.2);
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    #sceneStaff .coffee-bar:active { transform: scale(0.97); }
+    #sceneStaff .coffee-bar.hot {
+      border-color: #c9922a;
+      box-shadow: 0 0 0 3px rgba(240,193,75,0.45), 0 2px 0 rgba(90,100,120,0.2);
+      transform: scale(1.04);
+    }
+    #sceneStaff .coffee-bar.flash {
+      animation: teaFlash 0.45s ease;
+    }
+    @keyframes teaFlash {
+      0%, 100% { filter: none; }
+      40% { filter: brightness(1.25) saturate(1.2); }
+    }
+    #sceneStaff .coffee-bar .tea-label {
+      position: absolute;
+      left: 0; right: 0; top: 2px;
+      text-align: center;
+      font-size: clamp(0.42rem, 1.6vw, 0.58rem);
+      font-weight: 900;
+      color: #5b6b7f;
+      letter-spacing: 0.04em;
+      pointer-events: none;
     }
     #sceneStaff .coffee-bar .drink {
       position: absolute;
-      bottom: 35%;
-      font-size: clamp(0.35rem, 1.4vw, 0.5rem);
+      bottom: 18%;
+      font-size: clamp(0.7rem, 2.6vw, 1rem);
       line-height: 1;
       filter: drop-shadow(1px 1px 0 rgba(0,0,0,.12));
+      pointer-events: none;
     }
-    #sceneStaff .coffee-bar .drink.d1 { left: 6%; }
-    #sceneStaff .coffee-bar .drink.d2 { left: 34%; }
-    #sceneStaff .coffee-bar .drink.d3 { left: 62%; }
+    #sceneStaff .coffee-bar .drink.d1 { left: 8%; }
+    #sceneStaff .coffee-bar .drink.d2 { left: 38%; }
+    #sceneStaff .coffee-bar .drink.d3 { left: 68%; }
+    #sceneStaff .coffee-bar .tea-hint {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 0.58rem;
+      font-weight: 800;
+      color: #fff8ee;
+      background: #8b5e3c;
+      border: 2px solid #5c3a22;
+      border-radius: 8px;
+      padding: 2px 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+      z-index: 5;
+    }
+    #sceneStaff .coffee-bar.hot .tea-hint,
+    #sceneStaff .coffee-bar.show-hint .tea-hint { opacity: 1; }
+
+    /* staff room cats — pet for MP */
+    #sceneStaff .staff-cat {
+      position: absolute;
+      z-index: 14;
+      font-size: clamp(1.15rem, 4.2vw, 1.55rem);
+      line-height: 1;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      filter: drop-shadow(1px 2px 0 rgba(0,0,0,.18));
+      user-select: none;
+      transition: transform .12s ease;
+      animation: catIdle 2.8s ease-in-out infinite;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: none;
+      padding: 4px;
+      margin: 0;
+      color: inherit;
+    }
+    #sceneStaff .staff-cat:active { transform: scale(1.18) rotate(-8deg); }
+    #sceneStaff .staff-cat.petting {
+      animation: catPet 0.55s ease;
+    }
+    #sceneStaff .staff-cat.cat-a {
+      left: 18%;
+      bottom: 3.5%;
+      animation-delay: 0s;
+    }
+    #sceneStaff .staff-cat.cat-b {
+      right: 22%;
+      bottom: 5%;
+      left: auto;
+      animation-delay: -1.2s;
+    }
+    @keyframes catIdle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    @keyframes catPet {
+      0% { transform: scale(1) rotate(0); }
+      35% { transform: scale(1.25) rotate(-12deg); }
+      70% { transform: scale(1.1) rotate(8deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
     #sceneStaff .whiteboard {
       position: absolute;
       top: 1.5%;
@@ -2155,6 +2253,34 @@
       border-radius: 10px;
       padding: 8px 10px;
       border: 1.5px dashed #b0b8c4;
+    }
+    .teacher-hp-sheet .thp-meter-label {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: #8a93a3;
+      min-width: 1.8em;
+      letter-spacing: 0.02em;
+    }
+    .teacher-hp-sheet .thp-meter.mp {
+      margin-top: 8px;
+    }
+    .teacher-hp-sheet .thp-gems {
+      font-size: 0.95rem;
+      letter-spacing: -1px;
+      white-space: nowrap;
+      min-width: 5.5em;
+    }
+    .teacher-hp-sheet .thp-bar.mp-fill {
+      background: linear-gradient(90deg, #3498db, #9b59b6 55%, #1abc9c);
+    }
+    .teacher-hp-sheet .thp-bar.mp-fill.low { background: linear-gradient(90deg, #2980b9, #8e44ad); }
+    .teacher-hp-sheet .thp-bar.mp-fill.mid { background: linear-gradient(90deg, #3498db, #9b59b6); }
+    .teacher-hp-sheet .thp-hint {
+      margin-top: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #7a8a9e;
+      line-height: 1.35;
     }
     .teacher-hp-sheet .thp-close {
       margin-top: 10px;
@@ -3034,11 +3160,15 @@
         <div class="pigeon" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <div class="bookshelf" aria-hidden="true"><span class="book b1"></span><span class="book b2"></span><span class="book b3"></span><span class="book b4"></span><span class="book b5"></span><span class="book b6"></span><span class="book b7"></span><span class="book b8"></span><span class="book b9"></span><span class="book b10"></span></div>
         <div class="whiteboard"><div class="board-text" id="staffBoardText">空堂人數：—</div></div>
-        <div class="coffee-bar" aria-hidden="true">
+        <div class="coffee-bar" id="teaBar" title="茶吧 · 拖老師嚟飲茶 +1% MP" aria-label="茶吧，拖老師嚟飲茶可回復 MP">
+          <span class="tea-hint">飲茶 +1% MP</span>
+          <span class="tea-label">茶吧</span>
           <span class="drink d1">☕</span>
           <span class="drink d2">🍵</span>
           <span class="drink d3">💧</span>
         </div>
+        <button type="button" class="staff-cat cat-a" id="staffCatA" title="摸摸貓 · +2% MP" aria-label="教員室貓 A，點擊摸摸可回復 2% MP">🐱</button>
+        <button type="button" class="staff-cat cat-b" id="staffCatB" title="摸摸貓 · +2% MP" aria-label="教員室貓 B，點擊摸摸可回復 2% MP">🐈</button>
         <div class="staff-desks" id="staffDesks" aria-hidden="true"></div>
         <div class="npc-layer" id="staffNpcLayer" aria-label="教員室老師"></div>
         <div class="staff-empty" id="staffEmpty" hidden>而家教員室靜靜地～</div>
@@ -3167,11 +3297,19 @@
     <div class="thp-title" id="thpTitle"></div>
     <div class="thp-sub" id="thpSub"></div>
     <div class="thp-meter">
+      <span class="thp-meter-label">HP</span>
       <span class="thp-hearts" id="thpHearts"></span>
       <div class="thp-bar-wrap"><div class="thp-bar" id="thpBar"></div></div>
       <span class="thp-pct" id="thpPct"></span>
     </div>
+    <div class="thp-meter mp">
+      <span class="thp-meter-label">MP</span>
+      <span class="thp-gems" id="thpGems"></span>
+      <div class="thp-bar-wrap"><div class="thp-bar mp-fill" id="thpMpBar"></div></div>
+      <span class="thp-pct" id="thpMpPct"></span>
+    </div>
     <div class="thp-lessons" id="thpLessons"></div>
+    <div class="thp-hint" id="thpHint">每堂 −10% HP／MP · 茶吧飲茶 +1% MP · 摸貓 +2% MP</div>
     <button type="button" class="btn ghost thp-close" id="teacherHpCloseBtn">關閉</button>
   </div>
 
@@ -3300,6 +3438,7 @@
   var PRAISE_HEART_CAP = 5;
   var LS_PRAISE_PREFIX = 'tt_game_stars_'; // + YYYY-MM
   var LS_TEACHER_KUDOS_PREFIX = 'tt_game_teacher_kudos_'; // + YYYY-MM
+  var LS_TEACHER_MP = 'tt_game_teacher_mp'; // JSON { "YYYY-MM-DD": { "CODE": { drinks:n, catA:n, catB:n } } }
 
   var DATA = window.TIMETABLE_DATA;
   var BELLS = window.BELLS_DATA;
@@ -7350,6 +7489,8 @@
     setPrincipalVisiting(false);
     var doorHint = principalEl();
     if (doorHint) doorHint.classList.remove('show-hint', 'flash', 'hot');
+    var teaHintClear = document.getElementById('teaBar');
+    if (teaHintClear) teaHintClear.classList.remove('show-hint', 'flash', 'hot');
     var layer = document.getElementById('staffNpcLayer');
     if (layer) layer.innerHTML = '';
     var wrap = document.getElementById('staffDesks');
@@ -7408,6 +7549,69 @@
     return { finished: finished, hp: hp };
   }
 
+  function loadTeacherMpStore() {
+    try {
+      var raw = localStorage.getItem(LS_TEACHER_MP);
+      var obj = raw ? JSON.parse(raw) : {};
+      return obj && typeof obj === 'object' ? obj : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveTeacherMpStore(store) {
+    try { localStorage.setItem(LS_TEACHER_MP, JSON.stringify(store || {})); } catch (e2) {}
+  }
+
+  function mpBonusFor(code, ymd) {
+    var store = loadTeacherMpStore();
+    var day = store[ymd] || {};
+    var key = String(code || '').toUpperCase();
+    var row = day[key] || {};
+    return {
+      drinks: Math.max(0, parseInt(row.drinks, 10) || 0),
+      catA: Math.max(0, parseInt(row.catA, 10) || 0),
+      catB: Math.max(0, parseInt(row.catB, 10) || 0)
+    };
+  }
+
+  function setMpBonusFor(code, ymd, bonus) {
+    var store = loadTeacherMpStore();
+    if (!store[ymd]) store[ymd] = {};
+    var key = String(code || '').toUpperCase();
+    store[ymd][key] = {
+      drinks: Math.max(0, bonus.drinks || 0),
+      catA: Math.max(0, bonus.catA || 0),
+      catB: Math.max(0, bonus.catB || 0)
+    };
+    // keep ~14 recent days
+    var keys = Object.keys(store).sort();
+    while (keys.length > 14) {
+      delete store[keys.shift()];
+      keys = Object.keys(store).sort();
+    }
+    saveTeacherMpStore(store);
+  }
+
+  function teacherMpInfo(teacher, cycleDay, ymd) {
+    var finished = finishedLessonsTodayFor(teacher, cycleDay);
+    var base = Math.max(0, 100 - 10 * finished);
+    var code = teacher && teacher.code ? teacher.code : '';
+    var day = ymd || todayYmdHK();
+    var bonus = mpBonusFor(code, day);
+    var gain = bonus.drinks * 1 + bonus.catA * 2 + bonus.catB * 2;
+    var mp = Math.max(0, Math.min(100, base + gain));
+    return {
+      finished: finished,
+      base: base,
+      mp: mp,
+      drinks: bonus.drinks,
+      catA: bonus.catA,
+      catB: bonus.catB,
+      gain: gain
+    };
+  }
+
   function heartMeterForHp(hp) {
     var filled = Math.round(hp / 20);
     var s = '';
@@ -7415,17 +7619,40 @@
     return s;
   }
 
+  function gemMeterForMp(mp) {
+    var filled = Math.round(mp / 20);
+    var s = '';
+    for (var i = 0; i < 5; i++) s += (i < filled ? '◆' : '◇');
+    return s;
+  }
+
+  var _thpOpenSpec = null;
+  var _mpFocusSpec = null;
+
+  function setMpFocusFromSpec(spec) {
+    if (spec && spec.role === 'teacher' && spec.code) _mpFocusSpec = spec;
+  }
+
   function openTeacherHpSheet(spec) {
     if (!spec || spec.role !== 'teacher') return;
+    _thpOpenSpec = spec;
+    setMpFocusFromSpec(spec);
     var ctx = getContext();
     var t = spec.teacherRef || lookupTeacher(spec.code);
-    var info = teacherHpInfo(t, ctx.holiday ? null : (ctx.cycle && ctx.cycle.day));
+    var day = ctx.holiday ? null : (ctx.cycle && ctx.cycle.day);
+    var ymd = ctx.ymd || todayYmdHK();
+    var info = teacherHpInfo(t, day);
+    var mpInfo = teacherMpInfo(t, day, ymd);
     var title = document.getElementById('thpTitle');
     var sub = document.getElementById('thpSub');
     var hearts = document.getElementById('thpHearts');
     var bar = document.getElementById('thpBar');
     var pct = document.getElementById('thpPct');
+    var gems = document.getElementById('thpGems');
+    var mpBar = document.getElementById('thpMpBar');
+    var mpPct = document.getElementById('thpMpPct');
     var lessons = document.getElementById('thpLessons');
+    var hint = document.getElementById('thpHint');
     var backdrop = document.getElementById('teacherHpBackdrop');
     var sheet = document.getElementById('teacherHpSheet');
     if (title) title.textContent = spec.chi || spec.label || spec.name || '老師';
@@ -7438,12 +7665,26 @@
       if (info.hp <= 30) bar.classList.add('low');
       else if (info.hp <= 60) bar.classList.add('mid');
     }
+    if (gems) gems.textContent = gemMeterForMp(mpInfo.mp);
+    if (mpPct) mpPct.textContent = mpInfo.mp + '%';
+    if (mpBar) {
+      mpBar.style.width = mpInfo.mp + '%';
+      mpBar.classList.remove('low', 'mid');
+      if (mpInfo.mp <= 30) mpBar.classList.add('low');
+      else if (mpInfo.mp <= 60) mpBar.classList.add('mid');
+    }
     if (lessons) {
       if (ctx.holiday || !ctx.cycle || ctx.cycle.day == null) {
-        lessons.textContent = '今日無正規日課 · HP 100%';
+        lessons.textContent = '今日無正規日課 · HP 100% · MP ' + mpInfo.mp + '%';
       } else {
-        lessons.textContent = '今日已上 ' + info.finished + ' 堂 · HP ' + info.hp + '%（每堂 −10%）';
+        lessons.textContent = '今日已上 ' + info.finished + ' 堂 · HP ' + info.hp + '% · MP ' + mpInfo.mp + '%（每堂 −10%）';
       }
+      if (mpInfo.gain > 0) {
+        lessons.textContent += ' · 已回復 +' + mpInfo.gain + '%（茶 ' + mpInfo.drinks + '／貓 ' + (mpInfo.catA + mpInfo.catB) + '）';
+      }
+    }
+    if (hint) {
+      hint.textContent = '每堂 −10% HP／MP · 拖去茶吧飲茶 +1% MP · 摸教員室貓 +2% MP';
     }
     if (backdrop) {
       backdrop.hidden = false;
@@ -7457,17 +7698,91 @@
     }
   }
 
+  function refreshTeacherHpSheetIfOpen(code) {
+    if (!_thpOpenSpec) return;
+    var sheet = document.getElementById('teacherHpSheet');
+    if (!sheet || !sheet.classList.contains('show')) return;
+    var openCode = String(_thpOpenSpec.code || '').toUpperCase();
+    if (code && openCode && openCode !== String(code).toUpperCase()) return;
+    openTeacherHpSheet(_thpOpenSpec);
+  }
+
   function closeTeacherHpSheet() {
     var backdrop = document.getElementById('teacherHpBackdrop');
     var sheet = document.getElementById('teacherHpSheet');
     if (backdrop) backdrop.classList.remove('show');
     if (sheet) sheet.classList.remove('show');
+    _thpOpenSpec = null;
     setTimeout(function () {
       if (sheet && !sheet.classList.contains('show')) {
         if (backdrop) backdrop.hidden = true;
         sheet.hidden = true;
       }
     }, 220);
+  }
+
+  function resolveMpTeacher(specOrCode) {
+    if (specOrCode && typeof specOrCode === 'object') {
+      var fromSpec = specOrCode.teacherRef || lookupTeacher(specOrCode.code);
+      if (fromSpec) return fromSpec;
+      if (specOrCode.code) return specOrCode;
+    }
+    if (specOrCode) {
+      var byCode = lookupTeacher(specOrCode);
+      if (byCode) return byCode;
+    }
+    if (_mpFocusSpec) {
+      var focused = _mpFocusSpec.teacherRef || lookupTeacher(_mpFocusSpec.code);
+      if (focused) return focused;
+    }
+    return state.teacher || null;
+  }
+
+  function applyMpDrink(teacherLike) {
+    var t = resolveMpTeacher(teacherLike);
+    if (!t || !t.code) {
+      toast('拖一位老師去茶吧飲茶～');
+      return false;
+    }
+    var ctx = getContext();
+    var ymd = ctx.ymd || todayYmdHK();
+    var day = ctx.holiday ? null : (ctx.cycle && ctx.cycle.day);
+    var before = teacherMpInfo(t, day, ymd);
+    if (before.mp >= 100) {
+      toast((t.chi || t.code) + ' MP 已滿 100%');
+      return false;
+    }
+    var bonus = mpBonusFor(t.code, ymd);
+    bonus.drinks += 1;
+    setMpBonusFor(t.code, ymd, bonus);
+    var after = teacherMpInfo(t, day, ymd);
+    toast('🍵 ' + (t.chi || t.code) + ' 飲咗杯茶 · MP ' + before.mp + '% → ' + after.mp + '%');
+    refreshTeacherHpSheetIfOpen(t.code);
+    return true;
+  }
+
+  function applyMpCatPet(catKey, teacherLike) {
+    var t = resolveMpTeacher(teacherLike);
+    if (!t || !t.code) {
+      toast('先揀／撳一位老師，再摸摸貓～');
+      return false;
+    }
+    var ctx = getContext();
+    var ymd = ctx.ymd || todayYmdHK();
+    var day = ctx.holiday ? null : (ctx.cycle && ctx.cycle.day);
+    var before = teacherMpInfo(t, day, ymd);
+    if (before.mp >= 100) {
+      toast((t.chi || t.code) + ' MP 已滿 100%');
+      return false;
+    }
+    var bonus = mpBonusFor(t.code, ymd);
+    if (catKey === 'catB') bonus.catB += 1;
+    else bonus.catA += 1;
+    setMpBonusFor(t.code, ymd, bonus);
+    var after = teacherMpInfo(t, day, ymd);
+    toast('🐱 摸摸貓 · ' + (t.chi || t.code) + ' MP ' + before.mp + '% → ' + after.mp + '%');
+    refreshTeacherHpSheetIfOpen(t.code);
+    return true;
   }
 
   /* ===== Staff principal office: drag teacher in, return after 10s ===== */
@@ -7789,6 +8104,116 @@
     staffNpcState.principalTimers.push(exitDone);
   }
 
+
+  /* ===== Staff tea bar + cats (MP restore) ===== */
+  function teaBarEl() {
+    return document.getElementById('teaBar');
+  }
+
+  function pointOverTeaBar(clientX, clientY) {
+    var bar = teaBarEl();
+    if (!bar) return false;
+    var r = bar.getBoundingClientRect();
+    var pad = 14;
+    return clientX >= r.left - pad && clientX <= r.right + pad &&
+      clientY >= r.top - pad && clientY <= r.bottom + pad;
+  }
+
+  function setTeaBarHot(on) {
+    var bar = teaBarEl();
+    if (!bar) return;
+    bar.classList.toggle('hot', !!on);
+  }
+
+  function flashTeaBar() {
+    var bar = teaBarEl();
+    if (!bar) return;
+    bar.classList.remove('flash');
+    void bar.offsetWidth;
+    bar.classList.add('flash');
+    setTimeout(function () { bar.classList.remove('flash'); }, 480);
+  }
+
+  function teaBarStaffPercent() {
+    return { x: 88, y: 58 };
+  }
+
+  function dropTeacherAtTeaBar(n) {
+    if (!n || !n.el || !n.spec) return;
+    setMpFocusFromSpec(n.spec);
+    ensureStaffWalker(n);
+    var pos = teaBarStaffPercent();
+    n.x = pos.x;
+    n.y = pos.y;
+    n.baseY = pos.y;
+    n.el.style.left = pos.x.toFixed(2) + '%';
+    n.el.style.bottom = pos.y.toFixed(2) + '%';
+    n.el.style.zIndex = '40';
+    flashTeaBar();
+    var ok = applyMpDrink(n.spec);
+    var f = document.createElement('div');
+    f.className = 'float-plus heart';
+    f.textContent = ok ? '+1% MP' : 'MP';
+    n.el.appendChild(f);
+    setTimeout(function () { f.remove(); }, 950);
+    // reseat shortly after sip
+    clearTimeout(n._teaReturnTimer);
+    n._teaReturnTimer = setTimeout(function () {
+      n._teaReturnTimer = 0;
+      if (!n.el || !n.el.isConnected || n.dragging || n.inPrincipal) return;
+      if (n.homeDesk != null) reseatStaffNpc(n);
+    }, 900);
+  }
+
+  function bindStaffMpInteractives() {
+    var bar = teaBarEl();
+    if (bar && !bar._mpBound) {
+      bar._mpBound = true;
+      bar.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        flashTeaBar();
+        var ok = applyMpDrink(_mpFocusSpec || state.teacher);
+        if (ok) {
+          var f = document.createElement('div');
+          f.className = 'float-plus heart';
+          f.textContent = '+1% MP';
+          f.style.position = 'absolute';
+          f.style.left = '40%';
+          f.style.bottom = '70%';
+          bar.appendChild(f);
+          setTimeout(function () { f.remove(); }, 950);
+        }
+      });
+    }
+    function bindCat(id, key) {
+      var cat = document.getElementById(id);
+      if (!cat || cat._mpBound) return;
+      cat._mpBound = true;
+      cat.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        cat.classList.remove('petting');
+        void cat.offsetWidth;
+        cat.classList.add('petting');
+        setTimeout(function () { cat.classList.remove('petting'); }, 560);
+        var focus = _mpFocusSpec || state.teacher;
+        var ok = applyMpCatPet(key, focus);
+        var f = document.createElement('div');
+        f.className = 'float-plus heart';
+        f.textContent = ok ? '+2% MP' : '🐱';
+        f.style.position = 'absolute';
+        f.style.left = '50%';
+        f.style.bottom = '100%';
+        f.style.transform = 'translateX(-50%)';
+        cat.appendChild(f);
+        setTimeout(function () { f.remove(); }, 950);
+      });
+    }
+    bindCat('staffCatA', 'catA');
+    bindCat('staffCatB', 'catB');
+  }
+
   function bindTeacherPrincipalDrag(el, spec) {
     if (!spec || spec.role !== 'teacher') return;
     el.style.touchAction = 'none';
@@ -7830,6 +8255,8 @@
         el.classList.remove('wander-bounce');
         var door = principalEl();
         if (door) door.classList.add('show-hint');
+        var teaHint = teaBarEl();
+        if (teaHint) teaHint.classList.add('show-hint');
       }
       var pos = clientToStaffPercent(ev.clientX, ev.clientY);
       if (pos) {
@@ -7841,15 +8268,20 @@
         el.style.zIndex = '40';
       }
       setPrincipalHot(pointOverPrincipal(ev.clientX, ev.clientY));
+      setTeaBarHot(pointOverTeaBar(ev.clientX, ev.clientY));
     });
     function endDrag(ev) {
       var d = staffNpcState.drag;
       if (!d || d.n.el !== el) return;
       if (ev && d.pointerId !== ev.pointerId) return;
       var over = ev ? pointOverPrincipal(ev.clientX, ev.clientY) : false;
+      var overTea = ev ? pointOverTeaBar(ev.clientX, ev.clientY) : false;
       var door = principalEl();
       if (door) door.classList.remove('show-hint');
       setPrincipalHot(false);
+      var tea = teaBarEl();
+      if (tea) tea.classList.remove('show-hint');
+      setTeaBarHot(false);
       el.classList.remove('dragging');
       d.n.dragging = false;
       staffNpcState.drag = null;
@@ -7857,6 +8289,10 @@
       if (d.suppressClick) el._binSuppressClick = true;
       if (d.moved && over) {
         dropTeacherInPrincipal(d.n);
+        return;
+      }
+      if (d.moved && overTea) {
+        dropTeacherAtTeaBar(d.n);
         return;
       }
       if (d.moved) {
@@ -8999,6 +9435,7 @@
   var thpBackdrop = document.getElementById('teacherHpBackdrop');
   if (thpClose) thpClose.addEventListener('click', closeTeacherHpSheet);
   if (thpBackdrop) thpBackdrop.addEventListener('click', closeTeacherHpSheet);
+  bindStaffMpInteractives();
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') {
       closePraiseSheet();
