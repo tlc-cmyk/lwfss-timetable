@@ -444,7 +444,7 @@
     .scene.classroom .board {
       top: 3%;
       width: 42%;
-      height: 12%;
+      height: 14%;
     }
     .scene.classroom .window {
       top: 3%;
@@ -7869,6 +7869,65 @@
     if (board) board.textContent = '空堂人數：' + nShow;
   }
 
+
+  /** Count students for this period's classroom scene (zh-HK 學生人數 on blackboard). */
+  function countClassroomPeriodStudents(ctx) {
+    if (!ctx || !ctx.slot) return null;
+    var rng = function () { return 0; };
+    var pickR = state.pickRoom || '';
+    var day = ctx.cycle && ctx.cycle.day;
+    var period = ctx.slot.period;
+
+    if (pickR && !isPlaygroundRoom(pickR) &&
+        ctx.slot.kind === 'period' && day != null && period != null) {
+      var roomEntries = collectRoomLessons(day, period, pickR);
+      if (!roomEntries.length) return 0;
+      var seenRm = {};
+      var nRm = 0;
+      roomEntries.forEach(function (entry) {
+        var resolvedRm = resolveLessonStudents(entry.lesson, Number.POSITIVE_INFINITY, rng);
+        (resolvedRm.students || []).forEach(function (s) {
+          var sk = String(s.class || '') + '|' + String(s.no || '');
+          if (seenRm[sk]) return;
+          seenRm[sk] = true;
+          nRm++;
+        });
+      });
+      return nRm;
+    }
+
+    if (ctx.slot.kind === 'period') {
+      var L = ctx.lesson;
+      var pickC = state.pickClass || '';
+      if (L && lessonMatchesPick(L)) {
+        var resolved = resolveLessonStudents(L, Number.POSITIVE_INFINITY, rng);
+        var studs = resolved.students || [];
+        if (pickC) {
+          var filtered = studs.filter(function (s) {
+            return normalizeClassId(s.class) === pickC;
+          });
+          if (filtered.length) studs = filtered;
+        }
+        return studs.length;
+      }
+      if (pickC) {
+        return (studentsByClass[pickC] || []).length;
+      }
+      if (L) {
+        return (resolveLessonStudents(L, Number.POSITIVE_INFINITY, rng).students || []).length;
+      }
+      return 0;
+    }
+
+    if (ctx.slot.kind === 'break' && ctx.slot.key === 'reading') {
+      var rClass = state.pickClass || readingClassForTeacher(state.teacher);
+      if (!rClass) return null;
+      return (studentsByClass[rClass] || []).length;
+    }
+
+    return null;
+  }
+
   function paintScene(ctx) {
 
     var scene = document.getElementById('scene');
@@ -7998,8 +8057,17 @@
     }
     syncPlaygroundVenue(ctx);
 
+    // Classroom blackboard only: that period's student count (學生人數)
+    var classroomBoardMsg = boardMsg;
+    if (mood === 'class' || mood === 'free' || mood === 'reading') {
+      var studentCountBoard = countClassroomPeriodStudents(ctx);
+      if (studentCountBoard != null) {
+        classroomBoardMsg = (classroomBoardMsg ? classroomBoardMsg + '\n' : '') + '學生人數：' + studentCountBoard;
+      }
+    }
+
     if (scene) scene.setAttribute('data-mood', mood);
-    if (board) board.textContent = boardMsg;
+    if (board) board.textContent = classroomBoardMsg;
     if (badge) badge.textContent = badgeMsg;
 
     var pgScene = document.getElementById('scenePlayground');
