@@ -548,6 +548,116 @@
       line-height: 1.45;
       margin: 0 0 10px;
     }
+
+    /* 事項／Deadline reminders */
+    .deadline-banner {
+      margin: 0;
+      padding: 0;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 4px 8px;
+      cursor: pointer;
+    }
+    .deadline-banner:empty { display: none; }
+    .deadline-banner .dl-label { opacity: .9; font-weight: 800; }
+    .deadline-banner .dl-text { font-weight: 700; line-height: 1.35; }
+    .deadline-banner .dl-pill {
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.28);
+      letter-spacing: .02em;
+    }
+    .deadline-banner.is-soon .dl-pill,
+    .deadline-banner.is-overdue .dl-pill { background: rgba(220,60,50,.55); }
+    .deadline-banner.is-today .dl-pill { background: rgba(255,180,40,.5); }
+    .dl-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 10px;
+    }
+    .dl-filter-row button {
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border, #e2e8f0);
+      background: var(--card-soft, #f4f7fb);
+      color: var(--text, #1a2332);
+      cursor: pointer;
+    }
+    .dl-filter-row button.active {
+      background: var(--primary, #2563eb);
+      color: #fff;
+      border-color: var(--primary, #2563eb);
+    }
+    .dl-section-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      margin: 12px 0 6px;
+      color: var(--primary-dark, #1e3a8a);
+    }
+    .dl-section-title:first-of-type { margin-top: 4px; }
+    .dl-list { display: flex; flex-direction: column; gap: 7px; }
+    .dl-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      background: var(--card-soft, #f4f7fb);
+      border: 1px solid var(--border, #e2e8f0);
+      cursor: pointer;
+      transition: border-color .12s, background .12s;
+    }
+    .dl-row:hover { border-color: var(--primary, #2563eb); }
+    .dl-row.is-today {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+    .dl-row.is-soon {
+      border-color: #f97316;
+      background: #fff7ed;
+    }
+    .dl-row.is-overdue {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .dl-row-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 5px 8px;
+    }
+    .dl-row .dl-date { font-weight: 800; min-width: 6.5rem; font-size: 0.88rem; }
+    .dl-row .dl-type {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 7px;
+      border-radius: 999px;
+      letter-spacing: .02em;
+    }
+    .dl-type.type-deadline { background: #fee2e2; color: #b91c1c; }
+    .dl-type.type-meeting { background: #dbeafe; color: #1d4ed8; }
+    .dl-type.type-event { background: #d1fae5; color: #047857; }
+    .dl-row .dl-urgency {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+    .dl-urgency.u-overdue { background: #fecaca; color: #991b1b; }
+    .dl-urgency.u-today { background: #fde68a; color: #92400e; }
+    .dl-urgency.u-soon { background: #fed7aa; color: #9a3412; }
+    .dl-row .dl-title { font-weight: 700; font-size: 0.9rem; line-height: 1.35; color: var(--text, #1a2332); }
+    .dl-row .dl-notes { font-size: 0.75rem; color: var(--muted, #64748b); line-height: 1.35; }
+    .dl-empty { font-size: 0.85rem; color: var(--muted); padding: 8px 2px; }
     /* 早會（header 內嵌；分頁表格樣式見下） */
     .assembly-banner {
       margin: 0;
@@ -2388,6 +2498,11 @@
           <span class="asm-theme" id="assemblyBannerTheme"></span>
           <span id="assemblyBannerBadges"></span>
         </div>
+        <div class="deadline-banner" id="deadlineBanner" hidden title="開啟事項／Deadline 分頁">
+          <span class="dl-label">事項：</span>
+          <span class="dl-text" id="deadlineBannerText"></span>
+          <span class="dl-pill" id="deadlineBannerPill" hidden></span>
+        </div>
       </div>
     </div>
   </header>
@@ -2421,6 +2536,7 @@
       <button class="tab" data-tab="search" type="button">搜尋課室／班別</button>
       <button class="tab" data-tab="cycle" type="button">循環日覆寫</button>
       <button class="tab" data-tab="cal" type="button">校曆</button>
+      <button class="tab" data-tab="deadlines" type="button">事項／Deadline</button>
       <button class="tab" data-tab="duty" type="button">當值</button>
       <button class="tab" data-tab="assembly" type="button">早會</button>
       <button class="tab" data-tab="formteachers" type="button">班主任</button>
@@ -2633,6 +2749,33 @@
         <div class="cal-weekdays" id="calWeekdays" aria-hidden="true"></div>
         <div class="cal-grid" id="calGrid" role="grid" aria-label="校曆"></div>
         <div class="cal-detail" id="calDetail" aria-live="polite">點選日子會同步頂部（日期、循環日、事項、當值）。</div>
+      </div>
+    </section>
+
+    <!-- 事項／Deadline -->
+    <section class="panel" id="panel-deadlines">
+      <div class="card">
+        <h2>事項／Deadline</h2>
+        <p class="hint" style="margin-bottom:6px;">來自 2026–2027 校曆「文件遞交清單及校務會議」與備註欄。顯示逾期、今日同未來 14 日；點一列可改頂部日期。</p>
+        <div class="dl-filter-row" id="dlFilterRow" role="group" aria-label="篩選類型">
+          <button type="button" class="active" data-dl-filter="all">全部</button>
+          <button type="button" data-dl-filter="deadline">Deadline</button>
+          <button type="button" data-dl-filter="meeting">會議</button>
+          <button type="button" data-dl-filter="event">事項</button>
+        </div>
+        <div id="dlOverdueBlock" hidden>
+          <div class="dl-section-title">⚠ 逾期（近 7 日）</div>
+          <div class="dl-list" id="dlOverdueList"></div>
+        </div>
+        <div id="dlTodayBlock" hidden>
+          <div class="dl-section-title">今日</div>
+          <div class="dl-list" id="dlTodayList"></div>
+        </div>
+        <div id="dlUpcomingBlock">
+          <div class="dl-section-title">即將（14 日內）</div>
+          <div class="dl-list" id="dlUpcomingList"></div>
+        </div>
+        <p class="hint" id="dlMetaHint" style="margin-top:10px;"></p>
       </div>
     </section>
 
@@ -3042,6 +3185,7 @@
 
   <script src="data.js"></script>
   <script src="calendar.js"></script>
+  <script src="calendar-events.js"></script>
   <script src="bells.js"></script>
   <script src="duty.js"></script>
   <script src="assembly.js"></script>
@@ -3066,6 +3210,8 @@
   var LS_ADMIN_OVERRIDE_DATE = 'tt_admin_override_date';
 
   var CAL = window.CALENDAR_DATA || null;
+  var CAL_EVENTS = window.CALENDAR_EVENTS_DATA || null;
+  var dlFilter = 'all';
   var schoolCycleConfig = { overrideDay: null, pin: '1234', updated: null };
 
   var teachersByCode = {};
@@ -3101,6 +3247,17 @@
   var dutyBannerMain = document.getElementById('dutyBannerMain');
   var dutyUpcomingList = document.getElementById('dutyUpcomingList');
   var dutyRoleHint = document.getElementById('dutyRoleHint');
+  var deadlineBanner = document.getElementById('deadlineBanner');
+  var deadlineBannerText = document.getElementById('deadlineBannerText');
+  var deadlineBannerPill = document.getElementById('deadlineBannerPill');
+  var dlOverdueList = document.getElementById('dlOverdueList');
+  var dlTodayList = document.getElementById('dlTodayList');
+  var dlUpcomingList = document.getElementById('dlUpcomingList');
+  var dlOverdueBlock = document.getElementById('dlOverdueBlock');
+  var dlTodayBlock = document.getElementById('dlTodayBlock');
+  var dlUpcomingBlock = document.getElementById('dlUpcomingBlock');
+  var dlMetaHint = document.getElementById('dlMetaHint');
+  var dlFilterRow = document.getElementById('dlFilterRow');
   var assemblyBanner = document.getElementById('assemblyBanner');
   var assemblyBannerLabel = document.getElementById('assemblyBannerLabel');
   var assemblyBannerTheme = document.getElementById('assemblyBannerTheme');
@@ -3503,6 +3660,244 @@
     }
   }
 
+
+  /* --- 事項／Deadline reminders (calendar-events.js) --- */
+  var DL_TYPE_LABEL = { deadline: 'Deadline', meeting: '會議', event: '事項' };
+  var DL_LOOKAHEAD_DAYS = 14;
+  var DL_OVERDUE_DAYS = 7;
+
+  function calEventsItems() {
+    return (CAL_EVENTS && Array.isArray(CAL_EVENTS.items)) ? CAL_EVENTS.items : [];
+  }
+
+  function itemActiveOn(item, ymd) {
+    if (!item || !item.date) return false;
+    var end = item.endDate || item.date;
+    return item.date <= ymd && ymd <= end;
+  }
+
+  function itemsForYmd(ymd, typ) {
+    return calEventsItems().filter(function (it) {
+      if (typ && typ !== 'all' && it.type !== typ) return false;
+      return itemActiveOn(it, ymd);
+    });
+  }
+
+  function daysBetweenYmd(a, b) {
+    // a,b YYYY-MM-DD → signed day delta (b - a), using UTC noon to avoid DST issues
+    var pa = a.split('-').map(Number);
+    var pb = b.split('-').map(Number);
+    var da = Date.UTC(pa[0], pa[1] - 1, pa[2], 12);
+    var db = Date.UTC(pb[0], pb[1] - 1, pb[2], 12);
+    return Math.round((db - da) / 86400000);
+  }
+
+  function urgencyForItem(item, today) {
+    if (!item || !item.date) return null;
+    var start = item.date;
+    var end = item.endDate || item.date;
+    if (end < today) {
+      return { key: 'overdue', label: '逾期', days: daysBetweenYmd(end, today) };
+    }
+    if (itemActiveOn(item, today) || start === today) {
+      return { key: 'today', label: '今日', days: 0 };
+    }
+    var d = daysBetweenYmd(today, start);
+    if (d >= 1 && d <= 3) return { key: 'soon', label: d + ' 日後', days: d };
+    if (d > 3 && d <= DL_LOOKAHEAD_DAYS) return { key: 'upcoming', label: d + ' 日後', days: d };
+    return { key: 'later', label: '', days: d };
+  }
+
+  function filterByType(list, typ) {
+    if (!typ || typ === 'all') return list;
+    return list.filter(function (it) { return it.type === typ; });
+  }
+
+  function collectDeadlineBuckets(today, typ) {
+    today = today || todayYmdHK();
+    typ = typ || dlFilter || 'all';
+    var overdue = [];
+    var todayItems = [];
+    var upcoming = [];
+    var seen = {};
+    calEventsItems().forEach(function (it) {
+      if (typ && typ !== 'all' && it.type !== typ) return;
+      var end = it.endDate || it.date;
+      var key = it.date + '|' + it.type + '|' + it.title;
+      if (seen[key]) return;
+      seen[key] = true;
+      var u = urgencyForItem(it, today);
+      if (!u) return;
+      if (u.key === 'overdue' && u.days <= DL_OVERDUE_DAYS) overdue.push(it);
+      else if (u.key === 'today') todayItems.push(it);
+      else if (u.key === 'soon' || u.key === 'upcoming') upcoming.push(it);
+    });
+    function sortItems(a, b) {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      var oa = { deadline: 0, meeting: 1, event: 2 }[a.type] || 9;
+      var ob = { deadline: 0, meeting: 1, event: 2 }[b.type] || 9;
+      if (oa !== ob) return oa - ob;
+      return (a.title || '').localeCompare(b.title || '', 'zh-HK');
+    }
+    overdue.sort(sortItems);
+    todayItems.sort(sortItems);
+    upcoming.sort(sortItems);
+    return { overdue: overdue, today: todayItems, upcoming: upcoming, todayYmd: today };
+  }
+
+  function makeDlRow(item, today) {
+    var row = document.createElement('div');
+    row.className = 'dl-row';
+    var u = urgencyForItem(item, today);
+    if (u && u.key === 'overdue') row.classList.add('is-overdue');
+    else if (u && u.key === 'today') row.classList.add('is-today');
+    else if (u && u.key === 'soon') row.classList.add('is-soon');
+
+    var head = document.createElement('div');
+    head.className = 'dl-row-head';
+    var dateEl = document.createElement('span');
+    dateEl.className = 'dl-date';
+    var dateText = formatYmdZh(item.date);
+    if (weekdayLabelHK(item.date)) dateText += '（' + weekdayLabelHK(item.date) + '）';
+    if (item.endDate && item.endDate !== item.date) {
+      dateText += '–' + formatYmdZh(item.endDate).replace(/^\d{4}年/, '');
+    }
+    dateEl.textContent = dateText;
+    head.appendChild(dateEl);
+
+    var typeEl = document.createElement('span');
+    typeEl.className = 'dl-type type-' + (item.type || 'event');
+    typeEl.textContent = DL_TYPE_LABEL[item.type] || item.type || '';
+    head.appendChild(typeEl);
+
+    if (u && (u.key === 'overdue' || u.key === 'today' || u.key === 'soon')) {
+      var urg = document.createElement('span');
+      urg.className = 'dl-urgency u-' + u.key;
+      urg.textContent = u.label;
+      head.appendChild(urg);
+    }
+    row.appendChild(head);
+
+    var titleEl = document.createElement('div');
+    titleEl.className = 'dl-title';
+    titleEl.textContent = item.title || '';
+    row.appendChild(titleEl);
+
+    if (item.notes) {
+      var notesEl = document.createElement('div');
+      notesEl.className = 'dl-notes';
+      notesEl.textContent = item.notes;
+      row.appendChild(notesEl);
+    }
+
+    row.title = '點擊查閱此日';
+    row.addEventListener('click', function () {
+      onDatePicked(item.date);
+    });
+    return row;
+  }
+
+  function fillDlList(el, items, today) {
+    if (!el) return;
+    el.innerHTML = '';
+    if (!items.length) {
+      var empty = document.createElement('div');
+      empty.className = 'dl-empty';
+      empty.textContent = '沒有項目。';
+      el.appendChild(empty);
+      return;
+    }
+    items.forEach(function (it) {
+      el.appendChild(makeDlRow(it, today));
+    });
+  }
+
+  function renderDeadlinesPanel(ymd) {
+    var today = todayYmdHK();
+    var buckets = collectDeadlineBuckets(today, dlFilter);
+    fillDlList(dlOverdueList, buckets.overdue, today);
+    fillDlList(dlTodayList, buckets.today, today);
+    fillDlList(dlUpcomingList, buckets.upcoming, today);
+    if (dlOverdueBlock) dlOverdueBlock.hidden = !buckets.overdue.length;
+    if (dlTodayBlock) dlTodayBlock.hidden = !buckets.today.length;
+    if (dlUpcomingBlock) {
+      // keep visible; show empty message inside list
+      dlUpcomingBlock.hidden = false;
+    }
+    if (dlMetaHint) {
+      var n = calEventsItems().length;
+      var meta = (CAL_EVENTS && CAL_EVENTS.meta) ? CAL_EVENTS.meta : null;
+      var src = meta && meta.source ? meta.source : '校曆表';
+      dlMetaHint.textContent =
+        '共 ' + n + ' 項（Deadline／會議／事項）。來源：' + src +
+        '。篩選：' + (dlFilter === 'all' ? '全部' : (DL_TYPE_LABEL[dlFilter] || dlFilter)) + '。';
+    }
+  }
+
+  function refreshDeadlineBanner(ymd) {
+    if (!deadlineBanner || !deadlineBannerText) return;
+    var today = todayYmdHK();
+    // Banner always reflects real today (reminders), not browse date
+    var buckets = collectDeadlineBuckets(today, 'all');
+    // Prefer deadlines/meetings over generic events for the compact line
+    function pickLine(list) {
+      var dl = list.filter(function (it) { return it.type === 'deadline' || it.type === 'meeting'; });
+      return dl.length ? dl : list;
+    }
+    var focus = pickLine(buckets.today);
+    var mode = 'today';
+    if (!focus.length) {
+      focus = pickLine(buckets.overdue);
+      mode = 'overdue';
+    }
+    if (!focus.length) {
+      focus = pickLine(buckets.upcoming).slice(0, 3);
+      mode = focus.length ? 'soon' : '';
+    } else if (mode === 'today') {
+      // also hint if something is soon
+    }
+    deadlineBanner.classList.remove('is-today', 'is-soon', 'is-overdue');
+    if (!focus.length) {
+      deadlineBanner.hidden = true;
+      deadlineBannerText.textContent = '';
+      if (deadlineBannerPill) { deadlineBannerPill.hidden = true; deadlineBannerPill.textContent = ''; }
+      return;
+    }
+    deadlineBanner.hidden = false;
+    var titles = focus.slice(0, 2).map(function (it) {
+      var prefix = '';
+      if (it.type === 'deadline') prefix = '📋 ';
+      else if (it.type === 'meeting') prefix = '🗓 ';
+      return prefix + it.title;
+    });
+    var more = focus.length > 2 ? ' 等 ' + focus.length + ' 項' : (focus.length === 2 ? '' : '');
+    var text = titles.join(' · ');
+    if (focus.length > 2) text += ' 等 ' + focus.length + ' 項';
+    if (mode === 'overdue') {
+      deadlineBannerText.textContent = '逾期：' + text;
+      deadlineBanner.classList.add('is-overdue');
+      if (deadlineBannerPill) { deadlineBannerPill.hidden = false; deadlineBannerPill.textContent = '逾期'; }
+    } else if (mode === 'today') {
+      deadlineBannerText.textContent = text;
+      deadlineBanner.classList.add('is-today');
+      if (deadlineBannerPill) { deadlineBannerPill.hidden = false; deadlineBannerPill.textContent = '今日'; }
+    } else {
+      var first = focus[0];
+      var d = daysBetweenYmd(today, first.date);
+      deadlineBannerText.textContent = (d === 1 ? '明日：' : d + ' 日後：') + text;
+      deadlineBanner.classList.add(d <= 3 ? 'is-soon' : '');
+      if (deadlineBannerPill) {
+        deadlineBannerPill.hidden = false;
+        deadlineBannerPill.textContent = d <= 3 ? '即將' : '預告';
+      }
+    }
+  }
+
+  function refreshDeadlinesUI(ymd) {
+    refreshDeadlineBanner(ymd);
+    renderDeadlinesPanel(ymd);
+  }
+
   function assemblyForDay(day) {
     if (!ASSEMBLY || !ASSEMBLY.days || day == null) return null;
     return ASSEMBLY.days[String(day)] || null;
@@ -3653,12 +4048,13 @@
   }
 
   function updateDateResultUI(info) {
-    // Header is the single source of truth for date / cycle / events / duty / assembly.
+    // Header is the single source of truth for date / cycle / events / duty / assembly / deadlines.
     refreshCalBanner(info.ymd);
     refreshDutyBanner(info.ymd);
     refreshDutyPanel(info.ymd);
     refreshAssemblyBanner(info.ymd);
     renderAssemblyPanel(info.ymd);
+    refreshDeadlinesUI(info.ymd);
   }
 
   /** Apply a picked calendar date: update UI; if school day, jump cycle day. */
@@ -3918,7 +4314,15 @@
     }
     var evEl = document.getElementById('calBannerEvents');
     if (evEl) {
-      var evs = eventsFor(ymd);
+      var evs = eventsFor(ymd).slice();
+      var extra = itemsForYmd(ymd, 'all').filter(function (it) {
+        return it.type === 'deadline' || it.type === 'meeting';
+      }).map(function (it) {
+        return (it.type === 'meeting' ? '會議：' : 'Deadline：') + it.title;
+      });
+      extra.forEach(function (t) {
+        if (evs.indexOf(t) === -1) evs.push(t);
+      });
       if (evs.length) {
         evEl.innerHTML = '';
         var lab = document.createElement('span');
@@ -4499,6 +4903,9 @@
     }
     if (name === 'assembly') {
       renderAssemblyPanel(state.browseDate || todayYmdHK());
+    }
+    if (name === 'deadlines') {
+      renderDeadlinesPanel(state.browseDate || todayYmdHK());
     }
   }
 
@@ -6468,6 +6875,27 @@
     });
   }
 
+  if (dlFilterRow) {
+    dlFilterRow.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-dl-filter]');
+      if (!btn) return;
+      dlFilter = btn.getAttribute('data-dl-filter') || 'all';
+      dlFilterRow.querySelectorAll('button').forEach(function (b) {
+        b.classList.toggle('active', b === btn);
+      });
+      renderDeadlinesPanel(state.browseDate || todayYmdHK());
+    });
+  }
+  if (deadlineBanner) {
+    deadlineBanner.addEventListener('click', function () {
+      switchTab('deadlines');
+      try {
+        var panel = document.getElementById('panel-deadlines');
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {}
+    });
+  }
+
 
   // --- 校曆檢視 (month / week) ---
   var CIRCLE_DAYS = ['', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
@@ -7368,6 +7796,10 @@
       }
     } catch (e) {}
     refreshCycleUI();
+    try {
+      var hash = (location.hash || '').replace(/^#/, '');
+      if (hash === 'deadlines') switchTab('deadlines');
+    } catch (eHash) {}
   }
 
   // Load optional school-wide cycle-config.json (static hosting)

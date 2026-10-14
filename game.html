@@ -196,6 +196,22 @@
     .lesson-line strong { color: var(--wood-deeper); }
     .lesson-line .muted { color: var(--muted); font-size: 0.8rem; }
 
+    .game-deadline-hint {
+      margin: 6px 12px 0;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      font-size: 0.78rem;
+      font-weight: 650;
+      line-height: 1.35;
+      color: #9a3412;
+      display: none;
+    }
+    .game-deadline-hint.show { display: block; }
+    .game-deadline-hint a { color: #c2410c; font-weight: 800; text-decoration: none; }
+    .game-deadline-hint.is-overdue { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .game-deadline-hint.is-today { background: #fffbeb; border-color: #fde68a; color: #92400e; }
     /* ===== School-day timeline scrubber (課室 + 教員室) ===== */
     .timeline-card {
       background: var(--card);
@@ -3302,6 +3318,8 @@
       <div class="timeline-marks" id="timelineMarks" role="list"></div>
     </div>
 
+    <div class="game-deadline-hint" id="gameDeadlineHint" hidden></div>
+
     <div class="scene-tabs" role="tablist" aria-label="場景切換">
       <button type="button" class="scene-tab active" id="tabClassroom" role="tab" aria-selected="true" data-view="classroom">🏫 課室</button>
       <button type="button" class="scene-tab" id="tabPlayground" role="tab" aria-selected="false" data-view="playground" title="PLAYGROUND1 學校操場籃球場">🏀 操場／籃球場</button>
@@ -3527,6 +3545,7 @@
   <script src="data.js?v=live-scene-init-fix-v1"></script>
   <script src="bells.js?v=live-scene-init-fix-v1"></script>
   <script src="calendar.js?v=live-scene-init-fix-v1"></script>
+  <script src="calendar-events.js?v=deadlines-v1"></script>
   <script src="duty.js?v=live-scene-init-fix-v1"></script>
   <script src="form-teachers.js?v=live-scene-init-fix-v1"></script>
   <script src="assembly.js?v=morning-assembly-v1"></script>
@@ -3719,6 +3738,56 @@
         minutes: hh * 60 + mm
       };
     }
+  }
+
+
+  function paintGameDeadlineHint() {
+    var el = document.getElementById('gameDeadlineHint');
+    if (!el) return;
+    var data = window.CALENDAR_EVENTS_DATA;
+    if (!data || !Array.isArray(data.items)) {
+      el.hidden = true;
+      el.classList.remove('show');
+      return;
+    }
+    var today = todayYmdHK();
+    function activeOn(it, ymd) {
+      var end = it.endDate || it.date;
+      return it.date <= ymd && ymd <= end;
+    }
+    function daysBetween(a, b) {
+      var pa = a.split('-').map(Number);
+      var pb = b.split('-').map(Number);
+      return Math.round((Date.UTC(pb[0], pb[1]-1, pb[2], 12) - Date.UTC(pa[0], pa[1]-1, pa[2], 12)) / 86400000);
+    }
+    var overdue = [];
+    var todayItems = [];
+    var soon = [];
+    data.items.forEach(function (it) {
+      if (it.type !== 'deadline' && it.type !== 'meeting') return;
+      var end = it.endDate || it.date;
+      if (end < today && daysBetween(end, today) <= 7) overdue.push(it);
+      else if (activeOn(it, today) || it.date === today) todayItems.push(it);
+      else if (it.date > today && daysBetween(today, it.date) <= 3) soon.push(it);
+    });
+    var focus = todayItems.length ? todayItems : (overdue.length ? overdue : soon);
+    var mode = todayItems.length ? 'today' : (overdue.length ? 'overdue' : (soon.length ? 'soon' : ''));
+    el.classList.remove('is-today', 'is-overdue', 'show');
+    if (!focus.length) {
+      el.hidden = true;
+      el.innerHTML = '';
+      return;
+    }
+    var titles = focus.slice(0, 2).map(function (it) { return it.title; });
+    var text = titles.join(' · ');
+    if (focus.length > 2) text += ' 等' + focus.length + '項';
+    var label = mode === 'overdue' ? '逾期' : (mode === 'today' ? '今日事項' : '即將');
+    el.innerHTML = '<strong>' + label + '</strong>：' + text +
+      ' · <a href="index.html#deadlines">詳情</a>';
+    el.hidden = false;
+    el.classList.add('show');
+    if (mode === 'today') el.classList.add('is-today');
+    if (mode === 'overdue') el.classList.add('is-overdue');
   }
 
   /* ===== Timeline scrubber: live HKT vs preview minutes (課室 + 教員室) ===== */
@@ -9158,6 +9227,7 @@
   }
 
   function render() {
+    try { paintGameDeadlineHint(); } catch (eDl) {}
     var ctx = getContext();
     var clockEl = document.getElementById('clockHm');
     if (clockEl) clockEl.textContent = ctx.hm + (ctx.scrubbed ? ' 預覽' : '');
