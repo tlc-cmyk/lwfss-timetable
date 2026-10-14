@@ -1315,89 +1315,92 @@
 
 
 
-    /* Cover password gate (client-side only) */
-    .cover-gate-card .cover-gate-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .cover-gate-card input[type="password"] {
-      flex: 1;
-      min-width: 0;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 1rem;
-      background: #fff;
-    }
-    .cover-gate-card input[type="password"]:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--focus-ring);
-    }
-    .cover-gate-note {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 10px;
-    }
-    #coverUnlocked[hidden],
-    #coverGateCard[hidden] { display: none !important; }
-
-    /* Member / game password gate modal */
-    .member-gate-backdrop {
+    /* Site-wide password gate (client-side only; localStorage) */
+    .site-gate-screen {
       position: fixed; inset: 0;
-      background: rgba(30, 45, 70, 0.45);
-      z-index: 1200;
-      display: none;
+      z-index: 2000;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 20px 16px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, #d6e4f5 0%, var(--bg) 45%, #c5d8ef 100%);
     }
-    .member-gate-backdrop.show { display: flex; }
-    .member-gate-modal {
-      width: min(420px, 100%);
-      background: var(--card, #fff);
+    .site-gate-screen[hidden] { display: none !important; }
+    html.site-unlocked .site-gate-screen { display: none !important; }
+    html.site-unlocked body.site-gated .app-header,
+    html.site-unlocked body.site-gated .wrap,
+    html.site-unlocked body.site-gated .app-footer {
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+    .site-gate-card {
+      width: min(400px, 100%);
+      background: var(--card);
       border: 1.5px solid var(--border);
-      border-radius: var(--radius, 14px);
-      box-shadow: 0 12px 40px rgba(30, 45, 70, 0.25);
-      padding: 18px 16px 16px;
-    }
-    .member-gate-modal h2 {
-      font-size: 1.1rem;
-      margin: 0 0 6px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 16px 16px;
       color: var(--text);
     }
-    .member-gate-modal .hint { margin-bottom: 10px; }
-    .member-gate-row {
+    .site-gate-card h1 {
+      font-size: 1.15rem;
+      margin: 0 0 8px;
+      color: var(--primary);
+    }
+    .site-gate-card .gate-hint {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+    .site-gate-card label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+    .site-gate-row {
       display: flex;
       gap: 8px;
-      margin-top: 4px;
+      margin-bottom: 8px;
     }
-    .member-gate-row input[type="password"] {
+    .site-gate-row input[type="password"] {
       flex: 1;
       min-width: 0;
       border: 1.5px solid var(--border);
       border-radius: 10px;
       padding: 10px 12px;
       font-size: 1rem;
-      background: #fff;
       font-family: inherit;
+      background: #fff;
+      color: var(--text);
     }
-    .member-gate-row input[type="password"]:focus {
+    .site-gate-row input[type="password"]:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px var(--focus-ring);
     }
-    .member-gate-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      justify-content: flex-end;
+    .site-gate-card .gate-error {
+      color: var(--danger);
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 4px 0 8px;
+      display: none;
     }
-    .member-gate-note {
-      font-size: 0.78rem;
+    .site-gate-card .gate-error.show { display: block; }
+    .site-gate-card .gate-note {
+      font-size: 0.75rem;
       color: var(--muted);
       margin-top: 10px;
+    }
+    body.site-gated .app-header,
+    body.site-gated .wrap,
+    body.site-gated .app-footer {
+      visibility: hidden !important;
+      pointer-events: none !important;
     }
 
     /* Cover / substitute assistant */
@@ -2463,6 +2466,37 @@
   </style>
 </head>
 <body>
+  <script>
+  (function () {
+    try {
+      var k = 'lwfssSiteUnlocked';
+      var ok = localStorage.getItem(k) === '1';
+      if (ok) {
+        document.documentElement.classList.add('site-unlocked');
+      } else {
+        document.body.classList.add('site-gated');
+      }
+    } catch (e) {
+      document.body.classList.add('site-gated');
+    }
+  })();
+  </script>
+  <div class="site-gate-screen" id="siteGateScreen" role="dialog" aria-modal="true" aria-labelledby="siteGateHeading">
+    <div class="site-gate-card">
+      <h1 id="siteGateHeading">網站密碼</h1>
+      <p class="gate-hint">請輸入密碼以使用本網站。解鎖後本瀏覽器會記住（唔使每次重新輸入）。</p>
+      <form id="siteGateForm" action="#" method="dialog" autocomplete="on">
+        <label for="siteGatePassword">密碼</label>
+        <div class="site-gate-row">
+          <input type="password" id="siteGatePassword" name="siteGatePassword" placeholder="輸入密碼…" autocomplete="current-password" />
+          <button type="submit" class="btn" id="siteGateUnlockBtn">解鎖</button>
+        </div>
+      </form>
+      <div class="gate-error" id="siteGateError">密碼不正確，請再試。</div>
+      <p class="gate-note">僅前端檢查，並非真正保安；請勿依賴此密碼保護敏感資料。</p>
+    </div>
+  </div>
+
   <header class="app-header">
     <h1>教師時間表</h1>
     <div class="header-info" id="headerInfo">
@@ -2658,19 +2692,6 @@
 
     <!-- Cover / substitute assistant -->
     <section class="panel" id="panel-cover">
-      <div class="card cover-gate-card" id="coverGateCard">
-        <h2>代堂助手</h2>
-        <p class="hint" style="margin-bottom:10px;">請輸入密碼以使用代堂助手。解鎖後本瀏覽器分頁／視窗有效（sessionStorage）。</p>
-        <label class="field-label" for="coverPassword">密碼</label>
-        <div class="cover-gate-row">
-          <input type="password" id="coverPassword" placeholder="輸入密碼…" autocomplete="current-password" />
-          <button class="btn" id="coverUnlockBtn" type="button">解鎖</button>
-        </div>
-        <div class="error-msg" id="coverGateError">密碼不正確，請再試。</div>
-        <p class="cover-gate-note">僅前端檢查，並非真正保安；請勿依賴此密碼保護敏感資料。</p>
-      </div>
-
-      <div id="coverUnlocked" hidden>
       <div class="card">
         <h2>代堂助手</h2>
         <p class="hint" style="margin-bottom:10px;">先揀缺席教師，再揀循環日（或跟頂部校曆日期），為當日每節課堂指派代堂老師同備註，最後匯出。</p>
@@ -2720,7 +2741,6 @@
         <pre class="cover-export-preview" id="coverExportPreview" aria-live="polite"></pre>
       </div>
       <div class="empty" id="coverEmpty">請先輸入缺席教師 ShortName，再按「載入課堂」。</div>
-      </div><!-- /#coverUnlocked -->
     </section>
 
 
@@ -3164,22 +3184,6 @@
     </section>
   </div>
 
-  <div class="member-gate-backdrop" id="memberGateBackdrop" hidden aria-hidden="true">
-    <div class="member-gate-modal" role="dialog" aria-modal="true" aria-labelledby="memberGateTitle">
-      <h2 id="memberGateTitle">會員付費</h2>
-      <p class="hint">請輸入會員密碼以進入模擬遊戲。解鎖後本瀏覽器分頁／視窗有效（sessionStorage）。</p>
-      <label class="field-label" for="memberGatePassword">密碼</label>
-      <div class="member-gate-row">
-        <input type="password" id="memberGatePassword" placeholder="輸入密碼…" autocomplete="current-password" />
-        <button class="btn" id="memberGateUnlockBtn" type="button">進入</button>
-      </div>
-      <div class="error-msg" id="memberGateError">密碼不正確，請再試。</div>
-      <div class="member-gate-actions">
-        <button class="btn btn-ghost" id="memberGateCancelBtn" type="button">取消</button>
-      </div>
-      <p class="member-gate-note">僅前端檢查，並非真正保安。</p>
-    </div>
-  </div>
 
   <footer class="app-footer" id="appFooter"></footer>
 
@@ -4957,69 +4961,106 @@
   }
 
 
-  // --- Cover password gate (client-side only; not real security) ---
-  var COVER_GATE_KEY = 'lwfssCoverUnlocked';
-  var COVER_PASSWORD = '123';
-  var coverGateCard = document.getElementById('coverGateCard');
-  var coverUnlockedEl = document.getElementById('coverUnlocked');
-  var coverPassword = document.getElementById('coverPassword');
-  var coverUnlockBtn = document.getElementById('coverUnlockBtn');
-  var coverGateError = document.getElementById('coverGateError');
+  // --- Site-wide password gate (client-side only; localStorage) ---
+  var SITE_GATE_KEY = 'lwfssSiteUnlocked';
+  var SITE_PASSWORD = '6';
+  var siteGateScreen = document.getElementById('siteGateScreen');
+  var siteGatePassword = document.getElementById('siteGatePassword');
+  var siteGateUnlockBtn = document.getElementById('siteGateUnlockBtn');
+  var siteGateError = document.getElementById('siteGateError');
+  var siteGateForm = document.getElementById('siteGateForm');
+  var siteUnlockedMemory = false;
 
-  function isCoverUnlocked() {
+  function isSiteUnlocked() {
+    if (siteUnlockedMemory) return true;
     try {
-      return sessionStorage.getItem(COVER_GATE_KEY) === '1';
+      return localStorage.getItem(SITE_GATE_KEY) === '1';
     } catch (e) {
       return false;
     }
   }
 
-  function setCoverUnlocked() {
-    try {
-      sessionStorage.setItem(COVER_GATE_KEY, '1');
-    } catch (e) { /* ignore quota / private mode */ }
+  function setSiteUnlocked() {
+    siteUnlockedMemory = true;
+    try { localStorage.setItem(SITE_GATE_KEY, '1'); } catch (e) { /* ignore quota / private mode */ }
   }
 
-  function applyCoverGate() {
-    var unlocked = isCoverUnlocked();
-    if (coverGateCard) coverGateCard.hidden = unlocked;
-    if (coverUnlockedEl) coverUnlockedEl.hidden = !unlocked;
-    if (coverGateError) coverGateError.classList.remove('show');
-    if (!unlocked && coverPassword) {
-      coverPassword.value = '';
-      setTimeout(function () {
-        try { coverPassword.focus(); } catch (e) {}
-      }, 0);
+  function applySiteGate() {
+    var unlocked = isSiteUnlocked();
+    if (unlocked) {
+      siteUnlockedMemory = true;
+      document.documentElement.classList.add('site-unlocked');
+      document.body.classList.remove('site-gated');
+      if (siteGateScreen) {
+        siteGateScreen.hidden = true;
+        siteGateScreen.setAttribute('aria-hidden', 'true');
+      }
+      if (siteGateError) siteGateError.classList.remove('show');
+    } else {
+      document.documentElement.classList.remove('site-unlocked');
+      document.body.classList.add('site-gated');
+      if (siteGateScreen) {
+        siteGateScreen.hidden = false;
+        siteGateScreen.setAttribute('aria-hidden', 'false');
+      }
+      if (siteGateError) siteGateError.classList.remove('show');
+      if (siteGatePassword && !siteGatePassword.value) {
+        setTimeout(function () {
+          try { siteGatePassword.focus(); } catch (e) {}
+        }, 0);
+      }
     }
+    return unlocked;
   }
 
-  function tryUnlockCover() {
-    var pw = coverPassword ? String(coverPassword.value || '') : '';
-    if (pw === COVER_PASSWORD) {
-      setCoverUnlocked();
-      applyCoverGate();
-      if (typeof refreshCoverDateHint === 'function') refreshCoverDateHint();
-      return;
+  function tryUnlockSite() {
+    if (siteUnlockedMemory || isSiteUnlocked()) {
+      setSiteUnlocked();
+      applySiteGate();
+      return true;
     }
-    if (coverGateError) coverGateError.classList.add('show');
-    if (coverPassword) {
-      coverPassword.value = '';
-      coverPassword.focus();
+    var pw = siteGatePassword ? String(siteGatePassword.value || '') : '';
+    if (pw === SITE_PASSWORD) {
+      setSiteUnlocked();
+      applySiteGate();
+      return true;
     }
+    if (siteGateError) siteGateError.classList.add('show');
+    if (siteGatePassword) {
+      siteGatePassword.value = '';
+      siteGatePassword.focus();
+    }
+    return false;
   }
 
-  if (coverUnlockBtn) {
-    coverUnlockBtn.addEventListener('click', tryUnlockCover);
+  if (siteGateForm) {
+    siteGateForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      tryUnlockSite();
+      return false;
+    });
   }
-  if (coverPassword) {
-    coverPassword.addEventListener('keydown', function (e) {
+  if (siteGateUnlockBtn) {
+    siteGateUnlockBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      tryUnlockSite();
+    });
+  }
+  if (siteGatePassword) {
+    siteGatePassword.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        tryUnlockCover();
+        e.stopPropagation();
+        tryUnlockSite();
       }
     });
   }
-  applyCoverGate();
+  applySiteGate();
+
+  // Cover panel: no separate password (site gate covers whole site)
+  function isCoverUnlocked() { return true; }
+  function applyCoverGate() { /* no-op */ }
 
   // --- Cover / substitute assistant ---
   var coverDay = document.getElementById('coverDay');
@@ -6666,102 +6707,11 @@
     }
   });
 
-  // --- Member / game password gate (client-side only) ---
-  var MEMBER_GATE_KEY = 'lwfssMemberUnlocked';
-  var MEMBER_PASSWORD = '111';
-  var memberGateBackdrop = document.getElementById('memberGateBackdrop');
-  var memberGatePassword = document.getElementById('memberGatePassword');
-  var memberGateUnlockBtn = document.getElementById('memberGateUnlockBtn');
-  var memberGateCancelBtn = document.getElementById('memberGateCancelBtn');
-  var memberGateError = document.getElementById('memberGateError');
-  var gameTabLink = document.getElementById('gameTabLink');
-
-  function isMemberUnlocked() {
-    try {
-      return sessionStorage.getItem(MEMBER_GATE_KEY) === '1';
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function setMemberUnlocked() {
-    try {
-      sessionStorage.setItem(MEMBER_GATE_KEY, '1');
-    } catch (e) { /* ignore quota / private mode */ }
-  }
-
-  function openMemberGate() {
-    if (!memberGateBackdrop) return;
-    memberGateBackdrop.hidden = false;
-    memberGateBackdrop.setAttribute('aria-hidden', 'false');
-    memberGateBackdrop.classList.add('show');
-    if (memberGateError) memberGateError.classList.remove('show');
-    if (memberGatePassword) {
-      memberGatePassword.value = '';
-      setTimeout(function () {
-        try { memberGatePassword.focus(); } catch (e) {}
-      }, 0);
-    }
-  }
-
-  function closeMemberGate() {
-    if (!memberGateBackdrop) return;
-    memberGateBackdrop.classList.remove('show');
-    memberGateBackdrop.hidden = true;
-    memberGateBackdrop.setAttribute('aria-hidden', 'true');
-    if (memberGateError) memberGateError.classList.remove('show');
-    if (memberGatePassword) memberGatePassword.value = '';
-  }
-
-  function tryUnlockMember() {
-    var pw = memberGatePassword ? String(memberGatePassword.value || '') : '';
-    if (pw === MEMBER_PASSWORD) {
-      setMemberUnlocked();
-      closeMemberGate();
-      window.location.href = 'game.html';
-      return;
-    }
-    if (memberGateError) memberGateError.classList.add('show');
-    if (memberGatePassword) {
-      memberGatePassword.value = '';
-      memberGatePassword.focus();
-    }
-  }
-
-  if (memberGateUnlockBtn) {
-    memberGateUnlockBtn.addEventListener('click', tryUnlockMember);
-  }
-  if (memberGateCancelBtn) {
-    memberGateCancelBtn.addEventListener('click', closeMemberGate);
-  }
-  if (memberGatePassword) {
-    memberGatePassword.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        tryUnlockMember();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        closeMemberGate();
-      }
-    });
-  }
-  if (memberGateBackdrop) {
-    memberGateBackdrop.addEventListener('click', function (e) {
-      if (e.target === memberGateBackdrop) closeMemberGate();
-    });
-  }
-
+  // Game tab: site gate already unlocked whole site; navigate freely
   document.querySelectorAll('.tab').forEach(function (tab) {
     tab.addEventListener('click', function (e) {
-      // External linked tab: 會員付費 → game.html (password-gated)
       if (tab.tagName === 'A' && tab.getAttribute('href')) {
-        if (tab.id === 'gameTabLink' || tab.dataset.tab === 'game') {
-          if (isMemberUnlocked()) return; // allow navigation
-          e.preventDefault();
-          openMemberGate();
-          return;
-        }
-        return;
+        return; // allow navigation (e.g. game.html)
       }
       e.preventDefault();
       switchTab(tab.dataset.tab);

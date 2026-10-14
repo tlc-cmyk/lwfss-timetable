@@ -3250,10 +3250,9 @@
   <script>
   (function () {
     try {
-      var k = 'lwfssMemberUnlocked';
-      var ok = sessionStorage.getItem(k) === '1' || localStorage.getItem(k) === '1';
+      var k = 'lwfssSiteUnlocked';
+      var ok = localStorage.getItem(k) === '1';
       if (ok) {
-        try { sessionStorage.setItem(k, '1'); } catch (e0) {}
         document.documentElement.classList.add('member-unlocked');
       } else {
         document.body.classList.add('member-gated');
@@ -3265,17 +3264,17 @@
   </script>
   <div class="member-gate-screen" id="memberGateScreen" role="dialog" aria-modal="true" aria-labelledby="memberGateHeading">
     <div class="member-gate-card">
-      <h1 id="memberGateHeading">會員付費</h1>
-      <p class="gate-hint">請輸入會員密碼以進入模擬遊戲。解鎖後本瀏覽器會記住（唔會每次重新輸入）。</p>
+      <h1 id="memberGateHeading">網站密碼</h1>
+      <p class="gate-hint">請輸入密碼以使用本網站。解鎖後本瀏覽器會記住（唔使每次重新輸入）。</p>
       <form id="memberGateForm" action="#" method="dialog" autocomplete="on">
         <label for="memberGatePassword">密碼</label>
         <div class="member-gate-row">
           <input type="password" id="memberGatePassword" name="memberGatePassword" placeholder="輸入密碼…" autocomplete="current-password" />
-          <button type="submit" class="btn primary" id="memberGateUnlockBtn" style="grid-column:auto;padding:10px 14px;">進入</button>
+          <button type="submit" class="btn primary" id="memberGateUnlockBtn" style="grid-column:auto;padding:10px 14px;">解鎖</button>
         </div>
       </form>
       <div class="gate-error" id="memberGateError">密碼不正確，請再試。</div>
-      <p class="gate-note">僅前端檢查，並非真正保安。</p>
+      <p class="gate-note">僅前端檢查，並非真正保安；請勿依賴此密碼保護敏感資料。</p>
       <a class="gate-back" href="index.html">← 返回課表</a>
     </div>
   </div>
@@ -3556,9 +3555,9 @@
 (function () {
   'use strict';
 
-  // --- Member password gate (client-side only; persist; no re-prompt loop) ---
-  var MEMBER_GATE_KEY = 'lwfssMemberUnlocked';
-  var MEMBER_PASSWORD = '111';
+  // --- Site-wide password gate (shared with index.html; localStorage) ---
+  var MEMBER_GATE_KEY = 'lwfssSiteUnlocked';
+  var MEMBER_PASSWORD = '6';
   var memberGateScreen = document.getElementById('memberGateScreen');
   var memberGatePassword = document.getElementById('memberGatePassword');
   var memberGateUnlockBtn = document.getElementById('memberGateUnlockBtn');
@@ -3569,18 +3568,13 @@
   function isMemberUnlocked() {
     if (memberUnlockedMemory) return true;
     try {
-      if (sessionStorage.getItem(MEMBER_GATE_KEY) === '1') return true;
-      if (localStorage.getItem(MEMBER_GATE_KEY) === '1') {
-        try { sessionStorage.setItem(MEMBER_GATE_KEY, '1'); } catch (e1) {}
-        return true;
-      }
+      return localStorage.getItem(MEMBER_GATE_KEY) === '1';
     } catch (e) {}
     return false;
   }
 
   function setMemberUnlocked() {
     memberUnlockedMemory = true;
-    try { sessionStorage.setItem(MEMBER_GATE_KEY, '1'); } catch (e) {}
     try { localStorage.setItem(MEMBER_GATE_KEY, '1'); } catch (e2) {}
   }
 
