@@ -3567,7 +3567,7 @@
   <script src="students.js?v=live-scene-init-fix-v1"></script>
   <script src="groups.js?v=live-scene-init-fix-v1"></script>
   <script src="seating.js?v=live-scene-init-fix-v1"></script>
-  <script src="attendance.js?v=att-v2"></script>
+  <script src="attendance.js?v=att-v3"></script>
   <script>
 (function () {
   'use strict';
@@ -3801,25 +3801,171 @@
     if (mode === 'overdue') el.classList.add('is-overdue');
   }
 
-  function paintGameAttendanceHintFromRaw(raw) {
+  /* ===== 今日拍卡 → game NPC gate + blackboard ===== */
+  var gameAttState = {
+    ready: false,
+    loading: false,
+    raw: '',
+    dates: [],
+    /** Calendar day we gate on (only when today's taps are loaded). */
+    gateYmd: '',
+    /** Hint may show latest file date even if not gating. */
+    hintYmd: '',
+    byKey: {},
+    arrived: 0,
+    source: ''
+  };
+
+  function gameAttTodayYmd() {
+    var U = window.AttendanceUtil;
+    if (typeof todayYmdHK === 'function') return todayYmdHK();
+    return U ? U.todayYmdHK() : '';
+  }
+
+  function gameAttStudentKey(className, no) {
+    var U = window.AttendanceUtil;
+    if (U && typeof U.studentKey === 'function') return U.studentKey(className, no);
+    var c = String(className || '').trim().toUpperCase();
+    var m = c.match(/^S?(\d+[A-D])$/i);
+    if (m) c = m[1].toUpperCase();
+    var n = parseInt(no, 10);
+    if (!c || !n) return '';
+    return c + '|' + n;
+  }
+
+  function applyGameAttendanceRaw(raw, source) {
+    var U = window.AttendanceUtil;
+    gameAttState.raw = raw || '';
+    gameAttState.source = source || '';
+    gameAttState.dates = [];
+    gameAttState.gateYmd = '';
+    gameAttState.hintYmd = '';
+    gameAttState.byKey = {};
+    gameAttState.arrived = 0;
+    if (!U || !raw) {
+      gameAttState.ready = true;
+      return false;
+    }
+    var parsed = U.parseCsvText(raw);
+    if (!parsed.records.length) {
+      gameAttState.ready = true;
+      return false;
+    }
+    gameAttState.dates = parsed.dates || [];
+    var today = gameAttTodayYmd();
+    var hint = (gameAttState.dates.indexOf(today) !== -1)
+      ? today
+      : (gameAttState.dates.length ? gameAttState.dates[gameAttState.dates.length - 1] : '');
+    gameAttState.hintYmd = hint;
+    // Gate only when today's taps are present in the loaded file
+    if (today && gameAttState.dates.indexOf(today) !== -1) {
+      gameAttState.gateYmd = today;
+      var day = U.filterByDate(parsed.records, today);
+      gameAttState.byKey = U.buildTapIndex(day);
+      gameAttState.arrived = Object.keys(gameAttState.byKey).length;
+    }
+    gameAttState.ready = true;
+    return true;
+  }
+
+  function invalidateNpcAttendanceGate() {
+    if (typeof npcState !== 'undefined' && npcState) npcState.key = '';
+  }
+
+  /**
+   * mode: 'gate' | 'missing' | 'off' | 'pending'
+   * gate = viewing gateYmd with tap index; missing = today but no today's taps loaded;
+   * off = other day / no util; pending = still fetching sample.
+   */
+  function getAttendanceGate(viewYmd) {
+    var today = gameAttTodayYmd();
+    var ymd = viewYmd || today;
+    if (!window.AttendanceUtil) {
+      return { mode: (ymd === today ? 'missing' : 'off'), byKey: {}, gateYmd: '', arrived: 0 };
+    }
+    if (!gameAttState.ready) {
+      return { mode: (ymd === today ? 'pending' : 'off'), byKey: {}, gateYmd: '', arrived: 0 };
+    }
+    if (gameAttState.gateYmd && ymd === gameAttState.gateYmd) {
+      return {
+        mode: 'gate',
+        byKey: gameAttState.byKey,
+        gateYmd: gameAttState.gateYmd,
+        arrived: gameAttState.arrived
+      };
+    }
+    if (ymd === today) {
+      return { mode: 'missing', byKey: {}, gateYmd: '', arrived: 0 };
+    }
+    return { mode: 'off', byKey: {}, gateYmd: '', arrived: 0 };
+  }
+
+  function studentHasTapToday(s, gate) {
+    if (!gate || gate.mode !== 'gate' || !s) return true;
+    var k = gameAttStudentKey(s.class, s.no);
+    return !!(k && gate.byKey && gate.byKey[k]);
+  }
+
+  function formatAbsentBoardLine(absents) {
+    absents = (absents || []).slice().sort(function (a, b) {
+      var ca = String(a.class || '').localeCompare(String(b.class || ''), 'zh-HK');
+      if (ca) return ca;
+      return (parseInt(a.no, 10) || 0) - (parseInt(b.no, 10) || 0);
+    });
+    var n = absents.length;
+    if (!n) return '';
+    var names = absents.map(function (s) {
+      return (s.chi || s.name || '').replace(/\s*\([0-9]+[A-Za-z]-[0-9]+\)\s*$/, '').trim() ||
+        (String(s.class || '') + String(s.no || ''));
+    }).filter(Boolean);
+    var show = names.slice(0, 6);
+    var line = '今日無拍卡（' + n + '）：' + show.join('、');
+    if (names.length > show.length) line += '…';
+    return line;
+  }
+
+  /** Append 學生人數 / 今日無拍卡 / 未載入 lines for classroom blackboard. */
+  function appendAttendanceBoardLines(boardMsg, stats) {
+    stats = stats || {};
+    var msg = boardMsg || '';
+    if (stats.expected != null) {
+      if (stats.mode === 'gate' && stats.absentCount > 0) {
+        msg = (msg ? msg + '\n' : '') + '學生人數：' + stats.presentCount + '／' + stats.expected;
+      } else if (stats.mode === 'missing' || stats.mode === 'pending') {
+        msg = (msg ? msg + '\n' : '') + '學生人數：0';
+      } else {
+        msg = (msg ? msg + '\n' : '') + '學生人數：' + (stats.presentCount != null ? stats.presentCount : stats.expected);
+      }
+    }
+    if (stats.mode === 'missing' || stats.mode === 'pending') {
+      msg = (msg ? msg + '\n' : '') + '未載入今日拍卡';
+    } else if (stats.mode === 'gate' && stats.absentLine) {
+      msg = (msg ? msg + '\n' : '') + stats.absentLine;
+    }
+    return msg;
+  }
+
+  function paintGameAttendanceHintFromState() {
     var el = document.getElementById('gameAttendanceHint');
     if (!el) return;
     var U = window.AttendanceUtil;
-    if (!U || !raw) {
+    if (!U || !gameAttState.ready || !gameAttState.hintYmd || !gameAttState.arrived) {
+      // still show arrived from hint day even if gateYmd empty (legacy hint)
+      if (!U || !gameAttState.ready || !gameAttState.raw) {
+        el.hidden = true;
+        el.classList.remove('show');
+        el.innerHTML = '';
+        return;
+      }
+    }
+    if (!gameAttState.raw) {
       el.hidden = true;
       el.classList.remove('show');
       el.innerHTML = '';
       return;
     }
-    var parsed = U.parseCsvText(raw);
-    if (!parsed.records.length) {
-      el.hidden = true;
-      el.classList.remove('show');
-      return;
-    }
-    var today = typeof todayYmdHK === 'function' ? todayYmdHK() : U.todayYmdHK();
-    var focus = (parsed.dates.indexOf(today) !== -1) ? today : (parsed.dates.length ? parsed.dates[parsed.dates.length - 1] : '');
-    var day = U.filterByDate(parsed.records, focus);
+    var focus = gameAttState.hintYmd;
+    var day = U.filterByDate(U.parseCsvText(gameAttState.raw).records, focus);
     var sum = U.summarize(day);
     if (!sum.arrived) {
       el.hidden = true;
@@ -3839,36 +3985,78 @@
     el.classList.add('show');
   }
 
+  function paintGameAttendanceHintFromRaw(raw) {
+    applyGameAttendanceRaw(raw, gameAttState.source || 'storage');
+    paintGameAttendanceHintFromState();
+  }
+
   function paintGameAttendanceHint() {
     var el = document.getElementById('gameAttendanceHint');
-    if (!el) return;
     var U = window.AttendanceUtil;
     if (!U) {
-      el.hidden = true;
-      el.classList.remove('show');
+      gameAttState.ready = true;
+      if (el) {
+        el.hidden = true;
+        el.classList.remove('show');
+      }
       return;
     }
     var raw = U.loadRawFromStorage();
+    var today = gameAttTodayYmd();
     if (raw) {
-      paintGameAttendanceHintFromRaw(raw);
+      var parsed = U.parseCsvText(raw);
+      // If storage has data but not today, try auto-load today's sample (same as index 今日拍卡)
+      if (!parsed.dates || parsed.dates.indexOf(today) === -1) {
+        if (!gameAttState.loading) {
+          gameAttState.loading = true;
+          applyGameAttendanceRaw(raw, 'storage'); // interim
+          paintGameAttendanceHintFromState();
+          U.fetchSampleText().then(function (text) {
+            var p2 = U.parseCsvText(text);
+            if (p2.dates && p2.dates.indexOf(today) !== -1) {
+              U.saveRawToStorage(text);
+              applyGameAttendanceRaw(text, 'auto');
+              invalidateNpcAttendanceGate();
+              paintGameAttendanceHintFromState();
+              try { if (typeof render === 'function') render(); } catch (eR) {}
+            }
+            gameAttState.loading = false;
+          }).catch(function () {
+            gameAttState.loading = false;
+          });
+        }
+        return;
+      }
+      applyGameAttendanceRaw(raw, 'storage');
+      paintGameAttendanceHintFromState();
       return;
     }
-    // empty storage: try today's sample so teachers see hint without upload
+    if (gameAttState.loading) return;
+    gameAttState.loading = true;
+    gameAttState.ready = false;
     U.fetchSampleText().then(function (text) {
       var parsed = U.parseCsvText(text);
-      var today = typeof todayYmdHK === 'function' ? todayYmdHK() : U.todayYmdHK();
-      if (!parsed.records.length || !parsed.dates || parsed.dates.indexOf(today) === -1) {
+      var ok = parsed.records.length && parsed.dates && parsed.dates.indexOf(today) !== -1;
+      if (ok) {
+        U.saveRawToStorage(text);
+        applyGameAttendanceRaw(text, 'auto');
+      } else {
+        applyGameAttendanceRaw('', '');
+      }
+      gameAttState.loading = false;
+      paintGameAttendanceHintFromState();
+      invalidateNpcAttendanceGate();
+      try { if (typeof render === 'function') render(); } catch (eR2) {}
+    }).catch(function () {
+      applyGameAttendanceRaw('', '');
+      gameAttState.loading = false;
+      if (el) {
         el.hidden = true;
         el.classList.remove('show');
         el.innerHTML = '';
-        return;
       }
-      U.saveRawToStorage(text);
-      paintGameAttendanceHintFromRaw(text);
-    }).catch(function () {
-      el.hidden = true;
-      el.classList.remove('show');
-      el.innerHTML = '';
+      invalidateNpcAttendanceGate();
+      try { if (typeof render === 'function') render(); } catch (eR3) {}
     });
   }
 
@@ -4873,7 +5061,8 @@
     drag: null,
     bubbleTimer: 0,
     bubbleHide: 0,
-    walkTimer: 0
+    walkTimer: 0,
+    attStats: null
   };
 
   function mulberry32(a) {
@@ -5539,10 +5728,52 @@
     var player = state.teacher;
     var emptyMsg = '';
     var lessonNote = '';
+    var attGate = getAttendanceGate(ymd);
+    var attAbsent = [];
+    var attExpected = 0;
+    var attPresent = 0;
+    // Classroom blackboard lists untapped classmates; playground/assembly only filter spawns
+    var attTrackAbsent = (typeof viewMode === 'undefined' || viewMode === 'classroom');
+
+    function finishRosterReturn() {
+      if ((attGate.mode === 'missing' || attGate.mode === 'pending') &&
+          !roster.some(function (r) { return r.role === 'student'; }) &&
+          (mood === 'class' || mood === 'reading' || mood === 'assembly' ||
+           (typeof viewMode !== 'undefined' && viewMode === 'playground'))) {
+        if (!emptyMsg) emptyMsg = '未載入今日拍卡';
+      }
+      var attStats = {
+        mode: attGate.mode,
+        expected: attExpected,
+        presentCount: (attGate.mode === 'gate' || attGate.mode === 'missing' || attGate.mode === 'pending')
+          ? attPresent
+          : roster.filter(function (r) { return r.role === 'student'; }).length,
+        absentCount: attAbsent.length,
+        absentLine: attTrackAbsent ? formatAbsentBoardLine(attAbsent) : '',
+        gateYmd: attGate.gateYmd || ''
+      };
+      return {
+        roster: roster,
+        rng: rng,
+        seed: seed,
+        emptyMsg: emptyMsg,
+        lessonNote: lessonNote,
+        attStats: attStats,
+        attAbsent: attAbsent
+      };
+    }
 
     function addStudent(s, opts) {
       opts = opts || {};
       s = enrichStudentFields(s) || s;
+      if (attGate.mode === 'gate' || attGate.mode === 'missing' || attGate.mode === 'pending') {
+        attExpected++;
+        if (attGate.mode !== 'gate' || !studentHasTapToday(s, attGate)) {
+          if (attTrackAbsent && attGate.mode === 'gate') attAbsent.push(s);
+          return; // no NPC — missing taps or attendance not loaded
+        }
+        attPresent++;
+      }
       var label = s.chi;
       var house = (s.house || '').toUpperCase();
       if (house !== 'S' && house !== 'W' && house !== 'E' && house !== 'N') house = '';
@@ -5656,7 +5887,7 @@
       } else {
         emptyMsg = '而家操場靜靜地～';
       }
-      return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
+      return finishRosterReturn();
     }
 
     // Room pick: show that classroom's occupancy at current period (students + teachers),
@@ -5724,7 +5955,7 @@
         emptyMsg = '房間 ' + (friendlyRoomLabel(pickR) || pickR) + ' · 而家冇課';
         lessonNote = friendlyRoomLabel(pickR) || pickR;
       }
-      return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
+      return finishRosterReturn();
     }
 
     // Classroom tracks the *searched teacher's* current lesson — never fill with random school-wide kids.
@@ -5898,7 +6129,7 @@
       emptyMsg = '課室靜靜地～';
     }
 
-    return { roster: roster, rng: rng, seed: seed, emptyMsg: emptyMsg, lessonNote: lessonNote };
+    return finishRosterReturn();
   }
 
   // Default classroom grid when no 座位表 layout (5 wide × 8 deep = 40)
@@ -6297,11 +6528,14 @@
       ? (peekLayout.key + '|' + (peekLayout.updated || '') + '|' + peekLayout.rows + 'x' + peekLayout.cols)
       : 'random';
     key += '|' + seatingFp;
+    var attGateSync = getAttendanceGate(ctx.ymd || '');
+    key += '|att:' + attGateSync.mode + ':' + (attGateSync.gateYmd || '') + ':' + (attGateSync.arrived || 0);
     if (key === npcState.key) return;
     npcState.key = key;
     var built = buildNpcRoster(mood, ctx);
     npcState.npcs = placeNpcs(built.roster, built.rng);
     npcState.lastTs = 0;
+    npcState.attStats = built.attStats || null;
     setClassroomEmptyMsg(built.emptyMsg || '');
     if (typeof viewMode === 'undefined' || viewMode === 'classroom' || viewMode === 'playground') {
       startClassAmbience();
@@ -9142,17 +9376,11 @@
     }
     syncPlaygroundVenue(ctx);
 
-    // Classroom blackboard only: that period's student count (學生人數)
+    // Classroom blackboard: period student count + 今日無拍卡 (filled after syncNpcs)
     var classroomBoardMsg = boardMsg;
-    if (mood === 'class' || mood === 'free' || mood === 'reading') {
-      var studentCountBoard = countClassroomPeriodStudents(ctx);
-      if (studentCountBoard != null) {
-        classroomBoardMsg = (classroomBoardMsg ? classroomBoardMsg + '\n' : '') + '學生人數：' + studentCountBoard;
-      }
-    }
+    var wantStudentCountBoard = (mood === 'class' || mood === 'free' || mood === 'reading');
 
     if (scene) scene.setAttribute('data-mood', mood);
-    if (board) board.textContent = classroomBoardMsg;
     if (badge) badge.textContent = badgeMsg;
 
     var pgScene = document.getElementById('scenePlayground');
@@ -9217,6 +9445,31 @@
     try { ensurePlaygroundWeather(false); } catch (ePgWx) {}
 
     syncNpcs(mood, ctx);
+    // Blackboard after NPCs so 今日無拍卡 uses the same gated roster
+    if (board) {
+      var finalBoard = classroomBoardMsg;
+      var attSt = (npcState && npcState.attStats) ? npcState.attStats : null;
+      if (wantStudentCountBoard) {
+        var expectedBoard = countClassroomPeriodStudents(ctx);
+        if (attSt && (attSt.mode === 'gate' || attSt.mode === 'missing' || attSt.mode === 'pending')) {
+          finalBoard = appendAttendanceBoardLines(finalBoard, {
+            mode: attSt.mode,
+            expected: attSt.expected != null ? attSt.expected : expectedBoard,
+            presentCount: attSt.presentCount,
+            absentCount: attSt.absentCount,
+            absentLine: attSt.absentLine || ''
+          });
+        } else if (expectedBoard != null) {
+          finalBoard = (finalBoard ? finalBoard + '\n' : '') + '學生人數：' + expectedBoard;
+        }
+      }
+      board.textContent = finalBoard;
+      if (attSt && attSt.absentLine) {
+        board.style.fontSize = 'clamp(0.55rem, 2.4vw, 0.75rem)';
+      } else {
+        board.style.fontSize = '';
+      }
+    }
     startNpcLoop();
     syncStaffNpcs(mood, ctx);
     var ymNow = monthKeyHK(ctx.ymd);

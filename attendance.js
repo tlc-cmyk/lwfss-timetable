@@ -283,6 +283,37 @@
     });
   }
 
+
+  /** Match key used by game + 今日拍卡: CLASS|classNo (no leading zeros). */
+  function studentKey(className, no) {
+    var c = String(className || '').trim().toUpperCase();
+    var m = c.match(/^S?(\d+[A-D])$/i);
+    if (m) c = m[1].toUpperCase();
+    var n = parseInt(no, 10);
+    if (!c || !n) return '';
+    return c + '|' + n;
+  }
+
+  /**
+   * Index students who have at least one tap time.
+   * @returns {Object.<string, object>} key -> record
+   */
+  function buildTapIndex(records) {
+    var byKey = {};
+    (records || []).forEach(function (r) {
+      if (!r || !r.times || !r.times.length) return;
+      var k = studentKey(r.className, r.no);
+      if (!k) return;
+      byKey[k] = r;
+    });
+    return byKey;
+  }
+
+  function hasTap(byKey, className, no) {
+    var k = studentKey(className, no);
+    return !!(k && byKey && byKey[k]);
+  }
+
   global.AttendanceUtil = {
     STORAGE_KEY: STORAGE_KEY,
     SAMPLE_URL: SAMPLE_URL,
@@ -299,6 +330,9 @@
     rosterTotals: rosterTotals,
     fetchSampleText: fetchSampleText,
     readFileAsBuffer: readFileAsBuffer,
-    shortTime: shortTime
+    shortTime: shortTime,
+    studentKey: studentKey,
+    buildTapIndex: buildTapIndex,
+    hasTap: hasTap
   };
 })(typeof window !== 'undefined' ? window : this);
