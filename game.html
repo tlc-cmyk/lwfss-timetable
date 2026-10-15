@@ -3567,7 +3567,7 @@
   <script src="students.js?v=live-scene-init-fix-v1"></script>
   <script src="groups.js?v=live-scene-init-fix-v1"></script>
   <script src="seating.js?v=live-scene-init-fix-v1"></script>
-  <script src="attendance.js?v=att-v1"></script>
+  <script src="attendance.js?v=att-v2"></script>
   <script>
 (function () {
   'use strict';
@@ -3801,17 +3801,11 @@
     if (mode === 'overdue') el.classList.add('is-overdue');
   }
 
-  function paintGameAttendanceHint() {
+  function paintGameAttendanceHintFromRaw(raw) {
     var el = document.getElementById('gameAttendanceHint');
     if (!el) return;
     var U = window.AttendanceUtil;
-    if (!U) {
-      el.hidden = true;
-      el.classList.remove('show');
-      return;
-    }
-    var raw = U.loadRawFromStorage();
-    if (!raw) {
+    if (!U || !raw) {
       el.hidden = true;
       el.classList.remove('show');
       el.innerHTML = '';
@@ -3843,6 +3837,39 @@
       ' · <a href="index.html#attendance">詳情</a>';
     el.hidden = false;
     el.classList.add('show');
+  }
+
+  function paintGameAttendanceHint() {
+    var el = document.getElementById('gameAttendanceHint');
+    if (!el) return;
+    var U = window.AttendanceUtil;
+    if (!U) {
+      el.hidden = true;
+      el.classList.remove('show');
+      return;
+    }
+    var raw = U.loadRawFromStorage();
+    if (raw) {
+      paintGameAttendanceHintFromRaw(raw);
+      return;
+    }
+    // empty storage: try today's sample so teachers see hint without upload
+    U.fetchSampleText().then(function (text) {
+      var parsed = U.parseCsvText(text);
+      var today = typeof todayYmdHK === 'function' ? todayYmdHK() : U.todayYmdHK();
+      if (!parsed.records.length || !parsed.dates || parsed.dates.indexOf(today) === -1) {
+        el.hidden = true;
+        el.classList.remove('show');
+        el.innerHTML = '';
+        return;
+      }
+      U.saveRawToStorage(text);
+      paintGameAttendanceHintFromRaw(text);
+    }).catch(function () {
+      el.hidden = true;
+      el.classList.remove('show');
+      el.innerHTML = '';
+    });
   }
 
   /* ===== Timeline scrubber: live HKT vs preview minutes (課室 + 教員室) ===== */

@@ -3368,7 +3368,7 @@
   <script src="students.js?v=seating-v1"></script>
   <script src="groups.js?v=house-sex-groups-v1"></script>
   <script src="seating.js?v=game-desks-v1"></script>
-  <script src="attendance.js?v=att-v1"></script>
+  <script src="attendance.js?v=att-v2"></script>
   <script>
 (function () {
   'use strict';
@@ -5244,6 +5244,7 @@
     metaParts.push(sum.classOrder.length + ' 班有紀錄');
     if (sum.lastTap) metaParts.push('最後 ' + U.shortTime(sum.lastTap));
     if (attState.source === 'sample') metaParts.push('示例');
+    else if (attState.source === 'auto') metaParts.push('今日自動');
     else if (attState.source === 'upload') metaParts.push('已上載');
     else if (attState.source === 'storage') metaParts.push('本機');
     if (metaEl) metaEl.textContent = metaParts.join(' · ');
@@ -5371,6 +5372,40 @@
     });
   }
 
+  function attNeedsTodaySample() {
+    var U = window.AttendanceUtil;
+    if (!U) return false;
+    var today = U.todayYmdHK();
+    if (!attState.records.length) return true;
+    var focus = attPickFocusDate(attState.dates);
+    return !focus || focus !== today;
+  }
+
+  function attTryAutoLoadTodaySample() {
+    var U = window.AttendanceUtil;
+    if (!U || !attNeedsTodaySample()) {
+      renderAttendancePanel();
+      return;
+    }
+    U.fetchSampleText().then(function (text) {
+      var parsed = U.parseCsvText(text);
+      var today = U.todayYmdHK();
+      if (parsed.error && !parsed.records.length) {
+        renderAttendancePanel();
+        return;
+      }
+      if (!parsed.dates || parsed.dates.indexOf(today) === -1) {
+        renderAttendancePanel();
+        return;
+      }
+      var err = attApplyParsed(parsed, text, 'auto');
+      if (!err) U.saveRawToStorage(text);
+      renderAttendancePanel();
+    }).catch(function () {
+      renderAttendancePanel();
+    });
+  }
+
   function initAttendanceUI() {
     attLoadFromStorage();
     var uploadBtn = document.getElementById('attUploadBtn');
@@ -5404,6 +5439,7 @@
         renderAttendancePanel();
       });
     });
+    attTryAutoLoadTodaySample();
   }
 
   // --- Site-wide password gate (client-side only; localStorage) ---
