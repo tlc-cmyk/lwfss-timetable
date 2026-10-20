@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#8b5e3c" />
-  <meta name="game-build" content="staff-cute-cats-v2" />
+  <meta name="game-build" content="flat-chibi-v1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="準時到堂" />
   <title>準時到堂 · 課室／操場／教員室 · 劉皇發中學</title>
@@ -3259,9 +3259,513 @@
     .praise-sheet { display: none !important; }
     body.view-staff .wrap { max-width: 480px; }
 
+
+    /* ===== Flat illustration / chibi theme (preview B) ===== */
+    body.theme-flat {
+      --cream: #f6f1ea;
+      --cream-dark: #ebe3d8;
+      --wood: #c9a882;
+      --wood-dark: #a07850;
+      --wood-deeper: #7a5a3c;
+      --wall: #f7f0e8;
+      --floor: #e2c4a0;
+      --floor-line: #d4b48c;
+      --board: #3f7a58;
+      --board-frame: #a07850;
+      --text: #3a2e24;
+      --muted: #7a6a5a;
+      --shadow: 0 6px 18px rgba(80, 55, 35, 0.12);
+      --radius: 18px;
+      --flat-border: #c4a484;
+      --flat-border-soft: #d4b898;
+      background: linear-gradient(180deg, #efe6da 0%, var(--cream) 42%, #e8dccf 100%);
+    }
+    body.theme-flat::before { display: none; }
+
+    body.theme-flat .topbar {
+      background: linear-gradient(180deg, #b88858 0%, #9a6e44 100%);
+      box-shadow: 0 4px 14px rgba(60, 35, 15, 0.18);
+      border-bottom: 1px solid rgba(255,248,238,0.12);
+    }
+    body.theme-flat .avatar {
+      border: 2px solid var(--flat-border);
+      image-rendering: auto;
+      box-shadow: 0 2px 6px rgba(80,55,35,0.12);
+    }
+    body.theme-flat .currency {
+      border-width: 1.5px;
+      backdrop-filter: blur(2px);
+    }
+    body.theme-flat .currency .coin {
+      border: 1.5px solid #b8892a;
+      box-shadow: 0 1px 3px rgba(0,0,0,.1);
+    }
+    body.theme-flat .back-link,
+    body.theme-flat .topbar .change-teacher-btn,
+    body.theme-flat .topbar .change-room-btn {
+      border-width: 1.5px;
+      border-radius: 999px;
+    }
+    body.theme-flat .status-card,
+    body.theme-flat .timeline-card {
+      border: 1.5px solid var(--flat-border-soft);
+      box-shadow: var(--shadow);
+    }
+
+    /* Scene chrome */
+    body.theme-flat .scene-frame {
+      border: 2px solid var(--flat-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.55);
+      image-rendering: auto;
+      background: linear-gradient(180deg, #faf6f0 0%, var(--wall) 100%);
+    }
+    body.theme-flat .scene .ceiling {
+      background: linear-gradient(180deg, rgba(255,255,255,0.55), transparent);
+      opacity: 0.85;
+    }
+    body.theme-flat .scene .wall {
+      background: linear-gradient(180deg, #faf6f0 0%, var(--wall) 100%);
+    }
+    body.theme-flat .scene .floor {
+      background:
+        linear-gradient(180deg, #e8d0b0 0%, var(--floor) 18%, #dcb892 100%);
+      border-top: 2px solid var(--flat-border);
+      box-shadow: inset 0 8px 18px rgba(255,255,255,0.18);
+    }
+    body.theme-flat .scene .window {
+      border: 2px solid var(--flat-border);
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #fffaf4, 0 4px 12px rgba(80,55,35,0.08);
+    }
+    body.theme-flat .scene .window::after {
+      background:
+        linear-gradient(var(--flat-border), var(--flat-border)) center/1.5px 100% no-repeat,
+        linear-gradient(var(--flat-border), var(--flat-border)) center/100% 1.5px no-repeat;
+      opacity: 0.7;
+    }
+    body.theme-flat .scene .board {
+      border: 3px solid var(--board-frame);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+    body.theme-flat .scene .board-text {
+      text-shadow: none;
+    }
+    body.theme-flat .scene[data-mood="class"] .board {
+      box-shadow: 0 4px 12px rgba(0,0,0,.1), 0 0 14px rgba(240,193,75,0.22);
+    }
+
+    /* Classroom desks — soft flat wood */
+    body.theme-flat #classDesks .class-desk-slot .desk-top {
+      background: linear-gradient(180deg, #d4a870 0%, #c49258 100%);
+      border: 1.5px solid var(--flat-border);
+      border-radius: 8px;
+      box-shadow: 0 3px 0 rgba(140,100,60,0.28), 0 4px 8px rgba(80,55,35,0.08);
+    }
+    body.theme-flat #classDesks .class-desk-slot .desk-leg {
+      background: #c4a484;
+      border: 1px solid #a88868;
+      border-radius: 3px;
+    }
+
+    /* Static .char leftovers — chibi */
+    body.theme-flat .char {
+      image-rendering: auto;
+      width: 30px;
+      height: 42px;
+      filter: drop-shadow(0 3px 4px rgba(80,55,35,0.14));
+    }
+    body.theme-flat .char .head {
+      width: 20px; height: 18px;
+      border: 1.5px solid var(--flat-border);
+      border-radius: 50%;
+      background: #f7d7bc;
+      box-shadow: inset 0 -2px 0 rgba(180,120,80,0.12);
+    }
+    body.theme-flat .char .head::before,
+    body.theme-flat .char .head::after {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      top: 7px;
+      background: #3a2e24;
+    }
+    body.theme-flat .char .body {
+      width: 20px; height: 15px;
+      border: 1.5px solid var(--flat-border);
+      border-radius: 10px 10px 8px 8px;
+      margin-top: 0;
+    }
+    body.theme-flat .char .hair {
+      border: 1.5px solid #4a3428;
+      border-radius: 12px 12px 4px 4px;
+      width: 22px; height: 9px;
+      top: -5px;
+    }
+
+    /* Wandering NPCs — flat chibi */
+    body.theme-flat .npc {
+      image-rendering: auto;
+      width: 26px;
+      height: 40px;
+      filter: drop-shadow(0 3px 5px rgba(80,55,35,0.16));
+    }
+    body.theme-flat .npc .npc-sprite {
+      width: 24px;
+      height: 38px;
+      margin-left: -12px;
+    }
+    body.theme-flat .npc .npc-hair {
+      border: 1.5px solid #4a3428;
+      border-radius: 10px 10px 3px 3px;
+      width: 20px; height: 8px;
+    }
+    body.theme-flat .npc.sex-M .npc-hair {
+      width: 18px; height: 6px;
+      border-radius: 9px 9px 2px 2px;
+    }
+    body.theme-flat .npc.sex-F .npc-hair {
+      width: 22px; height: 10px;
+      border-radius: 12px 12px 4px 4px;
+    }
+    body.theme-flat .npc.sex-F .npc-hair::before,
+    body.theme-flat .npc.sex-F .npc-hair::after {
+      border: 1.5px solid #4a3428;
+      width: 6px; height: 15px;
+      border-radius: 8px;
+    }
+    body.theme-flat .npc.sex-F .npc-hair::before {
+      border-radius: 8px 2px 6px 8px;
+      border-right-width: 0;
+    }
+    body.theme-flat .npc.sex-F .npc-hair::after {
+      border-radius: 2px 8px 8px 6px;
+      border-left-width: 0;
+    }
+    body.theme-flat .npc .npc-head {
+      width: 18px; height: 16px;
+      top: 5px;
+      border: 1.5px solid var(--flat-border);
+      border-radius: 50%;
+      background: #f7d7bc;
+      box-shadow: inset 0 -2px 0 rgba(180,120,80,0.12);
+    }
+    body.theme-flat .npc .npc-head::before,
+    body.theme-flat .npc .npc-head::after {
+      width: 2.5px; height: 2.5px;
+      border-radius: 50%;
+      top: 6px;
+      background: #3a2e24;
+    }
+    body.theme-flat .npc .npc-head::before { left: 4px; }
+    body.theme-flat .npc .npc-head::after { right: 4px; }
+    body.theme-flat .npc.sleep .npc-head::before,
+    body.theme-flat .npc.sleep .npc-head::after {
+      height: 1.5px; width: 4px; top: 7px; border-radius: 2px;
+    }
+    body.theme-flat .npc .npc-body {
+      width: 18px; height: 14px;
+      top: 18px;
+      border: 1.5px solid var(--flat-border);
+      border-radius: 9px 9px 7px 7px;
+    }
+    body.theme-flat .npc.role-teacher .npc-head {
+      background: #efd0ae;
+    }
+    body.theme-flat .npc.sex-F .npc-skirt {
+      border: 1.5px solid var(--flat-border);
+      border-top: 0;
+      border-radius: 0 0 10px 10px;
+      width: 20px;
+      height: 9px;
+      top: 28px;
+      clip-path: polygon(2% 0, 98% 0, 88% 100%, 12% 100%);
+    }
+    body.theme-flat .npc.sex-F .npc-body {
+      height: 12px;
+      border-radius: 9px 9px 2px 2px;
+    }
+    body.theme-flat .npc .npc-label {
+      border: 1px solid var(--flat-border-soft);
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(80,55,35,0.1);
+      padding: 2px 5px;
+      background: rgba(255,252,248,0.96);
+    }
+    body.theme-flat .npc.role-teacher .npc-label {
+      border-color: #c4a484;
+      background: #fff8ee;
+    }
+    body.theme-flat .npc .npc-status {
+      border: 1px solid #e0b84a;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(80,55,35,0.1);
+    }
+    body.theme-flat .npc.sitting .npc-legs {
+      border: 1.5px solid var(--flat-border);
+      border-radius: 0 0 8px 8px;
+      background: #c4a484;
+    }
+    body.theme-flat .npc.sitting {
+      filter: drop-shadow(0 2px 4px rgba(80,55,35,0.14));
+    }
+    body.theme-flat .npc.dragging {
+      filter: drop-shadow(0 6px 10px rgba(80,55,35,0.22));
+    }
+
+    /* Keep house + duty colours (explicit so flat borders don't wash them) */
+    body.theme-flat .npc.house-S .npc-body,
+    body.theme-flat .npc.house-S .npc-skirt { background: #4a7fd4; }
+    body.theme-flat .npc.house-W .npc-body,
+    body.theme-flat .npc.house-W .npc-skirt { background: #e6c84a; }
+    body.theme-flat .npc.house-E .npc-body,
+    body.theme-flat .npc.house-E .npc-skirt { background: #4a9a62; }
+    body.theme-flat .npc.house-N .npc-body,
+    body.theme-flat .npc.house-N .npc-skirt { background: #d44a4a; }
+    body.theme-flat .npc.duty-red .npc-body,
+    body.theme-flat .npc.duty-red .npc-skirt,
+    body.theme-flat .npc.duty-red.role-teacher .npc-body { background: #e23b3b !important; }
+
+    /* Doors — soft flat */
+    body.theme-flat .discipline-door {
+      filter: drop-shadow(0 4px 8px rgba(30,42,58,0.18));
+    }
+    body.theme-flat .discipline-door .door-frame {
+      border: 1.5px solid #2a3a4e;
+      border-radius: 10px 10px 4px 4px;
+      background: #4a6078;
+    }
+    body.theme-flat .discipline-door .door-panel {
+      border: 1.5px solid #2a3a4e;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #7a9ac4 0%, #5a7aa8 100%);
+    }
+    body.theme-flat .discipline-door .door-panel::before,
+    body.theme-flat .discipline-door .door-panel::after {
+      border: 1.5px solid rgba(30,42,58,0.28);
+      border-radius: 6px;
+    }
+    body.theme-flat .discipline-door .door-sign {
+      border: 1px solid #1e2a3a;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.12);
+    }
+    body.theme-flat .discipline-door .door-hint {
+      border: 1px solid #2a3a4e;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    }
+
+    body.theme-flat .principal-door {
+      filter: drop-shadow(0 4px 8px rgba(62,42,26,0.18));
+    }
+    body.theme-flat .principal-door .door-frame {
+      border: 1.5px solid #5c3a22;
+      border-radius: 12px 12px 4px 4px;
+      background: #8a6a52;
+    }
+    body.theme-flat .principal-door .door-panel {
+      border: 1.5px solid #6b4423;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #d4b088 0%, #b88858 100%);
+    }
+    body.theme-flat .principal-door .door-panel::before,
+    body.theme-flat .principal-door .door-panel::after {
+      border: 1.5px solid rgba(62,42,26,0.28);
+      border-radius: 6px;
+    }
+    body.theme-flat .principal-door .door-sign {
+      border: 1px solid #3e2a1a;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.12);
+    }
+    body.theme-flat .principal-door .door-hint,
+    body.theme-flat .principal-door .visit-tag {
+      border-width: 1px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    }
+
+    /* Staff room props */
+    body.theme-flat #sceneStaff .pigeon {
+      border: 1.5px solid #a8b0be;
+      border-radius: 8px;
+      background: #d8dde6;
+      gap: 3px;
+      padding: 3px;
+    }
+    body.theme-flat #sceneStaff .pigeon span {
+      border-radius: 4px;
+      border-color: #c0c6d0;
+    }
+    body.theme-flat #sceneStaff .bookshelf {
+      border: 1.5px solid #a8b0be;
+      border-radius: 8px;
+      background: #f4f6fa;
+      box-shadow: 0 3px 8px rgba(80,90,110,0.1);
+    }
+    body.theme-flat #sceneStaff .bookshelf::before,
+    body.theme-flat #sceneStaff .bookshelf::after {
+      height: 2px;
+      background: #b0b8c6;
+    }
+    body.theme-flat #sceneStaff .bookshelf .book {
+      border: 1px solid rgba(40,30,20,0.25);
+      border-radius: 3px 3px 1px 1px;
+    }
+    body.theme-flat #sceneStaff .coffee-bar {
+      border: 1.5px solid #b0b8c6;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(90,100,120,0.12);
+      background: linear-gradient(180deg, #fffefb 0%, #f5ebe0 100%);
+    }
+    body.theme-flat #sceneStaff .coffee-bar .tea-hint {
+      border: 1.5px solid #8b5e3c;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    }
+    body.theme-flat #sceneStaff .staff-desk-slot .desk-top {
+      border: 1.5px solid #b0b8c6 !important;
+      border-radius: 8px;
+      box-shadow: 0 3px 0 #d8dde6, 0 4px 8px rgba(80,90,110,0.08);
+      background: #ffffff !important;
+    }
+    body.theme-flat #sceneStaff .staff-desk-slot .desk-leg {
+      border: 1px solid #b0b8c6 !important;
+      border-radius: 3px;
+      background: #dce0e8 !important;
+    }
+    body.theme-flat #sceneStaff .pc {
+      image-rendering: auto;
+    }
+    body.theme-flat #sceneStaff .pc .monitor {
+      border: 1.5px solid #2a3038;
+      border-radius: 8px;
+      background: #343b48;
+    }
+    body.theme-flat #sceneStaff .pc .monitor::before {
+      border-radius: 5px;
+      inset: 4px;
+    }
+    body.theme-flat #sceneStaff .pc .base {
+      border-radius: 4px;
+    }
+    body.theme-flat #sceneStaff .pc .keyboard {
+      border: 1.5px solid #a8b0be;
+      border-radius: 5px;
+    }
+    body.theme-flat #sceneStaff .whiteboard {
+      border-radius: 10px !important;
+    }
+    body.theme-flat #sceneStaff.staffroom .window,
+    body.theme-flat .scene.staffroom .window {
+      border-radius: 12px !important;
+      border-width: 2px !important;
+    }
+
+    /* Cats — softer flat drop shadow */
+    body.theme-flat #sceneStaff .staff-cat {
+      filter: drop-shadow(0 4px 6px rgba(80,55,35,0.16));
+    }
+    body.theme-flat #sceneStaff .staff-cat .cat-meow {
+      border: 1px solid #e8c8a0;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(80,55,35,0.1);
+    }
+
+    /* Playground flat polish */
+    body.theme-flat .scene-frame.scene-frame--playground {
+      border-color: #5a9a6e;
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.4);
+    }
+    body.theme-flat .scene.playground .pg-sky {
+      background:
+        radial-gradient(circle at 86% 28%, rgba(255,248,200,0.65) 0 10%, transparent 14%),
+        linear-gradient(180deg, #6ab8ec, #a8d8f4);
+    }
+    body.theme-flat .scene.playground .pg-fence {
+      background: linear-gradient(180deg, #7a8a7a 0%, #5a6a5a 100%);
+      border-top: 2px solid #4a584a;
+      border-bottom: 2px solid #4a584a;
+      opacity: 0.75;
+    }
+    body.theme-flat .scene.playground .pg-grass {
+      background: linear-gradient(180deg, #78c070 0%, #5faf5a 100%);
+    }
+    body.theme-flat .scene.playground .pg-court {
+      background: linear-gradient(180deg, #d4b06a 0%, #c49a52 100%);
+      border: 3px solid #fff;
+      border-radius: 14px;
+      box-shadow: 0 6px 14px rgba(0,0,0,.12);
+    }
+    body.theme-flat .scene.playground .pg-court::before {
+      border: 2.5px solid rgba(255,255,255,.92);
+      border-radius: 8px;
+    }
+    body.theme-flat .scene.playground .pg-key {
+      border-width: 2.5px;
+    }
+    body.theme-flat .scene.playground .pg-key.top {
+      border-radius: 0 0 48% 48%;
+    }
+    body.theme-flat .scene.playground .pg-key.bottom {
+      border-radius: 48% 48% 0 0;
+    }
+    body.theme-flat .scene.playground .pg-backboard {
+      border: 2px solid #2c3e50;
+      border-radius: 6px;
+      box-shadow: inset 0 0 0 2px #e74c3c;
+    }
+    body.theme-flat .scene.playground .pg-rim {
+      border-width: 2.5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.15);
+    }
+    body.theme-flat .scene.playground .pg-ball {
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,.2));
+    }
+    body.theme-flat .scene.playground .pg-sign {
+      border: 2px solid #1a3a24;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.14);
+    }
+    body.theme-flat .scene.playground .pg-moon {
+      image-rendering: auto;
+      box-shadow: 0 0 0 2px rgba(220,220,255,0.28), 0 0 16px rgba(180,200,255,0.45);
+    }
+
+    /* Scene tabs + badge */
+    body.theme-flat .scene-tab {
+      border-radius: 12px;
+      box-shadow: 0 2px 0 rgba(120,90,55,0.18);
+    }
+    body.theme-flat .scene-tab.active {
+      box-shadow: 0 3px 0 rgba(120,90,55,0.22);
+    }
+    body.theme-flat .scene-badge {
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+      border-width: 1.5px;
+    }
+
+    /* Soften classroom day/night window glow under flat */
+    body.theme-flat .scene.classroom[data-sky="morning"] .window {
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #fff8ee, 0 0 12px rgba(160,200,255,0.3);
+    }
+    body.theme-flat .scene.classroom[data-sky="noon"] .window {
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #fff8ee, 0 0 14px rgba(255,230,120,0.4);
+    }
+    body.theme-flat .scene.classroom[data-sky="evening"] .window {
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #fff0e0, 0 0 12px rgba(255,150,60,0.35);
+    }
+    body.theme-flat .scene.classroom[data-sky="night"] .window {
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px #1a2038, 0 0 10px rgba(100,130,200,0.22);
+    }
+
   </style>
 </head>
-<body>
+<body class="theme-flat">
   <script>
   (function () {
     try {
